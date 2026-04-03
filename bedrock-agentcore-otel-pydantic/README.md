@@ -124,7 +124,8 @@ main.py
   │     └── MeterProvider + OTLPMetricExporter
   │           └── requests.Session with AWSSigV4("monitoring")
   │
-  ├── Agent.instrument_all()     ← Emits gen_ai.* OTEL spans
+  ├── Agent.instrument_all(InstrumentationSettings(version=5))
+  │                               ← Emits gen_ai.* OTEL spans (v5 semconv)
   │
   ├── BedrockConverseModel       ← Claude via Bedrock Converse API
   │

@@ -24,7 +24,7 @@ from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
-from pydantic_ai import Agent
+from pydantic_ai import Agent, InstrumentationSettings
 
 
 def setup_otel():
@@ -65,7 +65,7 @@ def setup_otel():
 tracer_provider, meter_provider = setup_otel()
 
 # 2. Enable Pydantic AI instrumentation (must come after providers are set)
-Agent.instrument_all()
+Agent.instrument_all(InstrumentationSettings(version=5))
 
 # 3. Define the agent
 agent = Agent(
