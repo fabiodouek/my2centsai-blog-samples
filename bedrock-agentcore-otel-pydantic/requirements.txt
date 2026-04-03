@@ -1,0 +1,5 @@
+pydantic-ai-slim[bedrock]
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http
+requests-auth-aws-sigv4
