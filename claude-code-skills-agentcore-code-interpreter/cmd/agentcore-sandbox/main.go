@@ -20,14 +20,21 @@ func main() {
 	}
 
 	ctx := context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx)
+	var opts []func(*config.LoadOptions) error
+	if profile := os.Getenv("CUSTOM_AGENTCORE_AWS_PROFILE"); profile != "" {
+		opts = append(opts, config.WithSharedConfigProfile(profile))
+	}
+	if region := os.Getenv("CUSTOM_AGENTCORE_AWS_REGION"); region != "" {
+		opts = append(opts, config.WithRegion(region))
+	}
+	cfg, err := config.LoadDefaultConfig(ctx, opts...)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error loading AWS config: %v\n", err)
 		os.Exit(1)
 	}
 
 	client := bedrockagentcore.NewFromConfig(cfg)
-	interpreterID := os.Getenv("AGENTCORE_INTERPRETER_ID")
+	interpreterID := os.Getenv("CUSTOM_AGENTCORE_INTERPRETER_ID")
 	if interpreterID == "" {
 		interpreterID = defaultInterpreterID
 	}
