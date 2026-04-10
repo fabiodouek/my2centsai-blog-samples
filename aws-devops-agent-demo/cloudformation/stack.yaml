@@ -1,0 +1,367 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Simple serverless API for AWS DevOps Agent demo.
+  Deploys Lambda + API Gateway + DynamoDB with CloudWatch alarms.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: devops-agent-demo
+    Description: Name prefix for all resources
+
+Resources:
+  # ---- DynamoDB Table ----
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${ProjectName}-items"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      Tags:
+        - Key: devopsagent
+          Value: "true"
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ---- Lambda Execution Role ----
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                Resource: !GetAtt ItemsTable.Arn
+      Tags:
+        - Key: devopsagent
+          Value: "true"
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ---- Lambda Function ----
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${ProjectName}-api"
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaRole.Arn
+      Timeout: 15
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ItemsTable
+      Code:
+        ZipFile: |
+          import json
+          import os
+          import uuid
+          import time
+          import boto3
+          from botocore.exceptions import ClientError
+
+          dynamodb = boto3.resource("dynamodb")
+          table = dynamodb.Table(os.environ["TABLE_NAME"])
+
+          def lambda_handler(event, context):
+              http_method = event["httpMethod"]
+              path = event.get("path", "/")
+              try:
+                  if http_method == "GET" and path == "/items":
+                      return list_items()
+                  elif http_method == "GET" and path.startswith("/items/"):
+                      item_id = path.split("/")[-1]
+                      return get_item(item_id)
+                  elif http_method == "POST" and path == "/items":
+                      body = json.loads(event.get("body", "{}"))
+                      return create_item(body)
+                  elif http_method == "DELETE" and path.startswith("/items/"):
+                      item_id = path.split("/")[-1]
+                      return delete_item(item_id)
+                  elif http_method == "GET" and path == "/health":
+                      return response(200, {"status": "healthy", "timestamp": int(time.time())})
+                  else:
+                      return response(404, {"error": "Not found"})
+              except ClientError as e:
+                  error_code = e.response["Error"]["Code"]
+                  print(f"DynamoDB error: {error_code} - {e.response['Error']['Message']}")
+                  return response(500, {"error": f"Database error: {error_code}"})
+              except Exception as e:
+                  print(f"Unexpected error: {str(e)}")
+                  return response(500, {"error": "Internal server error"})
+
+          def list_items():
+              result = table.scan(Limit=50)
+              return response(200, {"items": result.get("Items", []), "count": result["Count"]})
+
+          def get_item(item_id):
+              result = table.get_item(Key={"id": item_id})
+              item = result.get("Item")
+              if not item:
+                  return response(404, {"error": "Item not found"})
+              return response(200, item)
+
+          def create_item(body):
+              if not body.get("name"):
+                  return response(400, {"error": "Missing required field: name"})
+              item = {
+                  "id": str(uuid.uuid4()),
+                  "name": body["name"],
+                  "description": body.get("description", ""),
+                  "created_at": int(time.time()),
+              }
+              table.put_item(Item=item)
+              return response(201, item)
+
+          def delete_item(item_id):
+              table.delete_item(Key={"id": item_id})
+              return response(200, {"message": "Item deleted", "id": item_id})
+
+          def response(status_code, body):
+              return {
+                  "statusCode": status_code,
+                  "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+                  "body": json.dumps(body, default=str),
+              }
+      Tags:
+        - Key: devopsagent
+          Value: "true"
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ---- API Gateway ----
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "${ProjectName}-api"
+      Description: Simple items CRUD API for DevOps Agent demo
+      Tags:
+        - Key: devopsagent
+          Value: "true"
+        - Key: Project
+          Value: !Ref ProjectName
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: "{proxy+}"
+
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+
+  RootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !GetAtt ApiGateway.RootResourceId
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiMethod
+      - RootMethod
+    Properties:
+      RestApiId: !Ref ApiGateway
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref ApiGateway
+      DeploymentId: !Ref ApiDeployment
+      StageName: prod
+      MethodSettings:
+        - HttpMethod: "*"
+          ResourcePath: "/*"
+          MetricsEnabled: true
+
+  LambdaApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+
+  # ---- CloudWatch Alarms ----
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${ProjectName}-lambda-errors"
+      AlarmDescription: Lambda function error rate is elevated
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ApiFunction
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  ApiGateway5xxAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${ProjectName}-api-5xx"
+      AlarmDescription: API Gateway 5xx error rate is elevated
+      Namespace: AWS/ApiGateway
+      MetricName: 5XXError
+      Dimensions:
+        - Name: ApiName
+          Value: !Sub "${ProjectName}-api"
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  DynamoDBThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${ProjectName}-dynamodb-throttles"
+      AlarmDescription: DynamoDB table is experiencing throttled requests
+      Namespace: AWS/DynamoDB
+      MetricName: WriteThrottleEvents
+      Dimensions:
+        - Name: TableName
+          Value: !Ref ItemsTable
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  # ---- CloudWatch Dashboard ----
+  OperationsDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${ProjectName}"
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "alarm",
+              "x": 0, "y": 0, "width": 24, "height": 3,
+              "properties": {
+                "title": "Alarm Status",
+                "alarms": [
+                  "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ProjectName}-dynamodb-throttles",
+                  "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ProjectName}-lambda-errors",
+                  "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ProjectName}-api-5xx"
+                ]
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0, "y": 3, "width": 8, "height": 6,
+              "properties": {
+                "title": "DynamoDB Throttles",
+                "metrics": [
+                  ["AWS/DynamoDB", "WriteThrottleEvents", "TableName", "${ProjectName}-items", {"stat": "Sum", "color": "#d62728"}],
+                  ["AWS/DynamoDB", "ReadThrottleEvents", "TableName", "${ProjectName}-items", {"stat": "Sum", "color": "#ff7f0e"}]
+                ],
+                "period": 60,
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "yAxis": {"left": {"min": 0}}
+              }
+            },
+            {
+              "type": "metric",
+              "x": 8, "y": 3, "width": 8, "height": 6,
+              "properties": {
+                "title": "Lambda Errors & Duration",
+                "metrics": [
+                  ["AWS/Lambda", "Errors", "FunctionName", "${ProjectName}-api", {"stat": "Sum", "color": "#d62728"}],
+                  ["AWS/Lambda", "Duration", "FunctionName", "${ProjectName}-api", {"stat": "Average", "color": "#1f77b4", "yAxis": "right"}]
+                ],
+                "period": 60,
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "yAxis": {"left": {"min": 0, "label": "Count"}, "right": {"min": 0, "label": "ms"}}
+              }
+            },
+            {
+              "type": "metric",
+              "x": 16, "y": 3, "width": 8, "height": 6,
+              "properties": {
+                "title": "API Gateway 5xx & Latency",
+                "metrics": [
+                  ["AWS/ApiGateway", "5XXError", "ApiName", "${ProjectName}-api", {"stat": "Sum", "color": "#d62728"}],
+                  ["AWS/ApiGateway", "Latency", "ApiName", "${ProjectName}-api", {"stat": "Average", "color": "#1f77b4", "yAxis": "right"}]
+                ],
+                "period": 60,
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "yAxis": {"left": {"min": 0, "label": "Count"}, "right": {"min": 0, "label": "ms"}}
+              }
+            }
+          ]
+        }
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod"
+
+  TableName:
+    Description: DynamoDB table name
+    Value: !Ref ItemsTable
+
+  FunctionName:
+    Description: Lambda function name
+    Value: !Ref ApiFunction
+
+  DashboardUrl:
+    Description: CloudWatch Dashboard URL
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/${ProjectName}"
+
+  StackRegion:
+    Description: Region where the stack is deployed
+    Value: !Ref AWS::Region
