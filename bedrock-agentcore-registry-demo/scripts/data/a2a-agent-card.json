@@ -1,0 +1,39 @@
+{
+  "name": "invoice-processing-agent",
+  "description": "Processes invoices from email attachments, extracts line items and totals, validates against purchase orders, and routes for manager approval",
+  "version": "2.1.0",
+  "url": "https://invoices.example.com/a2a/v1",
+  "protocolVersion": "0.3.0",
+  "additionalInterfaces": [
+    {
+      "url": "https://invoices.example.com/a2a/v1",
+      "transport": "JSONRPC"
+    }
+  ],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "defaultInputModes": ["application/json", "application/pdf"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "extract-line-items",
+      "name": "Extract Line Items",
+      "description": "Extract line items and totals from PDF invoices",
+      "tags": ["invoice", "pdf", "extraction"]
+    },
+    {
+      "id": "match-purchase-order",
+      "name": "Match Purchase Order",
+      "description": "Match invoice against existing purchase orders in the system",
+      "tags": ["invoice", "purchase-order", "matching"]
+    },
+    {
+      "id": "route-approval",
+      "name": "Route Approval",
+      "description": "Route to appropriate manager based on amount thresholds and department",
+      "tags": ["invoice", "approval", "workflow"]
+    }
+  ]
+}
