@@ -1,0 +1,43 @@
+{
+  "tools": [
+    {
+      "name": "get_forecast",
+      "description": "Get weather forecast for a location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "City name or coordinates"
+          },
+          "days": {
+            "type": "integer",
+            "description": "Number of forecast days (1-14)"
+          }
+        },
+        "required": ["location"]
+      }
+    },
+    {
+      "name": "get_historical",
+      "description": "Get historical weather data for a location and date range",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "ISO 8601 date"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "ISO 8601 date"
+          }
+        },
+        "required": ["location", "start_date", "end_date"]
+      }
+    }
+  ]
+}

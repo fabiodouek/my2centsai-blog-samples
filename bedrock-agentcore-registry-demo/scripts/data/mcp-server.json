@@ -1,0 +1,5 @@
+{
+  "name": "io.example/weather-forecast-server",
+  "description": "Weather forecast MCP server providing real-time weather data and historical weather analysis",
+  "version": "1.0.0"
+}
