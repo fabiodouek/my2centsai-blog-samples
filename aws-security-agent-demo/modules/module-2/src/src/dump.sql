@@ -491,7 +491,7 @@ INSERT INTO `reimbursments`(
     `isadmin`
 )
 VALUES(
-    '3',
+    '5',
     '2',
     'terry',
     'FOOD',
@@ -499,7 +499,7 @@ VALUES(
     'Pending',
     '2022-09-10',
     '1'
-    
+
 );
 
 INSERT INTO `reimbursments`(
@@ -513,7 +513,7 @@ INSERT INTO `reimbursments`(
     `isadmin`
 )
 VALUES(
-    '4',
+    '6',
     '3',
     'jasmine',
     'Equipment',
@@ -521,7 +521,7 @@ VALUES(
     'Pending',
     '2022-09-10',
     '1'
-    
+
 );
 
 

@@ -11,6 +11,28 @@ provider "aws" {
   region = "us-east-1"
 }
 
+variable "route53_zone_name" {
+  description = "Name of an existing Route 53 public hosted zone (e.g. example.com). Leave empty to skip custom domain setup."
+  type        = string
+  default     = ""
+}
+
+variable "custom_domain_name" {
+  description = "FQDN for Module 2's ALB custom domain (e.g. m2.example.com). Must be a subdomain of var.route53_zone_name. Required if route53_zone_name is set."
+  type        = string
+  default     = ""
+}
+
+locals {
+  create_custom_domain = var.route53_zone_name != "" && var.custom_domain_name != ""
+}
+
+data "aws_route53_zone" "custom" {
+  count        = local.create_custom_domain ? 1 : 0
+  name         = var.route53_zone_name
+  private_zone = false
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_availability_zones" "available" {
@@ -357,7 +379,7 @@ resource "aws_launch_template" "ecs_launch_template" {
   }
 
   vpc_security_group_ids = [aws_security_group.ecs_sg.id]
-  user_data              = base64encode(data.template_file.user_data.rendered)
+  user_data              = base64encode(file("${path.module}/resources/ecs/user_data.tpl"))
 }
 
 resource "aws_autoscaling_group" "ecs_asg" {
@@ -382,12 +404,8 @@ resource "aws_ecs_cluster" "cluster" {
   }
 }
 
-data "template_file" "user_data" {
-  template = file("${path.module}/resources/ecs/user_data.tpl")
-}
-
 resource "aws_ecs_task_definition" "task_definition" {
-  container_definitions    = data.template_file.task_definition_json.rendered
+  container_definitions    = data.local_file.task_definition_json.content
   family                   = "ECS-Lab-Task-definition"
   network_mode             = "bridge"
   memory                   = "512"
@@ -406,8 +424,8 @@ resource "aws_ecs_task_definition" "task_definition" {
   }
 }
 
-data "template_file" "task_definition_json" {
-  template = file("${path.module}/resources/ecs/task_definition.json")
+data "local_file" "task_definition_json" {
+  filename = "${path.module}/resources/ecs/task_definition.json"
   depends_on = [
     null_resource.rds_endpoint
   ]
@@ -486,7 +504,8 @@ resource "null_resource" "rds_endpoint" {
     command     = <<EOF
 RDS_URL="${aws_db_instance.database-instance.endpoint}"
 RDS_URL=$${RDS_URL::-5}
-sed -i "s,RDS_ENDPOINT_VALUE,$RDS_URL,g" ${path.module}/resources/ecs/task_definition.json
+sed -i.bak "s,RDS_ENDPOINT_VALUE,$RDS_URL,g" ${path.module}/resources/ecs/task_definition.json
+rm -f ${path.module}/resources/ecs/task_definition.json.bak
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
@@ -501,7 +520,8 @@ resource "null_resource" "cleanup" {
     command     = <<EOF
 RDS_URL="${aws_db_instance.database-instance.endpoint}"
 RDS_URL=$${RDS_URL::-5}
-sed -i "s,$RDS_URL,RDS_ENDPOINT_VALUE,g" ${path.module}/resources/ecs/task_definition.json
+sed -i.bak "s,$RDS_URL,RDS_ENDPOINT_VALUE,g" ${path.module}/resources/ecs/task_definition.json
+rm -f ${path.module}/resources/ecs/task_definition.json.bak
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
@@ -522,6 +542,81 @@ resource "aws_s3_bucket" "bucket_tf_files" {
   }
 }
 
+resource "aws_acm_certificate" "custom" {
+  count             = local.create_custom_domain ? 1 : 0
+  domain_name       = var.custom_domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "custom_cert_validation" {
+  for_each = local.create_custom_domain ? {
+    for dvo in aws_acm_certificate.custom[0].domain_validation_options :
+    dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
+
+  allow_overwrite = true
+  zone_id         = data.aws_route53_zone.custom[0].zone_id
+  name            = each.value.name
+  type            = each.value.type
+  ttl             = 60
+  records         = [each.value.record]
+}
+
+resource "aws_acm_certificate_validation" "custom" {
+  count                   = local.create_custom_domain ? 1 : 0
+  certificate_arn         = aws_acm_certificate.custom[0].arn
+  validation_record_fqdns = [for r in aws_route53_record.custom_cert_validation : r.fqdn]
+}
+
+resource "aws_security_group_rule" "alb_https" {
+  count             = local.create_custom_domain ? 1 : 0
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.load_balancer_security_group.id
+}
+
+resource "aws_lb_listener" "https" {
+  count             = local.create_custom_domain ? 1 : 0
+  load_balancer_arn = aws_alb.application_load_balancer.id
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.custom[0].certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.id
+  }
+}
+
+resource "aws_route53_record" "custom_alias" {
+  count   = local.create_custom_domain ? 1 : 0
+  zone_id = data.aws_route53_zone.custom[0].zone_id
+  name    = var.custom_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_alb.application_load_balancer.dns_name
+    zone_id                = aws_alb.application_load_balancer.zone_id
+    evaluate_target_health = false
+  }
+}
+
 output "ad_Target_URL" {
   value = "${aws_alb.application_load_balancer.dns_name}:80/login.php"
+}
+
+output "custom_app_url" {
+  value = local.create_custom_domain ? "https://${var.custom_domain_name}/login.php" : null
 }

@@ -10,6 +10,28 @@ provider "aws" {
   region = "us-east-1"
 }
 
+variable "route53_zone_name" {
+  description = "Name of an existing Route 53 public hosted zone (e.g. example.com). Leave empty to skip custom domain setup."
+  type        = string
+  default     = ""
+}
+
+variable "custom_domain_name" {
+  description = "FQDN for Module 1's API Gateway custom domain (e.g. m1.example.com). Must be a subdomain of var.route53_zone_name. Required if route53_zone_name is set."
+  type        = string
+  default     = ""
+}
+
+locals {
+  create_custom_domain = var.route53_zone_name != "" && var.custom_domain_name != ""
+}
+
+data "aws_route53_zone" "custom" {
+  count        = local.create_custom_domain ? 1 : 0
+  name         = var.route53_zone_name
+  private_zone = false
+}
+
 data "aws_caller_identity" "current" {}
 
 
@@ -3574,15 +3596,6 @@ resource "aws_iam_policy" "goat_inline_policy_2" {
   })
 }
 
-data "template_file" "goat_script" {
-  template = file("resources/ec2/goat_user_data.tpl")
-  vars = {
-    S3_BUCKET_NAME = aws_s3_bucket.bucket_temp.bucket
-  }
-  depends_on = [aws_s3_bucket.bucket_temp]
-}
-
-
 data "aws_ami" "goat_ami" {
   most_recent = true
   filter {
@@ -3605,7 +3618,9 @@ resource "aws_instance" "goat_instance" {
   tags = {
     Name = "AWS_GOAT_DEV_INSTANCE"
   }
-  user_data = data.template_file.goat_script.rendered
+  user_data = templatefile("${path.module}/resources/ec2/goat_user_data.tpl", {
+    S3_BUCKET_NAME = aws_s3_bucket.bucket_temp.bucket
+  })
   depends_on = [
     aws_s3_object.upload_temp_object_2
   ]
@@ -3641,7 +3656,8 @@ resource "aws_dynamodb_table" "posts_table" {
 resource "null_resource" "populate_table" {
   provisioner "local-exec" {
     command     = <<EOF
-sed -i 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/dynamodb/blog-posts.json
+sed -i.bak 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/dynamodb/blog-posts.json
+rm -f resources/dynamodb/blog-posts.json.bak
 python3 resources/dynamodb/populate-table.py
 EOF
     interpreter = ["/bin/bash", "-c"]
@@ -3653,7 +3669,7 @@ EOF
 # To replace with IP Address of EC2-Instance in .ssh/config
 resource "null_resource" "file_replacement_ec2_ip" {
   provisioner "local-exec" {
-    command     = "sed -i 's/EC2_IP_ADDR/${aws_instance.goat_instance.public_ip}/g' resources/s3/shared/shared/files/.ssh/config.txt"
+    command     = "sed -i.bak 's/EC2_IP_ADDR/${aws_instance.goat_instance.public_ip}/g' resources/s3/shared/shared/files/.ssh/config.txt && rm -f resources/s3/shared/shared/files/.ssh/config.txt.bak"
     interpreter = ["/bin/bash", "-c"]
   }
   depends_on = [aws_instance.goat_instance]
@@ -3662,7 +3678,7 @@ resource "null_resource" "file_replacement_ec2_ip" {
 
 resource "null_resource" "file_replacement_lambda_react" {
   provisioner "local-exec" {
-    command     = "sed -i 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/lambda/react/index.js"
+    command     = "sed -i.bak 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/lambda/react/index.js && rm -f resources/lambda/react/index.js.bak"
     interpreter = ["/bin/bash", "-c"]
   }
   depends_on = [
@@ -3672,7 +3688,7 @@ resource "null_resource" "file_replacement_lambda_react" {
 
 resource "null_resource" "file_replacement_lambda_data" {
   provisioner "local-exec" {
-    command     = "sed -i 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/lambda/data/lambda_function.py"
+    command     = "sed -i.bak 's/replace-bucket-name/${aws_s3_bucket.bucket_upload.bucket}/g' resources/lambda/data/lambda_function.py && rm -f resources/lambda/data/lambda_function.py.bak"
     interpreter = ["/bin/bash", "-c"]
   }
   depends_on = [
@@ -3684,10 +3700,11 @@ resource "null_resource" "file_replacement_lambda_data" {
 resource "null_resource" "file_replacement_api_gw" {
   provisioner "local-exec" {
     command     = <<EOF
-sed -i "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
-sed -i 's/"\/static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i 's/n.p+"static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
+sed -i.bak "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js
+sed -i.bak "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
+sed -i.bak 's/"\/static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
+sed -i.bak 's/n.p+"static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
+rm -f resources/s3/webfiles/build/static/js/main.e5839717.js.bak resources/s3/webfiles/build/static/js/main.e5839717.js.map.bak
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
@@ -3700,9 +3717,10 @@ EOF
 resource "null_resource" "file_replacement_api_gw_cleanup" {
   provisioner "local-exec" {
     command     = <<EOF
-sed -i "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
-sed -i 's/${aws_instance.goat_instance.public_ip}/EC2_IP_ADDR/g' resources/s3/shared/shared/files/.ssh/config.txt
+sed -i.bak "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js
+sed -i.bak "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
+sed -i.bak 's/${aws_instance.goat_instance.public_ip}/EC2_IP_ADDR/g' resources/s3/shared/shared/files/.ssh/config.txt
+rm -f resources/s3/webfiles/build/static/js/main.e5839717.js.bak resources/s3/webfiles/build/static/js/main.e5839717.js.map.bak resources/s3/shared/shared/files/.ssh/config.txt.bak
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
@@ -3712,7 +3730,75 @@ EOF
 }
 
 
+resource "aws_acm_certificate" "custom" {
+  count             = local.create_custom_domain ? 1 : 0
+  domain_name       = var.custom_domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "custom_cert_validation" {
+  for_each = local.create_custom_domain ? {
+    for dvo in aws_acm_certificate.custom[0].domain_validation_options :
+    dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
+
+  allow_overwrite = true
+  zone_id         = data.aws_route53_zone.custom[0].zone_id
+  name            = each.value.name
+  type            = each.value.type
+  ttl             = 60
+  records         = [each.value.record]
+}
+
+resource "aws_acm_certificate_validation" "custom" {
+  count                   = local.create_custom_domain ? 1 : 0
+  certificate_arn         = aws_acm_certificate.custom[0].arn
+  validation_record_fqdns = [for r in aws_route53_record.custom_cert_validation : r.fqdn]
+}
+
+resource "aws_api_gateway_domain_name" "custom" {
+  count                    = local.create_custom_domain ? 1 : 0
+  domain_name              = var.custom_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.custom[0].certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "custom" {
+  count       = local.create_custom_domain ? 1 : 0
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.api.stage_name
+  domain_name = aws_api_gateway_domain_name.custom[0].domain_name
+}
+
+resource "aws_route53_record" "custom_alias" {
+  count   = local.create_custom_domain ? 1 : 0
+  zone_id = data.aws_route53_zone.custom[0].zone_id
+  name    = var.custom_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.custom[0].regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.custom[0].regional_zone_id
+    evaluate_target_health = false
+  }
+}
+
 output "app_url" {
   value = "${aws_api_gateway_stage.api.invoke_url}/react"
+}
+
+output "custom_app_url" {
+  value = local.create_custom_domain ? "https://${var.custom_domain_name}/react" : null
 }
 

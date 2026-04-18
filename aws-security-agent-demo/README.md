@@ -20,28 +20,56 @@ All of that is in the post: **[AWS Security Agent deep dive](https://my2centsai.
 
 ## What's different from upstream AWSGoat
 
-This vendored copy adds two optional variables per module so the API Gateway (Module 1) and ALB (Module 2) can be fronted by a custom Route 53 DNS name with an ACM-issued TLS certificate:
+Four intentional changes are baked in. All of them are covered in the [blog post](https://my2centsai.com/deep-dive/aws-security-agent/); the summary below is the quick reference.
+
+### 1. Optional custom domain for Module 1 (API Gateway)
+
+`modules/module-1/main.tf` adds two optional variables — `route53_zone_name` and `custom_domain_name`. When set, Terraform provisions an ACM public certificate, DNS validation records in the named Route 53 hosted zone, an `aws_api_gateway_domain_name`, a base-path mapping, and an alias A record pointing the custom name at the API Gateway edge endpoint.
 
 ```bash
 cd modules/module-1
 terraform apply \
   -var route53_zone_name=example.com \
   -var custom_domain_name=m1.example.com
+```
 
-cd ../module-2
+Output: `custom_app_url = "https://m1.example.com/react"`.
+
+### 2. Optional custom domain for Module 2 (ALB)
+
+`modules/module-2/main.tf` adds the same two variables. When set, Terraform provisions an ACM public certificate, DNS validation records, an `aws_lb_listener` on 443 that forwards to the existing Module 2 target group, a security-group ingress rule for 443, and an alias A record pointing the custom name at the ALB.
+
+```bash
+cd modules/module-2
 terraform apply \
   -var route53_zone_name=example.com \
   -var custom_domain_name=m2.example.com
 ```
 
-If you don't set the variables, the modules deploy exactly as upstream — the new resources are count-guarded and default to disabled.
+Output: `custom_app_url = "https://m2.example.com/login.php"`.
 
-Outputs:
+Both blocks are `count`-guarded: if you don't set the variables, the modules deploy exactly as upstream and the existing `app_url` / `ad_Target_URL` outputs (raw AWS URLs) are unchanged.
 
-- Module 1: `custom_app_url = "https://m1.example.com/react"`
-- Module 2: `custom_app_url = "https://m2.example.com/login.php"`
+### 3. Module 2 RDS auto-seed on first boot
 
-The existing `app_url` / `ad_Target_URL` outputs (raw AWS URLs) are unchanged.
+`modules/module-2/src/script/startup.sh` replaces upstream's single `exec apache2-foreground` line with a small bootstrap that:
+
+- Waits (up to 60 s) for the RDS endpoint to become reachable,
+- Checks whether `appdb` already exists and loads `/var/www/html/dump.sql` only if it does not,
+- Then runs the upstream `sed` substitution into `config.inc` and execs Apache.
+
+This removes the manual `SSM Send Command → docker exec → mysql` step that upstream AWSGoat leaves to the operator. The DB credentials referenced by the script (`root` / `T2kVB3zgeN3YbrKS`) are the upstream defaults and already appear in `modules/module-2/main.tf` — no new secret is introduced.
+
+### 4. Module 2 `dump.sql` duplicate primary key fix
+
+`modules/module-2/src/src/dump.sql` had two rows in the `reimbursement` table that reused primary keys already present earlier in the file. Under MySQL's default stop-on-error behaviour and the `AUTOCOMMIT=0` / missing-`COMMIT` pattern in the dump, the collisions aborted the load mid-way and silently dropped every table in the transaction. Two `reimbursment_id` values are changed (`'3'` → `'5'`, `'4'` → `'6'`) to make the dump idempotent.
+
+### Upstream fixes already applied
+
+Two upstream-reported fixes are baked in so you don't have to patch anything on a Mac:
+
+- **Apple Silicon / Terraform 1.x**: the deprecated `template_file` data source is replaced with `templatefile()`, `file()`, or `local_file` where it appeared in both modules.
+- **BSD `sed`**: every `sed -i` host-side provisioner uses `sed -i.bak '...'` so the same command works on macOS and Linux.
 
 ## Prerequisites
 
