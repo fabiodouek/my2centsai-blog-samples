@@ -21,3 +21,15 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Lambda build artefacts
+**/resources/lambda/out/

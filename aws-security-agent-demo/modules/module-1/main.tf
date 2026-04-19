@@ -23,7 +23,8 @@ variable "custom_domain_name" {
 }
 
 locals {
-  create_custom_domain = var.route53_zone_name != "" && var.custom_domain_name != ""
+  create_custom_domain   = var.route53_zone_name != "" && var.custom_domain_name != ""
+  custom_api_domain_name = local.create_custom_domain ? replace(var.custom_domain_name, "/^([^.]+)\\./", "$1-api.") : ""
 }
 
 data "aws_route53_zone" "custom" {
@@ -3727,7 +3728,7 @@ resource "null_resource" "file_replacement_lambda_data" {
 
 
 locals {
-  backend_api_url = local.create_custom_domain ? "https://${var.custom_domain_name}/v1" : aws_api_gateway_deployment.apideploy_ba.invoke_url
+  backend_api_url = local.create_custom_domain ? "https://${local.custom_api_domain_name}" : aws_api_gateway_deployment.apideploy_ba.invoke_url
 }
 
 resource "null_resource" "file_replacement_api_gw" {
@@ -3774,9 +3775,10 @@ EOF
 
 
 resource "aws_acm_certificate" "custom" {
-  count             = local.create_custom_domain ? 1 : 0
-  domain_name       = var.custom_domain_name
-  validation_method = "DNS"
+  count                     = local.create_custom_domain ? 1 : 0
+  domain_name               = var.custom_domain_name
+  subject_alternative_names = [local.custom_api_domain_name]
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
@@ -3817,6 +3819,16 @@ resource "aws_api_gateway_domain_name" "custom" {
   }
 }
 
+resource "aws_api_gateway_domain_name" "custom_api" {
+  count                    = local.create_custom_domain ? 1 : 0
+  domain_name              = local.custom_api_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.custom[0].certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
 resource "aws_api_gateway_base_path_mapping" "custom" {
   count       = local.create_custom_domain ? 1 : 0
   api_id      = aws_api_gateway_rest_api.api.id
@@ -3828,8 +3840,7 @@ resource "aws_api_gateway_base_path_mapping" "custom_backend" {
   count       = local.create_custom_domain ? 1 : 0
   api_id      = aws_api_gateway_rest_api.apiLambda_ba.id
   stage_name  = aws_api_gateway_deployment.apideploy_ba.stage_name
-  domain_name = aws_api_gateway_domain_name.custom[0].domain_name
-  base_path   = "v1"
+  domain_name = aws_api_gateway_domain_name.custom_api[0].domain_name
 }
 
 resource "aws_route53_record" "custom_alias" {
@@ -3845,6 +3856,19 @@ resource "aws_route53_record" "custom_alias" {
   }
 }
 
+resource "aws_route53_record" "custom_api_alias" {
+  count   = local.create_custom_domain ? 1 : 0
+  zone_id = data.aws_route53_zone.custom[0].zone_id
+  name    = local.custom_api_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.custom_api[0].regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.custom_api[0].regional_zone_id
+    evaluate_target_health = false
+  }
+}
+
 output "app_url" {
   value = "${aws_api_gateway_stage.api.invoke_url}/react"
 }
@@ -3854,6 +3878,6 @@ output "custom_app_url" {
 }
 
 output "custom_api_url" {
-  value = local.create_custom_domain ? "https://${var.custom_domain_name}/v1" : aws_api_gateway_deployment.apideploy_ba.invoke_url
+  value = local.create_custom_domain ? "https://${local.custom_api_domain_name}" : aws_api_gateway_deployment.apideploy_ba.invoke_url
 }
 
