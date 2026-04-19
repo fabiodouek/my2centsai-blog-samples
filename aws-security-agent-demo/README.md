@@ -50,19 +50,43 @@ Output: `custom_app_url = "https://m2.example.com/login.php"`.
 
 Both blocks are `count`-guarded: if you don't set the variables, the modules deploy exactly as upstream and the existing `app_url` / `ad_Target_URL` outputs (raw AWS URLs) are unchanged.
 
-### 3. Module 2 RDS auto-seed on first boot
+### 3. Module 2 DB seed helper (`scripts/seed-module-2.sh`)
 
-`modules/module-2/src/script/startup.sh` replaces upstream's single `exec apache2-foreground` line with a small bootstrap that:
+The Module 2 ECS task definition pulls the upstream prebuilt public image (`public.ecr.aws/p3q0v3y2/aws-goat-m2:latest`), which does **not** seed RDS on its own. After `terraform apply` finishes, the login page will load but every query fails until the DB is populated.
 
-- Waits (up to 60 s) for the RDS endpoint to become reachable,
-- Checks whether `appdb` already exists and loads `/var/www/html/dump.sql` only if it does not,
-- Then runs the upstream `sed` substitution into `config.inc` and execs Apache.
+Run the helper script once after apply:
 
-This removes the manual `SSM Send Command → docker exec → mysql` step that upstream AWSGoat leaves to the operator. The DB credentials referenced by the script (`root` / `T2kVB3zgeN3YbrKS`) are the upstream defaults and already appear in `modules/module-2/main.tf` — no new secret is introduced.
+```bash
+scripts/seed-module-2.sh
+```
+
+What it does:
+
+- Finds the ECS EC2 instance via the `ecs-lab-cluster` cluster's registered container instance,
+- Fetches the DB username and password from Secrets Manager (`RDS_CREDS`) — no credentials are baked into the script,
+- Reads the RDS endpoint from `aws-goat-db`,
+- Base64-encodes the repo-local `modules/module-2/src/src/dump.sql` (pre-pending `DROP DATABASE IF EXISTS appdb;` and appending `COMMIT;` so the script is idempotent),
+- Ships the payload to the EC2 host via `aws ssm send-command`, which `docker cp`s it into the running container and runs `mysql < /tmp/dump.sql`,
+- Polls SSM and prints the final status.
+
+Only the AWS CLI and `base64` are required on your machine — no Docker, no MySQL client, no SSH. The script is safe to re-run: the `DROP DATABASE IF EXISTS appdb` prefix resets state before loading.
+
+**Customizing**: every hardcoded identifier in the script can be overridden by env var, so forks that rename resources don't need to edit the file:
+
+| Env var | Default | Source |
+|---|---|---|
+| `AWS_REGION` | `us-east-1` | Module 2's provider |
+| `CLUSTER_NAME` | `ecs-lab-cluster` | `main.tf` (ECS cluster) |
+| `DB_IDENTIFIER` | `aws-goat-db` | `main.tf` (RDS instance) |
+| `CONTAINER_LABEL` | `aws-goat-m2` | `resources/ecs/task_definition.json` |
+| `SECRET_ID` | `RDS_CREDS` | `main.tf` (Secrets Manager secret) |
+| `DUMP_FILE` | `modules/module-2/src/src/dump.sql` | this repo |
+
+An auto-seed version of `modules/module-2/src/script/startup.sh` ships in the repo for anyone who forks and builds their own container image (in which case the seed happens at container start and the helper script becomes unnecessary). With the default deploy path — the public image — that startup script never runs; the helper script is what you need.
 
 ### 4. Module 2 `dump.sql` duplicate primary key fix
 
-`modules/module-2/src/src/dump.sql` had two rows in the `reimbursement` table that reused primary keys already present earlier in the file. Under MySQL's default stop-on-error behaviour and the `AUTOCOMMIT=0` / missing-`COMMIT` pattern in the dump, the collisions aborted the load mid-way and silently dropped every table in the transaction. Two `reimbursment_id` values are changed (`'3'` → `'5'`, `'4'` → `'6'`) to make the dump idempotent.
+`modules/module-2/src/src/dump.sql` had two rows in the `reimbursement` table that reused primary keys already present earlier in the file. Under MySQL's default stop-on-error behaviour and the `AUTOCOMMIT=0` / missing-`COMMIT` pattern in the dump, the collisions aborted the load mid-way and left every table empty. Two `reimbursment_id` values are changed (`'3'` → `'5'`, `'4'` → `'6'`) so the dump loads cleanly. The seed helper above uses this fixed dump.
 
 ### Upstream fixes already applied
 
@@ -83,8 +107,9 @@ Two upstream-reported fixes are baked in so you don't have to patch anything on 
 
 1. Clone this repo.
 2. Deploy one or both modules per the commands above (or follow the upstream instructions in [README-original.md](README-original.md) to skip the custom domain).
-3. Follow the [blog post](https://my2centsai.com/deep-dive/aws-security-agent/) to wire the resulting URL into an Agent Space and start a pentest run.
-4. When done, `terraform destroy` in each module directory.
+3. **Module 2 only**: run `scripts/seed-module-2.sh` after `terraform apply` finishes to populate the RDS `appdb` database.
+4. Follow the [blog post](https://my2centsai.com/deep-dive/aws-security-agent/) to wire the resulting URL into an Agent Space and start a pentest run.
+5. When done, `terraform destroy` in each module directory.
 
 ## Cost
 
