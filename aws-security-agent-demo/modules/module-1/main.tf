@@ -170,13 +170,42 @@ resource "aws_lambda_permission" "apigw_ba" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
+resource "aws_api_gateway_resource" "endpoint_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_resource.endpoint.id
+  path_part   = "{proxy+}"
+}
 
+resource "aws_api_gateway_method" "endpoint_proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.endpoint_proxy.id
+  http_method   = "GET"
+  authorization = "NONE"
+
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "endpoint_proxy" {
+  depends_on = [aws_api_gateway_method.endpoint_proxy]
+
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.endpoint_proxy.id
+  http_method             = aws_api_gateway_method.endpoint_proxy.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.react_lambda_app.invoke_arn
+}
 
 
 resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   description = "Deployed endpoint at ${timestamp()}"
-  depends_on  = [aws_api_gateway_integration_response.endpoint]
+  depends_on = [
+    aws_api_gateway_integration_response.endpoint,
+    aws_api_gateway_integration.endpoint_proxy,
+  ]
 }
 
 resource "aws_api_gateway_stage" "api" {
@@ -3697,19 +3726,30 @@ resource "null_resource" "file_replacement_lambda_data" {
 }
 
 
+locals {
+  backend_api_url = local.create_custom_domain ? "https://${var.custom_domain_name}/v1" : aws_api_gateway_deployment.apideploy_ba.invoke_url
+}
+
 resource "null_resource" "file_replacement_api_gw" {
   provisioner "local-exec" {
     command     = <<EOF
-sed -i.bak "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i.bak "s,API_GATEWAY_URL,${aws_api_gateway_deployment.apideploy_ba.invoke_url},g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
-sed -i.bak 's/"\/static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i.bak 's/n.p+"static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' resources/s3/webfiles/build/static/js/main.e5839717.js
-rm -f resources/s3/webfiles/build/static/js/main.e5839717.js.bak resources/s3/webfiles/build/static/js/main.e5839717.js.map.bak
+for f in resources/s3/webfiles/build/static/js/main.*.js resources/s3/webfiles/build/static/js/main.*.js.map; do
+  [ -f "$f" ] || continue
+  sed -i.bak "s,API_GATEWAY_URL,${local.backend_api_url},g" "$f"
+  case "$f" in
+    *.js)
+      sed -i.bak 's/"\/static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' "$f"
+      sed -i.bak 's/n.p+"static/"https:\/\/${aws_s3_bucket.bucket_upload.bucket}\.s3\.amazonaws\.com\/build\/static/g' "$f"
+      ;;
+  esac
+  rm -f "$f.bak"
+done
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
   depends_on = [
-    aws_api_gateway_deployment.apideploy_ba
+    aws_api_gateway_deployment.apideploy_ba,
+    aws_api_gateway_base_path_mapping.custom_backend,
   ]
 }
 
@@ -3717,10 +3757,13 @@ EOF
 resource "null_resource" "file_replacement_api_gw_cleanup" {
   provisioner "local-exec" {
     command     = <<EOF
-sed -i.bak "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js
-sed -i.bak "s,${aws_api_gateway_deployment.apideploy_ba.invoke_url},API_GATEWAY_URL,g" resources/s3/webfiles/build/static/js/main.e5839717.js.map
+for f in resources/s3/webfiles/build/static/js/main.*.js resources/s3/webfiles/build/static/js/main.*.js.map; do
+  [ -f "$f" ] || continue
+  sed -i.bak "s,${local.backend_api_url},API_GATEWAY_URL,g" "$f"
+  rm -f "$f.bak"
+done
 sed -i.bak 's/${aws_instance.goat_instance.public_ip}/EC2_IP_ADDR/g' resources/s3/shared/shared/files/.ssh/config.txt
-rm -f resources/s3/webfiles/build/static/js/main.e5839717.js.bak resources/s3/webfiles/build/static/js/main.e5839717.js.map.bak resources/s3/shared/shared/files/.ssh/config.txt.bak
+rm -f resources/s3/shared/shared/files/.ssh/config.txt.bak
 EOF
     interpreter = ["/bin/bash", "-c"]
   }
@@ -3781,6 +3824,14 @@ resource "aws_api_gateway_base_path_mapping" "custom" {
   domain_name = aws_api_gateway_domain_name.custom[0].domain_name
 }
 
+resource "aws_api_gateway_base_path_mapping" "custom_backend" {
+  count       = local.create_custom_domain ? 1 : 0
+  api_id      = aws_api_gateway_rest_api.apiLambda_ba.id
+  stage_name  = aws_api_gateway_deployment.apideploy_ba.stage_name
+  domain_name = aws_api_gateway_domain_name.custom[0].domain_name
+  base_path   = "v1"
+}
+
 resource "aws_route53_record" "custom_alias" {
   count   = local.create_custom_domain ? 1 : 0
   zone_id = data.aws_route53_zone.custom[0].zone_id
@@ -3800,5 +3851,9 @@ output "app_url" {
 
 output "custom_app_url" {
   value = local.create_custom_domain ? "https://${var.custom_domain_name}/react" : null
+}
+
+output "custom_api_url" {
+  value = local.create_custom_domain ? "https://${var.custom_domain_name}/v1" : aws_api_gateway_deployment.apideploy_ba.invoke_url
 }
 
