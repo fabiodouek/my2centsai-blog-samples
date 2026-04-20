@@ -103,13 +103,28 @@ Two upstream-reported fixes are baked in so you don't have to patch anything on 
 - For the custom domain pieces: an existing public Route 53 hosted zone in the same account
 - AWS Security Agent enabled in a [supported region](https://console.aws.amazon.com/securityagent/) (the post uses `us-east-1`)
 
+## Before `terraform apply`: patch the placeholder account ID
+
+Three files under `modules/module-1/resources/` ship with a placeholder AWS account ID `111111111111` baked into S3 bucket names and URLs, so the repo is safe to read publicly. Before deploying Module 1, replace the placeholder with your own 12-digit account ID so the string baked into Lambda/DynamoDB matches the bucket names Terraform actually creates:
+
+```bash
+cd aws-security-agent-demo
+MY_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+find modules/module-1/resources \
+  \( -name lambda_function.py -o -name index.js -o -name blog-posts.json \) \
+  -exec sed -i.bak "s/111111111111/${MY_ACCOUNT_ID}/g" {} +
+```
+
+The `.bak` files `sed` leaves behind can be deleted after the replacement. Module 2 does not need this step.
+
 ## Quick start
 
 1. Clone this repo.
-2. Deploy one or both modules per the commands above (or follow the upstream instructions in [README-original.md](README-original.md) to skip the custom domain).
-3. **Module 2 only**: run `scripts/seed-module-2.sh` after `terraform apply` finishes to populate the RDS `appdb` database.
-4. Follow the [blog post](https://my2centsai.com/deep-dive/aws-security-agent/) to wire the resulting URL into an Agent Space and start a pentest run.
-5. When done, `terraform destroy` in each module directory.
+2. **Module 1 only**: run the `sed` replacement above so bucket names match the deployer's account ID.
+3. Deploy one or both modules per the commands above (or follow the upstream instructions in [README-original.md](README-original.md) to skip the custom domain).
+4. **Module 2 only**: run `scripts/seed-module-2.sh` after `terraform apply` finishes to populate the RDS `appdb` database.
+5. Follow the [blog post](https://my2centsai.com/deep-dive/aws-security-agent/) to wire the resulting URL into an Agent Space and start a pentest run.
+6. When done, `terraform destroy` in each module directory.
 
 ## Cost
 
@@ -120,6 +135,16 @@ Two upstream-reported fixes are baked in so you don't have to patch anything on 
 ## Warning
 
 AWSGoat is **intentionally vulnerable** and exposes a public HTTP/HTTPS surface once deployed. Use a dedicated sandbox AWS account, destroy the stacks when you're finished, and don't point your custom domain at AWSGoat from a zone that also serves production traffic.
+
+### Private keys in the repo
+
+Module 1 vendors a directory of RSA private keys at `modules/module-1/resources/s3/shared/shared/files/.ssh/keys/*.pem` (alice, bob, charles, john, mary, mike, sophia, VincentVanGoat). These mirror upstream AWSGoat, where they are an **intentional part of the vulnerability path** — the CTF-style attack chain depends on discovering and using them from a misconfigured S3 bucket. They are not secret: the same keys are checked into the public INE-labs repo.
+
+Because they are public and shared across every deploy of AWSGoat, treat them as **demo-only**:
+
+- Never reuse these keypairs for any real EC2 instance outside the sandbox.
+- The sandbox account warning above exists specifically so that a compromise via one of these keys cannot cross into anything you care about.
+- `terraform destroy` after the walkthrough to take the EC2 hosts they authorize offline.
 
 ## License
 
