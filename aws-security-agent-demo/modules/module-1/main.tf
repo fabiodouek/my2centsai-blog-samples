@@ -3881,3 +3881,19 @@ output "custom_api_url" {
   value = local.create_custom_domain ? "https://${local.custom_api_domain_name}" : aws_api_gateway_deployment.apideploy_ba.invoke_url
 }
 
+output "s3_bucket_production" {
+  value = aws_s3_bucket.bucket_upload.bucket
+}
+
+output "s3_bucket_dev" {
+  value = aws_s3_bucket.dev.bucket
+}
+
+output "s3_bucket_temp" {
+  value = aws_s3_bucket.bucket_temp.bucket
+}
+
+output "s3_website_url" {
+  value = "https://${aws_s3_bucket.bucket_upload.bucket_regional_domain_name}/build"
+}
+
