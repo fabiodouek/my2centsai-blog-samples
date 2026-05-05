@@ -1,0 +1,41 @@
+# Minimal Postgres-backed Temporal stack for the "graduate beyond start-dev" section.
+# Mirrors the single-node example from temporalio/samples-server/tree/main/compose
+# but trimmed to the bits relevant to this post (no Elasticsearch, no admin-tools).
+# The Web UI here lives on :8080, NOT :8233 like the CLI dev server.
+
+services:
+  postgresql:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  temporal:
+    image: temporalio/auto-setup:1.27
+    depends_on:
+      - postgresql
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: postgresql
+    ports:
+      - "7233:7233"
+
+  temporal-ui:
+    image: temporalio/ui:2.40.1
+    depends_on:
+      - temporal
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:
