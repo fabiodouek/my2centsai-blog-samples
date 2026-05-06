@@ -1,6 +1,6 @@
 # temporal-scheduling-quickstart
 
-Companion code for the my2cents.ai post **["Temporal: Hands-On with Scheduling on a Self-Hosted macOS Stack"](https://my2cents.ai/deep-dive/temporal-scheduling-on-macos)**.
+Companion code for the my2cents.ai post **["Temporal: Hands-On with Scheduling on a Self-Hosted macOS Stack"](https://my2cents.ai/deep-dive/temporal-scheduling)**.
 
 A minimal Python project that schedules a recurring health-check workflow against `httpbin.org`, records failures into a local SQLite `incidents` table, and exercises the parts of the Temporal Schedules API the post walks through: interval + calendar specs, overlap policy, jitter, pause/trigger/backfill/list/describe.
 
