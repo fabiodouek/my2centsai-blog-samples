@@ -7,8 +7,8 @@ A minimal Python project that schedules a recurring health-check workflow agains
 ## Prerequisites
 
 - macOS with Homebrew
-- Python 3.12 (`uv python install 3.12`)
 - [`uv`](https://docs.astral.sh/uv/) (`brew install uv`)
+- Python 3.12 (`uv python install 3.12`)
 - The Temporal CLI (`brew install temporal`)
 - Docker Desktop (only for the optional `compose-up` track)
 
@@ -48,13 +48,14 @@ src/
     list_describe.py    list all schedules / describe one
     delete_all.py       delete both schedules
 docker-compose.yml      Postgres-backed stack for the second track
-Makefile                make dev / worker / schedule / cron / pause / unpause / trigger / backfill / list / describe / delete / clean
+Makefile                see "Make targets" below (or run `make help`)
 ```
 
 ## Make targets
 
 | Target | What it does |
 |---|---|
+| `make help` | Print a summary of all targets |
 | `make install` | `uv sync` |
 | `make dev` | `temporal server start-dev --db-filename ./temporal.db --ui-port 8233` |
 | `make worker` | Run the Python worker |
@@ -72,8 +73,8 @@ Makefile                make dev / worker / schedule / cron / pause / unpause / 
 ```bash
 # Tear down the dev server (Ctrl-C in terminal 1)
 make compose-up
-# Worker still talks to localhost:7233 — no env change needed.
-make worker        # in another terminal
+# The worker from the Quickstart still talks to localhost:7233 — no env
+# change needed. If you stopped it, start it again with `make worker`.
 make schedule
 # Web UI is on http://localhost:8080 (not 8233)
 ```
