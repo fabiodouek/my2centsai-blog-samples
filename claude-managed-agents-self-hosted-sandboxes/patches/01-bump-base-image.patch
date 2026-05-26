@@ -1,0 +1,13 @@
+diff --git a/Dockerfile b/Dockerfile
+index 058f814..254fff0 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -1,7 +1,7 @@
+ # Cloudflare Sandbox base image — provides the sandbox runtime that the
+ # Worker SDK (`@cloudflare/sandbox`) talks to over port 3000 (exec, terminals,
+ # file I/O, etc.). Do NOT override ENTRYPOINT or the runtime won't start.
+-FROM docker.io/cloudflare/sandbox:0.10.1
++FROM docker.io/cloudflare/sandbox:0.10.2-python
+ 
+ ENV PATH="/usr/local/bin:/usr/bin:/bin:/home/claude/.npm-global/bin:/home/user/.npm-global/bin:${PATH}"
+ 

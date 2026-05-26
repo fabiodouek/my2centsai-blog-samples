@@ -1,0 +1,28 @@
+// Snippet to merge into the upstream cloudflare/claude-managed-agents
+// wrangler.jsonc. The upstream file already declares an R2 binding
+// (BACKUP_BUCKET); add PDFS alongside it inside the same r2_buckets array.
+//
+// Full merged shape:
+//
+// "r2_buckets": [
+//   {
+//     "binding": "BACKUP_BUCKET",
+//     "bucket_name": "claude-managed-agents-snapshots"
+//     // ... (existing fields from the upstream template)
+//   },
+//   {
+//     "binding": "PDFS",
+//     "bucket_name": "claude-managed-agents-pdfs",
+//     "preview_bucket_name": "claude-managed-agents-pdfs-preview"
+//   }
+// ]
+//
+// Create the bucket once before deploying:
+//
+//   npx wrangler r2 bucket create claude-managed-agents-pdfs
+//   npx wrangler r2 bucket create claude-managed-agents-pdfs-preview   # optional, for `wrangler dev`
+{
+  "binding": "PDFS",
+  "bucket_name": "claude-managed-agents-pdfs",
+  "preview_bucket_name": "claude-managed-agents-pdfs-preview"
+}
