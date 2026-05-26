@@ -33,3 +33,5 @@ crash.*.log
 
 # Lambda build artefacts
 **/resources/lambda/out/
+
+**/.wrangler/

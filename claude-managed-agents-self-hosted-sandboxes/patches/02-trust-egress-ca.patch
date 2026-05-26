@@ -1,0 +1,38 @@
+diff --git a/src/microvm/sandbox.ts b/src/microvm/sandbox.ts
+index 15ed9f6..d86afe5 100644
+--- a/src/microvm/sandbox.ts
++++ b/src/microvm/sandbox.ts
+@@ -415,6 +415,33 @@ export class Sandbox extends SandboxBase<Env> {
+       );
+     }
+ 
++    // Trust the Cloudflare egress-proxy CA the platform mounts at
++    // /etc/cloudflare/certs/cloudflare-containers-ca.crt. Without this
++    // step, outbound HTTPS from inside the container fails with
++    // `self-signed certificate in certificate chain`, ant beta:worker run
++    // cannot open its event stream against api.anthropic.com, and every
++    // session stalls at `requires_action` after the first tool_use.
++    // The base image's docs claim auto-trust happens on startup but in
++    // cloudflare/sandbox:0.10.2-python it does not — and we cannot fix it
++    // via an ENTRYPOINT wrapper because the platform overrides ENTRYPOINT
++    // to its own /container-server/sandbox runtime. Wrapping a few shell
++    // commands in `this.exec()` here is the next-best hook.
++    try {
++      const trustResult = await this.exec(
++        "if [ -f /etc/cloudflare/certs/cloudflare-containers-ca.crt ] && [ ! -f /usr/local/share/ca-certificates/cloudflare-containers-ca.crt ]; then cp /etc/cloudflare/certs/cloudflare-containers-ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates >/dev/null 2>&1; fi",
++        { timeout: 15000 },
++      );
++      if (trustResult.exitCode !== 0) {
++        console.warn(
++          `[sandbox] CA trust step exited ${trustResult.exitCode} for ${opts.sessionId}: ${trustResult.stderr || trustResult.stdout}`,
++        );
++      }
++    } catch (error) {
++      console.warn(
++        `[sandbox] CA trust step threw for ${opts.sessionId}: ${toErrorMessage(error)}`,
++      );
++    }
++
+     try {
+       // `ant beta:worker run` (formerly `ant worker dispatch`) reads the
+       // ANTHROPIC_* env vars we set above. `--unrestricted-paths` replaces
