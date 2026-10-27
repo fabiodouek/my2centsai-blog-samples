@@ -4,6 +4,12 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [e2b-sandbox-lifecycle](./e2b-sandbox-lifecycle)
+
+Nine Python scripts that walk an E2B sandbox through its full lifecycle: create, commands and files, timeouts, pause/resume, auto-pause and auto-resume, list and connect, fork and snapshots, a custom template, and cleanup. Each script prints timings.
+
+Blog post: [E2B Sandboxes: Hands-On with the Full Sandbox Lifecycle](https://my2cents.ai/deep-dive/e2b-sandboxes)
+
 ### [bedrock-agentcore-otel-pydantic](./bedrock-agentcore-otel-pydantic)
 
 A Pydantic AI agent instrumented with OpenTelemetry, exporting traces and metrics to Amazon CloudWatch OTLP endpoints using SigV4 authentication. Uses Claude on Amazon Bedrock AgentCore with three sample tools (weather, calculator, time).
