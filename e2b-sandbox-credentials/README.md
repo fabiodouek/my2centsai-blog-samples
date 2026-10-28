@@ -6,7 +6,7 @@ Claude Code runs inside an E2B sandbox that never holds a real credential. The A
 a GitHub token live in E2B Secrets. E2B's egress proxy adds them as HTTP headers on the way out,
 only for `api.anthropic.com`, `github.com` and `api.github.com`. Everything else is denied.
 
-Video walkthrough: https://youtu.be/jUcVsgsBYNg
+Video walkthrough: https://youtu.be/078_F25G2Zc
 
 ```text
 sandbox (placeholders only)  ──HTTPS──▶  E2B egress proxy  ──▶  api.anthropic.com   x-api-key: <real key>
