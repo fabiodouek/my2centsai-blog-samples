@@ -1,0 +1,9 @@
+[project]
+name = "e2b-sandbox-credentials"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai E2B sandbox credential injection deep dive"
+requires-python = ">=3.11"
+dependencies = [
+    "e2b==2.61.0",
+    "python-dotenv>=1.0",
+]

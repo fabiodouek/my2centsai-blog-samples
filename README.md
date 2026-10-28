@@ -4,6 +4,10 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [e2b-sandbox-credentials](./e2b-sandbox-credentials)
+
+Claude Code in an E2B sandbox that never holds the Anthropic key or the GitHub token: E2B Secrets plus per-host egress header injection. Eight Python scripts set up the secrets, test the injection mechanics, run Claude Code, clone and push with git and gh, open a PR end to end, attempt to leak the credentials, rotate them live, and clean up.
+
 ### [e2b-sandbox-lifecycle](./e2b-sandbox-lifecycle)
 
 Nine Python scripts that walk an E2B sandbox through its full lifecycle: create, commands and files, timeouts, pause/resume, auto-pause and auto-resume, list and connect, fork and snapshots, a custom template, and cleanup. Each script prints timings.
