@@ -1,0 +1,10 @@
+[project]
+name = "daytona-sandbox-lifecycle"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai Daytona sandbox lifecycle tutorial"
+requires-python = ">=3.11"
+dependencies = [
+    "daytona==0.226.1",
+    "python-dotenv>=1.0",
+    "requests>=2.32",
+]
