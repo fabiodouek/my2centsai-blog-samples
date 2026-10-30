@@ -1,0 +1,11 @@
+[project]
+name = "langsmith-sandbox-credentials"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai LangSmith sandbox credentials tutorial"
+requires-python = ">=3.11"
+dependencies = [
+    "langsmith==0.14.14",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "boto3>=1.40",
+]
