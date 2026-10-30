@@ -1,0 +1,12 @@
+[project]
+name = "daytona-sandbox-credentials"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai Daytona sandbox credentials tutorial"
+requires-python = ">=3.11"
+dependencies = [
+    "daytona==0.226.1",
+    "python-dotenv>=1.0",
+    "requests>=2.32",
+    "boto3>=1.40",
+    "aws-bedrock-token-generator>=1.1",
+]
