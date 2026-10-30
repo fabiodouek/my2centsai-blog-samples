@@ -4,6 +4,30 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [google-ax-stress](./google-ax-stress)
+
+Stress tests for Google AX on the two-node EKS cluster from `google-ax-eks`: density ceiling, create/resume/suspend latency under concurrency, wake-on-request bursts, control-plane throughput, noisy neighbors and a snapshot storm, with CloudWatch Container Insights and kubelet metrics, and the scripts that draw the post's charts.
+
+Blog post: [Google AX on Amazon EKS: Stress Testing Two Nodes](https://my2cents.ai/deep-dive/google-ax-stress)
+
+### [google-ax-lifecycle](./google-ax-lifecycle)
+
+Nine Python scripts that put Google AX tasks through their lifecycle on the EKS cluster from `google-ax-eks`: create, first resume, suspend/resume cycles, wake on request through Substrate's router, when snapshots reach S3, a 2 GB workspace, density on two workers, and failures. Each script prints timings.
+
+Blog post: [Google AX Task Lifecycle: Hands-On on Amazon EKS](https://my2cents.ai/deep-dive/google-ax-lifecycle)
+
+### [google-ax-credentials](./google-ax-credentials)
+
+Claude Code in a Google AX task that never holds the Anthropic key or the GitHub token: Kubernetes Secrets plus Substrate's egress gateway, which swaps placeholder headers for the real values. Eight Python scripts cover the mechanics, Claude Code, git and gh, an end-to-end pull request, leak attempts, rotation and cleanup.
+
+Blog post: [Google AX Credential Injection: Hands-On with Claude Code and GitHub](https://my2cents.ai/deep-dive/google-ax-credentials)
+
+### [google-ax-eks](./google-ax-eks)
+
+Google AX (Agent Executor) and Agent Substrate on Amazon EKS 1.37: Terraform for the cluster, S3 snapshot bucket, Pod Identity roles and an ECR create-on-push template, plus shell scripts that build Substrate and AX from source, install them with an EKS kustomize overlay and an 11-line `ate-setup` patch, create the gVisor WorkerPool and run AX's smoke test.
+
+Blog post: [Google AX on Amazon EKS: Hands-On with a Self-Hosted Install](https://my2cents.ai/deep-dive/google-ax-eks)
+
 ### [daytona-sandbox-credentials](./daytona-sandbox-credentials)
 
 Claude Code in a Daytona sandbox that holds only placeholders for its credentials: per-user Daytona Secrets that are substituted in HTTPS headers at egress. Python scripts set up the secrets, test the substitution, run Claude Code on the Anthropic API and on Bedrock, clone and push with git and gh, attempt to leak the credentials, rotate them live, give a second user a GitHub App user token through the OAuth device flow, sign S3 requests, and clean up.

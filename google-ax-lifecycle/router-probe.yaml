@@ -1,0 +1,38 @@
+# A curl pod that the atenet router will accept as a client.
+#
+# The router listens on 443 with mutual TLS and only admits the SPIFFE IDs
+# given to ate-setup with --ingress-allowed-spiffe-ids. For this install that
+# is spiffe://cluster.local/ns/ax-system/sa/ax-server, so the pod runs as the
+# ax-server service account and asks for the same pod certificate ax-server
+# gets. Anything that can create pods in ax-system can do the same: that is
+# the access boundary for every task's network endpoint.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: router-probe
+  namespace: ax-system
+spec:
+  serviceAccountName: ax-server
+  restartPolicy: Never
+  containers:
+  - name: curl
+    image: public.ecr.aws/docker/library/alpine:3.22
+    command: ["sh", "-c", "apk add -q curl >/dev/null && sleep 3600"]
+    volumeMounts:
+    - { name: servicedns-ca, mountPath: /run/servicedns-ca }
+    - { name: podidentity, mountPath: /run/podidentity }
+  volumes:
+  - name: servicedns-ca          # verifies the router's serving certificate
+    projected:
+      sources:
+      - clusterTrustBundle:
+          signerName: servicedns.podcert.ate.dev/identity
+          labelSelector: { matchLabels: { podcert.ate.dev/canarying: live } }
+          path: trust-bundle.pem
+  - name: podidentity            # this pod's client certificate (SPIFFE ID of ax-server)
+    projected:
+      sources:
+      - podCertificate:
+          signerName: podidentity.podcert.ate.dev/identity
+          keyType: ECDSAP256
+          credentialBundlePath: credential-bundle.pem

@@ -1,0 +1,4 @@
+.src/
+.records/
+terraform/tfplan
+terraform/.terraform.tfstate.lock.info
