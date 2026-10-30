@@ -1,0 +1,70 @@
+# Agent Substrate control plane on Amazon EKS.
+#
+# Copied into the Substrate checkout as manifests/ate-install/eks by
+# scripts/02_sources.sh and selected with ATE_SYSTEM_OVERLAY (see
+# ../ate-setup-overlay.patch). It mirrors ../base (the GKE bundle) with three
+# differences:
+#
+#   1. Snapshots go to S3 instead of GCS. The objectstore-plugin sidecars in
+#      ate-api-server and atelet read the pod's own AWS credentials, which EKS
+#      Pod Identity provides (terraform/main.tf associates a role with both
+#      service accounts). No endpoint or static keys, unlike the kind overlay.
+#   2. atelet pulls sandbox images with the node's kubelet credential provider.
+#      The base manifest mounts GKE's paths; AL2023 EKS nodes keep the ECR
+#      provider and its config under /etc/eks/image-credential-provider.
+#   3. No GKE-only objects: the PodMonitoring for the router is dropped, and
+#      telemetry isn't pointed at GKE's managed collector.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../ate-api-server.yaml
+  - ../ate-idp-server.yaml
+  - ../ate-controller.yaml
+  - ../atelet.yaml
+  - ../atenet-router.yaml
+  - ../ate-system-networkpolicies.yaml
+  - ate-otel-config.yaml
+
+patches:
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ate-api-server
+        namespace: ate-system
+      spec:
+        template:
+          spec:
+            initContainers:
+            - name: objectstore-plugin
+              env:
+              - name: ATE_STORAGE_BACKEND
+                value: s3
+              - name: AWS_REGION
+                value: AWS_REGION_PLACEHOLDER
+  - patch: |-
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: atelet
+        namespace: ate-system
+      spec:
+        template:
+          spec:
+            initContainers:
+            - name: objectstore-plugin
+              env:
+              - name: ATE_STORAGE_BACKEND
+                value: s3
+              - name: AWS_REGION
+                value: AWS_REGION_PLACEHOLDER
+            volumes:
+            - name: image-credential-provider-bin
+              hostPath:
+                path: /etc/eks/image-credential-provider
+                type: Directory
+            - name: image-credential-provider-config
+              hostPath:
+                path: /etc/eks/image-credential-provider/config.json
+                type: File

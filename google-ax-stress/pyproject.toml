@@ -1,0 +1,6 @@
+[project]
+name = "google-ax-stress"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive stress-testing Google AX on two EKS nodes"
+requires-python = ">=3.11"
+dependencies = ["matplotlib>=3.9"]

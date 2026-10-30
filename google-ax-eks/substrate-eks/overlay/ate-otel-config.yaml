@@ -1,0 +1,12 @@
+# Same ConfigMap name as ../ate-otel-config.yaml, which points every component
+# at GKE's managed collector. There is no collector in this cluster, so turn
+# the OTLP exporters off; actor events and lifecycle records stay on stdout
+# (kubectl logs), as on GKE.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ate-otel-config
+  namespace: ate-system
+data:
+  OTEL_TRACES_EXPORTER: none
+  OTEL_METRICS_EXPORTER: none

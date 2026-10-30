@@ -1,0 +1,41 @@
+diff --git a/cmd/ate-setup/internal/config/config.go b/cmd/ate-setup/internal/config/config.go
+index ab39897c..8adbb44b 100644
+--- a/cmd/ate-setup/internal/config/config.go
++++ b/cmd/ate-setup/internal/config/config.go
+@@ -303,7 +303,9 @@ func (c *Config) TransferServiceAccount() string {
+ // exchange impersonates the account and refuses to start without one.
+ // ate-setup installs GCS everywhere but kind, which uses S3.
+ func (c *Config) RequireTransferServiceAccount() error {
+-	if c.Kind {
++	// my2cents.ai EKS patch: the EKS overlay stores snapshots on S3, which
++	// has no transfer service account.
++	if c.Kind || os.Getenv("ATE_SYSTEM_OVERLAY") != "" {
+ 		return nil
+ 	}
+ 	if c.TransferGSAName == "" {
+diff --git a/cmd/ate-setup/internal/steps/overlay.go b/cmd/ate-setup/internal/steps/overlay.go
+index 8a2d6d3e..b7f72f96 100644
+--- a/cmd/ate-setup/internal/steps/overlay.go
++++ b/cmd/ate-setup/internal/steps/overlay.go
+@@ -73,6 +73,11 @@ func (e *Env) components() []string {
+ // variants, and the sandboxconfig files, all of which have their own apply
+ // steps.
+ func SystemOverlay(cfg *config.Config) string {
++	// my2cents.ai EKS patch: an install outside kind and GKE names its own
++	// kustomization, relative to the repository root.
++	if overlay := os.Getenv("ATE_SYSTEM_OVERLAY"); overlay != "" {
++		return overlay
++	}
+ 	switch {
+ 	case cfg.Router == config.RouterAgentgateway && cfg.Kind:
+ 		return installDir + "/kind-agentgateway"
+@@ -534,6 +539,9 @@ func (e *Env) applyAtenetEgress(ctx context.Context, provider config.CredentialP
+ // right copy themselves: applying the base file on a kind cluster would
+ // overwrite it with the GKE endpoint and break telemetry everywhere at once.
+ func (e *Env) otelConfigPath() string {
++	if overlay := os.Getenv("ATE_SYSTEM_OVERLAY"); overlay != "" {
++		return e.Cfg.Path(overlay + "/ate-otel-config.yaml")
++	}
+ 	if e.Cfg.Kind {
+ 		return e.Cfg.Manifest("kind", "ate-otel-config.yaml")
+ 	}
