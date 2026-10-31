@@ -6,7 +6,7 @@ create/resume/suspend latency under concurrency, wake-on-request bursts through 
 control-plane throughput, noisy neighbors and a snapshot storm. Every chart in the post is drawn by
 `09_charts.py` from the results these scripts write.
 
-Video walkthrough: https://youtu.be/hLPkKjIvDXY
+Video walkthrough: https://youtu.be/wT7NHCUMRbw
 
 No more nodes are added: everything runs on the two `m7i.xlarge` workers the install post created.
 
