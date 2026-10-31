@@ -8,7 +8,7 @@ GitHub token live in Kubernetes Secrets. Substrate's egress gateway terminates t
 the hosts its egress policy lists and swaps placeholder headers for the real values on the way out.
 Every other host doesn't even resolve.
 
-Video walkthrough: https://youtu.be/wf7HAWN3jeM
+Video walkthrough: https://youtu.be/XIi42B2cRps
 
 ```text
 AX task (placeholders only)  ──HTTPS──▶  Substrate egress gateway  ──▶  api.anthropic.com  x-api-key: <real key>
