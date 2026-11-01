@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
 
 from openshell import SandboxClient
 
-GATEWAY = "osh-eks"   # CLI registration from 05_install.sh (port-forward on 127.0.0.1:17680)
+GATEWAY = "osh-eks"   # CLI registration from 05_install.sh (port-forward on 127.0.0.1:$LOCAL_PORT)
 WORKSPACE = "default"
 NAMESPACE = "openshell"
 CONTEXT = "osh-eks"   # kubectl context from 01_cluster.sh
+PORT = os.environ.get("LOCAL_PORT", "17680")  # the port-forward 05_install.sh started
 
 
 def client() -> SandboxClient:
@@ -27,8 +29,8 @@ def require_gateway() -> None:
             c.health()
     except Exception:  # any connection, TLS or lookup failure means the same thing here
         print(
-            "Gateway not reachable at 127.0.0.1:17680: run ./05_install.sh, or "
-            "kubectl -n openshell port-forward svc/openshell 17680:8080",
+            f"Gateway not reachable at 127.0.0.1:{PORT}: run ./05_install.sh, or "
+            f"kubectl -n openshell port-forward svc/openshell {PORT}:8080",
             file=sys.stderr,
         )
         sys.exit(1)

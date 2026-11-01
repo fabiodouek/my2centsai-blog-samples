@@ -37,7 +37,7 @@ from common import (CONTEXT, GATEWAY, NAMESPACE, WORKSPACE, client,  # noqa: E40
 PREFIX = "p6-"
 RELEASE = "openshell"                                # Helm release from 05_install.sh
 CHART = INSTALL / "charts" / "helm-chart-0.1.6.tgz"  # the chart 05_install.sh installed
-PF_PORT = 17680                                      # the CLI's port-forward (part 2)
+PF_PORT = int(os.environ.get("LOCAL_PORT", "17680"))  # the CLI's port-forward (part 2's LOCAL_PORT)
 PROBES = HERE / "probes"
 POLICIES = HERE / "policies"
 VALUES = HERE / "values"
@@ -187,7 +187,7 @@ def gateway_up() -> bool:
 
 
 def wait_gateway(max_wait: float = float(os.environ.get("P6_GATEWAY_WAIT_S", 600))) -> None:
-    """Block until the gateway answers through the port-forward on 127.0.0.1:17680. With
+    """Block until the gateway answers through the port-forward on 127.0.0.1:PF_PORT. With
     P6_RESTART_PORT_FORWARD=1 the port-forward is restarted (at most once a minute); otherwise
     the run waits for whoever owns it. Gives up with a clear error after max_wait seconds."""
     global _pf_restarted
@@ -757,7 +757,7 @@ def gateway_pod_uid() -> str:
 
 
 def restart_port_forward() -> None:
-    """The CLI and SDK reach the gateway through `kubectl port-forward svc/openshell 17680:8080`
+    """The CLI and SDK reach the gateway through `kubectl port-forward svc/openshell PF_PORT:8080`
     (part 2's 05_install.sh), which dies with the gateway Pod. Same pid file and log as
     ../openshell-lifecycle/lib.sh restart_pf."""
     pidf, log = INSTALL / ".port-forward.pid", INSTALL / "logs" / "port-forward.log"

@@ -2,6 +2,8 @@
 # Test 1: a first sandbox from the CLI. Create, inspect, run commands, move a file in and
 # out, read the logs, delete.
 set -euo pipefail
+# The local gateway from 00_gateway.sh, even when another one (part 2's osh-eks) is active.
+export OPENSHELL_GATEWAY="${OPENSHELL_GATEWAY:-openshell}"
 cd "$(dirname "$0")"
 
 NAME="first"

@@ -15,8 +15,14 @@ Video walkthrough: https://youtu.be/NoI-68gMmtg
   && rm -rf "$(brew --prefix)/var/openshell"` (the official upgrade notes say the same).
   `00_gateway.sh` stops with a message if it finds one.
 
-On Linux, the same scripts work with the Debian/RPM packages that `install.sh` installs; the
-gateway then runs as a systemd user service and reads `~/.config/openshell/gateway.env`.
+I ran these only on macOS. `00_gateway.sh` installs with Homebrew and restarts the gateway with
+`brew services`, and the Docker supervisor's bridge mode relies on Docker Desktop's
+`host.docker.internal`. On Linux, `install.sh` installs Debian/RPM packages instead, and the gateway
+runs as a systemd user service that reads `~/.config/openshell/gateway.env`, so expect to adapt
+`00_gateway.sh`.
+
+The scripts talk to the local gateway, registered as `openshell`, even when another gateway is
+active (part 2's `05_install.sh` makes `osh-eks` active). Set `OPENSHELL_GATEWAY` to use another.
 
 ## Scripts
 
@@ -26,7 +32,7 @@ gateway then runs as a systemd user service and reads `~/.config/openshell/gatew
 | `01_first_sandbox.sh` | Test 1: create a sandbox from the CLI, inspect it, run commands, upload and download a file, read its logs, delete it |
 | `02_sdk.py` | Test 2: the same lifecycle from the Python SDK, with phase changes timestamped |
 | `03_network_policy.sh` | Test 3: deny by default. `curl` may reach `pypi.org`, `python3` may not, `httpbin.org` is blocked until a live policy update allows it for `curl`; the deny lines from the logs |
-| `99_cleanup.sh` | Deletes every sandbox on the active gateway (`--stop` also stops the gateway) |
+| `99_cleanup.sh` | Deletes every sandbox on the local gateway (`--stop` also stops it) |
 
 ```bash
 ./00_gateway.sh

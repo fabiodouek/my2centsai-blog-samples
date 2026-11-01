@@ -14,10 +14,11 @@ INSTALL="${HERE}/../openshell-eks"
 # shellcheck source=/dev/null
 source "${INSTALL}/env.sh"
 NS="openshell"
+LOCAL_PORT="${LOCAL_PORT:-17680}"   # part 2's port-forward; set it as you did for 05_install.sh
 kubectl() { command kubectl --context "$KUBE_CONTEXT" "$@"; }
 helm() { command helm --kube-context "$KUBE_CONTEXT" "$@"; }
 os() { openshell -g osh-eks "$@"; }   # -g before the subcommand
-os status >/dev/null 2>&1 || { echo "Gateway not reachable at 127.0.0.1:17680: run ../openshell-eks/09_scale.sh up" >&2; exit 1; }
+os status >/dev/null 2>&1 || { echo "Gateway not reachable at 127.0.0.1:${LOCAL_PORT}: run ../openshell-eks/09_scale.sh up" >&2; exit 1; }
 
 # 1. Sandboxes (in parallel: each delete takes about 30 s), then wait until none is listed.
 names=$(os sandbox list -o json 2>/dev/null | jq -r '.sandboxes[]?.name | select(startswith("p6-"))')
@@ -83,7 +84,7 @@ if [[ "${1:-}" != "--no-helm" ]]; then
     fi
     pidf="${INSTALL}/.port-forward.pid"
     [[ -f "$pidf" ]] && kill "$(cat "$pidf")" 2>/dev/null
-    nohup kubectl -n "$NS" port-forward svc/openshell 17680:8080 >"${INSTALL}/logs/port-forward.log" 2>&1 &
+    nohup kubectl -n "$NS" port-forward svc/openshell "${LOCAL_PORT}:8080" >"${INSTALL}/logs/port-forward.log" 2>&1 &
     echo $! >"$pidf"
     disown
     for _ in $(seq 1 30); do os status >/dev/null 2>&1 && break; sleep 1; done

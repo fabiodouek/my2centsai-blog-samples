@@ -9,6 +9,9 @@
 # openshell-demo-<timestamp>, which the script deletes again.
 source "$(dirname "$0")/lib.sh"
 : "${GITHUB_TOKEN:?set GITHUB_TOKEN}" "${GITHUB_REPO:?set GITHUB_REPO (owner/name)}" "${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY}"
+# gh deletes the demo branch from the host if a run stops before the in-sandbox delete. It reads
+# GITHUB_TOKEN from the environment, so the token never goes on a command line.
+command -v gh >/dev/null || { echo "gh not found: it deletes the demo branch if a run is interrupted" >&2; exit 1; }
 NAME="creds"
 BRANCH="openshell-demo-$(date +%s)"
 mask() { sed -e "s|${GITHUB_REPO}|<GITHUB_REPO>|g" -e 's|^remote: .*pull/new.*|remote: (pull-request link)|'; }
@@ -66,4 +69,4 @@ in_sb "$NAME" sh -c 'curl -sS -m 60 https://api.anthropic.com/v1/messages -H "x-
   | jq -r "\"  model:  \" + .model, \"  reply:  \" + .content[0].text, \"  tokens: \(.usage.input_tokens) in, \(.usage.output_tokens) out\""'
 
 say "openshell logs ${NAME}   (credential decisions)"
-ocsf "$NAME" | grep -E 'credential|authority|HTTP:POST.*(messages|receive-pack)' | cut -c1-140 | mask | sed 's/^/  /' | tail -n 4
+ocsf "$NAME" | grep -E 'credential|authority|HTTP:POST.*(messages|receive-pack)' | mask | cut -c1-140 | sed 's/^/  /' | tail -n 4

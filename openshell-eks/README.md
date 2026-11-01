@@ -3,8 +3,9 @@
 Companion code for part 2 of the my2cents.ai series "OpenShell on Amazon EKS": OpenShell
 **0.1.6** on Amazon EKS **1.37**, built with Terraform and a handful of scripts, with every image
 copied into ECR, VPC CNI network policy enforcement on, the gateway reachable through a
-port-forward (and, for one test, through an IP-restricted NLB), and Kata ready as a per-sandbox
-VM runtime. Parts 3 to 6 of the series run on this cluster.
+port-forward (and, for one test, through an IP-restricted NLB), and Kata installed as a
+per-sandbox VM runtime: a plain Kata Pod runs, but an OpenShell 0.1.6 sandbox under Kata doesn't
+(gate 3 below). Parts 3 to 6 of the series run on this cluster, with sandboxes on runc.
 
 Video walkthrough: https://youtu.be/ShSChGiXwmY
 
@@ -54,7 +55,7 @@ certificate is copied from it into `~/.config/openshell/gateways/osh-eks/mtls/`.
 ./04_fence.sh
 ./05_install.sh --show-preflight
 ./06_remote.sh
-uv run python 07_first_sandbox.py
+uv run python 07_first_sandbox.py --cold   # removes the workload image from both nodes first
 ./08_kata_sandbox.sh
 ./06_remote.sh --delete
 ./09_scale.sh down       # between sessions
@@ -99,12 +100,13 @@ Every script is safe to run again: a second run converges instead of failing or 
 | `DeleteSandbox` blocks until the Pods and the EBS volume are gone (about 30 s), past the Python SDK's default 30 s RPC timeout | `common.py` creates the client with a 120 s timeout |
 | The workload runs as UID 10001 whatever the image's `USER` says | Nothing to fix; the driver sets it |
 | Telemetry is on by default | `server.telemetryEnabled: false` |
-| Port 8080 may be taken on a laptop | The port-forward uses 127.0.0.1:17680 |
+| Port 8080 may be taken on a laptop | The port-forward uses 127.0.0.1:17680. To change it, export `LOCAL_PORT` before `05_install.sh`, and keep it set for `09_scale.sh` and parts 3 to 6 |
 
 ## Cost
 
-About $0.97 an hour with both nodes up (two `m7i.2xlarge` at $0.4032/h, the EKS control plane at
-$0.10/h, one NAT gateway at $0.045/h, plus small change), about $23 a day. The NLB adds about
+About $0.98 an hour with both nodes up (two `m7i.2xlarge` at $0.4032/h, the EKS control plane at
+$0.10/h, one NAT gateway at $0.045/h and its public IPv4, the root volumes and small change),
+about $23.50 a day. The NLB adds about
 $0.03/h while it exists. `./09_scale.sh down` leaves about $0.15/h (control plane and NAT gateway).
 
 ## Telemetry

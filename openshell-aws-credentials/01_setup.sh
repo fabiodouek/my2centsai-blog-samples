@@ -13,8 +13,8 @@
 # reported and skipped), reuses the provider, and reconfigures the refresh.
 #
 # terraform must already be applied (the IAM roles, the bucket and the Pod Identity association).
-# The agent that built this directory ran `terraform apply` once; re-run it from terraform/ if the
-# state is gone. No credential or the account id is ever printed.
+# Run `terraform init && terraform apply` in terraform/ first (see the README). No credential or
+# the account id is ever printed.
 source "$(dirname "$0")/lib.sh"
 TF="${HERE}/terraform"
 SESSION_NAME="p5-shared"   # CloudTrail session name for the shared provider (06_cloudtrail.sh)
@@ -86,4 +86,4 @@ os provider refresh status "$PROVIDER" 2>&1 | nocolor | mask
 
 echo
 ok "setup done. The provider mints the sandbox-role session; the tests attach it with --provider ${PROVIDER}"
-ok "and pass --policy "$(policy_file)" so the supervisor signs S3, Bedrock and STS."
+ok "and pass --policy logs/aws-signing.${PROVIDER}.yaml (policy_file in lib.sh) so the supervisor signs S3, Bedrock and STS."

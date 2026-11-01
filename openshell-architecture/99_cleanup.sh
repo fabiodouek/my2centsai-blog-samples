@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Deletes every sandbox on the active gateway. With --stop, also stops the local gateway.
+# Deletes every sandbox on the local gateway ($OPENSHELL_GATEWAY, default "openshell"). With --stop,
+# also stops it.
 set -euo pipefail
+# The local gateway from 00_gateway.sh, even when another one (part 2's osh-eks) is active.
+export OPENSHELL_GATEWAY="${OPENSHELL_GATEWAY:-openshell}"
 
 openshell status >/dev/null 2>&1 || { echo "OpenShell gateway not reachable: nothing to clean" >&2; exit 0; }
 

@@ -1,7 +1,8 @@
-"""Helpers shared by the Python scripts: connect to the active gateway and run commands."""
+"""Helpers shared by the Python scripts: connect to the local gateway and run commands."""
 
 from __future__ import annotations
 
+import os
 import sys
 
 from openshell import SandboxClient
@@ -11,8 +12,9 @@ WORKLOAD_IMAGE = "openshell-workload:0.1.6"
 
 
 def client() -> SandboxClient:
-    """The gateway the CLI has marked active (the installer registers the local one)."""
-    return SandboxClient.from_active_cluster()
+    """The local gateway from 00_gateway.sh ($OPENSHELL_GATEWAY, default "openshell"), even when
+    the CLI has another one marked active, such as part 2's osh-eks."""
+    return SandboxClient.from_active_cluster(cluster=os.environ.get("OPENSHELL_GATEWAY", "openshell"))
 
 
 def require_gateway() -> None:

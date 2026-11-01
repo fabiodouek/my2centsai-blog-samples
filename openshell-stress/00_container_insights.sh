@@ -10,6 +10,11 @@
 # ../openshell-eks/01_cluster.sh, so nothing else in the plan should change: read the plan
 # summary before it applies. The add-on runs a cloudwatch-agent DaemonSet, which takes one Pod
 # slot on each node (part of what 01_density.py measures against).
+#
+# After a successful apply, "on" writes ../openshell-eks/terraform/container_insights.auto.tfvars
+# and "off" removes it. Terraform reads that file on every run in that directory, so a re-run of
+# ../openshell-eks/01_cluster.sh (needed when your public IP changes) keeps the add-on instead of
+# quietly removing it in the middle of a test.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 INSTALL="${HERE}/../openshell-eks"
@@ -27,6 +32,10 @@ terraform -chdir="${INSTALL}/terraform" plan -input=false -no-color -out="$plan"
 grep -E '^(Plan:|No changes)|^  # ' "${HERE}/logs/container-insights-plan.log" || true
 read -r -p "apply this plan? [y/N] " ok
 [[ "$ok" == y ]] || { echo "not applied"; rm -f "$plan"; exit 0; }
-terraform -chdir="${INSTALL}/terraform" apply -input=false -no-color "$plan" | grep -E '^(Apply complete|Error)' || true
+out="$(terraform -chdir="${INSTALL}/terraform" apply -input=false -no-color "$plan" 2>&1)" \
+  || { tail -n 20 <<<"$out" >&2; rm -f "$plan"; exit 1; }
+grep -E '^Apply complete' <<<"$out"
 rm -f "$plan"
+tfvars="${INSTALL}/terraform/container_insights.auto.tfvars"
+if [[ "$want" == true ]]; then echo 'container_insights = true' >"$tfvars"; else rm -f "$tfvars"; fi
 kubectl --context "$KUBE_CONTEXT" -n amazon-cloudwatch get pods 2>/dev/null || true
