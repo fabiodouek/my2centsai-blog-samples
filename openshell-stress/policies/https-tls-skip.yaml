@@ -1,0 +1,17 @@
+# Egress ladder, HTTPS rungs (04_egress_ladder.py --https): an AWS endpoint in the same Region,
+# reached through the NAT gateway. tls: skip relays the client's own TLS session untouched.
+version: 1
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  s3:
+    endpoints:
+      - host: s3.us-east-1.amazonaws.com
+        port: 443
+        tls: skip
+    binaries:
+      - path: /usr/bin/python3.12

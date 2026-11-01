@@ -1,0 +1,58 @@
+# The Kata gate from 02_kata.sh: the same image and command under two runtimes.
+#   kata-test  runs in a Kata VM (RuntimeClass kata-qemu; 02_kata.sh can swap in another)
+#   runc-test  runs as an ordinary container on the node, for comparison
+# Each prints its kernel and how many CPUs carry the "hypervisor" flag, then waits until it
+# is deleted. The node is itself an EC2 VM, so both see the flag: the counts differ because
+# the Kata VM has its own vCPUs (one by default), while runc sees all of the node's.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kata-test
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kata-gate
+spec:
+  runtimeClassName: kata-qemu
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 5
+  containers:
+    - name: probe
+      image: public.ecr.aws/amazonlinux/amazonlinux:2023
+      command:
+        - sh
+        - -c
+        - |
+          echo "kernel: $(uname -r)"
+          echo "hypervisor: $(cat /proc/cpuinfo | grep -c hypervisor)"
+          trap 'exit 0' TERM
+          sleep 600 & wait
+      resources:
+        requests:
+          cpu: 100m
+          memory: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: runc-test
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kata-gate
+spec:
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 5
+  containers:
+    - name: probe
+      image: public.ecr.aws/amazonlinux/amazonlinux:2023
+      command:
+        - sh
+        - -c
+        - |
+          echo "kernel: $(uname -r)"
+          echo "hypervisor: $(cat /proc/cpuinfo | grep -c hypervisor)"
+          trap 'exit 0' TERM
+          sleep 600 & wait
+      resources:
+        requests:
+          cpu: 100m
+          memory: 64Mi

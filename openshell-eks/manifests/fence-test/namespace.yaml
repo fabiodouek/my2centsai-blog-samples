@@ -1,0 +1,5 @@
+# A namespace of its own, deleted at the end of 04_fence.sh.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fence-test

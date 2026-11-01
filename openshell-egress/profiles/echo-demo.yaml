@@ -1,0 +1,25 @@
+# A provider profile for the in-cluster echo server, with a dummy token. It exists so the tests can
+# show exactly what a destination receives when OpenShell substitutes a credential: the echo
+# server prints the Authorization header it got. Never put a real secret in it.
+#   openshell profile import -f profiles/echo-demo.yaml
+#   openshell provider create --name echo-demo --type echo-demo --credential ECHO_TOKEN=demo-token-1
+id: echo-demo
+display_name: Echo demo
+description: A dummy bearer token bound to echo.echo.svc.cluster.local
+category: other
+credentials:
+  - name: token
+    description: Dummy token, shown back by the echo server
+    env_vars: [ECHO_TOKEN]
+    required: true
+    auth_style: bearer
+    header_name: authorization
+discovery:
+  credentials: [token]
+endpoints:
+  - host: echo.echo.svc.cluster.local
+    port: 80
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+binaries: [/usr/bin/curl, /usr/bin/python3.12]

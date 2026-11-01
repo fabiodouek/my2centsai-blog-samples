@@ -1,0 +1,4 @@
+# Part 6 only (01_density.py --variant shared-1gi): 1 GiB workspace volumes instead of the
+# driver's default 2 GiB, for every new sandbox.
+server:
+  workspaceDefaultStorageSize: 1Gi

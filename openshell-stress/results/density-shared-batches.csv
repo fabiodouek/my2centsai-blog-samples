@@ -1,0 +1,8 @@
+variant,batch,requested,ready,batch_s,ready_p50_s,ready_max_s,pending_pods,t_rel,t_end,node0,node0_pods,node0_sandbox_pods,node0_ebs,node1,node1_pods,node1_sandbox_pods,node1_ebs
+shared,1,10,10,20.9,14.7,18.28,0,80.0,1793518837.614,ip-10-70-20-30.ec2.internal,17,6,7,ip-10-70-40-237.ec2.internal,17,4,4
+shared,2,20,20,20.3,13.97,17.55,0,101.0,1793518857.911,ip-10-70-20-30.ec2.internal,22,11,12,ip-10-70-40-237.ec2.internal,22,9,9
+shared,3,30,30,20.4,14.97,17.55,0,121.3,1793518878.319,ip-10-70-20-30.ec2.internal,27,16,17,ip-10-70-40-237.ec2.internal,27,14,14
+shared,4,40,40,18.0,13.76,15.05,0,141.7,1793518896.334,ip-10-70-20-30.ec2.internal,32,21,22,ip-10-70-40-237.ec2.internal,32,19,19
+shared,5,50,50,20.6,9.84,17.54,0,159.7,1793518916.953,ip-10-70-20-30.ec2.internal,37,26,27,ip-10-70-40-237.ec2.internal,37,24,24
+shared,6,60,60,20.7,10.9,17.33,0,180.3,1793518937.681,ip-10-70-20-30.ec2.internal,41,30,31,ip-10-70-40-237.ec2.internal,43,30,30
+shared,7,70,61,243.2,10.09,10.09,9,201.0,1793519180.877,ip-10-70-20-30.ec2.internal,41,30,31,ip-10-70-40-237.ec2.internal,44,31,31

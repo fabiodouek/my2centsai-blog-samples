@@ -1,0 +1,24 @@
+# Allow one binary, /usr/bin/curl, to reach one host, pypi.org:443. Everything else is denied:
+# other hosts for curl, and pypi.org for every other binary (python3 included).
+#
+#   openshell sandbox create --name netdemo --policy policies/curl-only.yaml ...
+#
+# The filesystem and Landlock sections are locked when the sandbox starts. The network
+# section can change while it runs (03_network_policy.sh adds httpbin.org live).
+version: 1
+
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/sandbox, /tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+
+network_policies:
+  pypi:
+    name: pypi-curl-only
+    endpoints:
+      - host: pypi.org
+        port: 443
+    binaries:
+      - { path: /usr/bin/curl }

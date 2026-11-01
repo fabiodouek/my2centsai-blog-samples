@@ -1,0 +1,35 @@
+# Values for the OpenShell 0.1.6 Helm chart (oci://ghcr.io/nvidia/openshell/helm-chart) on
+# Amazon EKS. 05_install.sh fills in ${ECR_REGISTRY} and ${ECR_PREFIX} from env.sh, and passes
+# pkiInitJob.serverDnsNames itself (the NLB hostname). Everything not listed here is the chart
+# default: a StatefulSet with one replica, SQLite on a PVC, one supervisor Pod per sandbox,
+# built-in mTLS PKI, NetworkPolicies on.
+
+# Every OpenShell image from ECR: the chart appends openshell/<component> to the registry,
+# and the tag is set explicitly rather than left to the chart's default.
+global:
+  image:
+    registry: ${ECR_REGISTRY}/${ECR_PREFIX}
+    tag: "0.1.6"
+
+# The default image for sandbox workloads (sandbox create without --from): ours, from ECR,
+# with the AWS CLI, boto3, git and gh, running as UID 1000.
+sandbox:
+  image:
+    repository: ${ECR_REGISTRY}/${ECR_PREFIX}/workload
+    tag: "0.1.6"
+
+server:
+  # On by default. The gateway passes the setting on to every supervisor it starts.
+  telemetryEnabled: false
+  drivers:
+    kubernetes:
+      # Lets a sandbox request driver settings such as a RuntimeClass (Kata, in part 3).
+      # A RuntimeClass still needs the openshell.ai/sandbox-attachable=true label.
+      allowDriverConfig: true
+
+# The chart sets no requests, which makes the gateway BestEffort: the first Pod evicted
+# under memory pressure.
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi

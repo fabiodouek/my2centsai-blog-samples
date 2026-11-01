@@ -1,0 +1,19 @@
+# curl, and only curl, may reach pypi.org:443. /sandbox/bin/fetch is a copy of curl that
+# 02_binaries.sh pins and then swaps.
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  pypi:
+    name: pypi-curl-only
+    endpoints:
+      - { host: pypi.org, port: 443 }
+    binaries:
+      - { path: /usr/bin/curl }
+      - { path: /sandbox/bin/fetch }

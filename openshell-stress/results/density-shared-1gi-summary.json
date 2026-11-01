@@ -1,0 +1,97 @@
+{
+ "variant": "shared-1gi",
+ "batch": 10,
+ "deadline_s": 240,
+ "limits": {
+  "ip-10-70-20-30.ec2.internal": {
+   "max_pods": 58,
+   "zone": "us-east-1a",
+   "mem_alloc_bytes": 32048005120,
+   "ebs_limit": 31
+  },
+  "ip-10-70-40-237.ec2.internal": {
+   "max_pods": 58,
+   "zone": "us-east-1b",
+   "mem_alloc_bytes": 32048005120,
+   "ebs_limit": 31
+  }
+ },
+ "baseline": {
+  "nodes": {
+   "ip-10-70-40-237.ec2.internal": {
+    "pods": 12,
+    "sandbox_pods": 0,
+    "p6_pods": 0,
+    "volume_attachments": 0
+   },
+   "ip-10-70-20-30.ec2.internal": {
+    "pods": 10,
+    "sandbox_pods": 0,
+    "p6_pods": 0,
+    "volume_attachments": 1
+   }
+  },
+  "pending_pods": 0
+ },
+ "requested": 70,
+ "max_ready": 61,
+ "stopped_by": "EBS attachments per node (CSINode allocatable)",
+ "first_failed": [
+  "p6-d062: Provisioning",
+  "p6-d063: Provisioning",
+  "p6-d064: Provisioning",
+  "p6-d065: Provisioning",
+  "p6-d066: Provisioning",
+  "p6-d067: Provisioning",
+  "p6-d068: Provisioning",
+  "p6-d069: Provisioning",
+  "p6-d070: Provisioning"
+ ],
+ "evidence": [
+  "p6-d062: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d063: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d064: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d065: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d066: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d067: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d068: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d069: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "p6-d070: conditions: PodScheduled=False Unschedulable 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.; Bootstrapping=True SandboxRuntimeGenerationStarting replacement sandbox-runtime generation is starting; ConfigurationReady=False ConfigurationPending Waiting for effective configuration validation before workload activati",
+  "pod default--p6-d062: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d063: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d064: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d065: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d066: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d067: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d068: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d069: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "pod default--p6-d070: PodScheduled: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d062: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d063: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d064: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d065: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d066: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d067: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d068: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d069: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.",
+  "event Pod/default--p6-d070: FailedScheduling: 0/2 nodes are available: 2 node(s) exceed max volume count. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod."
+ ],
+ "ready_s": {
+  "n": 61,
+  "p50": 11.114,
+  "p95": 17.558,
+  "p99": 17.558,
+  "min": 8.294,
+  "max": 17.558,
+  "mean": 12.824016393442623
+ },
+ "delete_call_s": {
+  "n": 70,
+  "p50": 31.108883624896407,
+  "p95": 31.65297287516296,
+  "p99": 31.734943749383092,
+  "min": 0.09103691671043634,
+  "max": 31.734943749383092,
+  "mean": 27.182506098265627
+ }
+}

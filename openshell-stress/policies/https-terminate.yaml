@@ -1,0 +1,17 @@
+# HTTPS rung "https-terminate": without tls: skip the supervisor terminates the client's TLS
+# with the sandbox's own CA (which the workload trusts through SSL_CERT_FILE) and opens a new
+# TLS connection to the destination.
+version: 1
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  s3:
+    endpoints:
+      - host: s3.us-east-1.amazonaws.com
+        port: 443
+    binaries:
+      - path: /usr/bin/python3.12

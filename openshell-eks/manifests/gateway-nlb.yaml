@@ -1,0 +1,29 @@
+# An internet-facing Network Load Balancer for the OpenShell gateway, reachable only from
+# ${MY_IP}. Our own Service rather than the chart's: the chart's Service can't take
+# annotations or source ranges, and it also publishes the unauthenticated metrics port 9090.
+#
+# TCP passthrough on 8080, so the gateway's own TLS (and mTLS client certificates) reach the
+# gateway untouched. An ALB, or the chart's GRPCRoute, would terminate TLS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: openshell-gateway-nlb
+  namespace: openshell
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+    - ${MY_IP}/32
+  # IP targets don't use node ports; not allocating them leaves no NodePort for this Service.
+  allocateLoadBalancerNodePorts: false
+  selector:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+  ports:
+    - name: grpc
+      port: 8080
+      targetPort: 8080
+      protocol: TCP

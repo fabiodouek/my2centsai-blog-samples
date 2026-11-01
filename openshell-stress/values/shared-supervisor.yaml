@@ -1,0 +1,19 @@
+# Part 6 only (01_density.py --variant shared|shared-1gi, 02_create_latency.py --topology shared).
+# The experimental shared supervisor pool: one Deployment hosts the supervisors of many
+# sandboxes instead of one supervisor Pod per sandbox. Two members, one per node, as in the
+# chart's high-availability docs. Applied with helm upgrade --reuse-values -f, and rolled back
+# to the previous release revision by the same script.
+gatewayConfig:
+  openshell.drivers.kubernetes:
+    supervisor_topology: gateway
+supervisor:
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: openshell-supervisor
+              app.kubernetes.io/instance: openshell
+              app.kubernetes.io/component: supervisor
+          topologyKey: kubernetes.io/hostname

@@ -1,0 +1,24 @@
+# A read-only REST endpoint without enforcement (audit mode): the prover won't vouch for it.
+version: 1
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  pypi:
+    name: pypi
+    endpoints:
+      - { host: pypi.org, port: 443 }
+    binaries:
+      - { path: /usr/bin/python3.12 }
+  echo_read:
+    name: echo-read
+    endpoints:
+      - host: echo.echo.svc.cluster.local
+        port: 80
+        protocol: rest
+        access: read-only
+    binaries:
+      - { path: /usr/bin/curl }

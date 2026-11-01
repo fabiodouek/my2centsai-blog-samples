@@ -1,0 +1,6 @@
+[project]
+name = "openshell-architecture"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on OpenShell's architecture (part 1 of OpenShell on Amazon EKS)"
+requires-python = ">=3.11"
+dependencies = ["openshell==0.1.6"]

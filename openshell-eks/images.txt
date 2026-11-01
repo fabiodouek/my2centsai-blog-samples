@@ -1,0 +1,15 @@
+# Images copied into ECR by 03_images.sh: <source>  <path under ${ECR_PREFIX}/>
+# A source may be pinned by digest (name@sha256:...); the ECR path always has a tag.
+
+# OpenShell 0.1.6. GHCR tags have no leading "v". The chart's default repositories are
+# openshell/<component>, so the values file only has to set the registry.
+ghcr.io/nvidia/openshell/gateway:0.1.6      openshell/gateway:0.1.6
+ghcr.io/nvidia/openshell/supervisor:0.1.6   openshell/supervisor:0.1.6
+ghcr.io/nvidia/openshell/sandbox:0.1.6      openshell/sandbox:0.1.6
+
+# The Agent Sandbox controller OpenShell's Kubernetes driver depends on (v1.0.3: the version
+# OpenShell's own CI tests).
+registry.k8s.io/agent-sandbox/agent-sandbox-controller:v1.0.3   agent-sandbox/agent-sandbox-controller:v1.0.3
+
+# The default workload base, pinned: the 24.04 tag moves.
+nvcr.io/nvidia/base/ubuntu@sha256:d9461f428eea54e553add3a5158a0f245c6e1ea73efc59fff8e98e3d4a38e378   base/ubuntu:24.04
