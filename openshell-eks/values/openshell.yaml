@@ -23,7 +23,7 @@ server:
   telemetryEnabled: false
   drivers:
     kubernetes:
-      # Lets a sandbox request driver settings such as a RuntimeClass (Kata, in part 3).
+      # Lets a sandbox request driver settings such as a RuntimeClass (Kata, in 08_kata_sandbox.sh).
       # A RuntimeClass still needs the openshell.ai/sandbox-attachable=true label.
       allowDriverConfig: true
 

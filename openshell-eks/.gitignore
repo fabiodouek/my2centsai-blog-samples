@@ -2,6 +2,7 @@
 *.tfstate*
 .terraform.lock.hcl
 terraform/tfplan
+terraform/*.auto.tfvars
 env.sh
 logs/
 charts/

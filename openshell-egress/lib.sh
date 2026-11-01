@@ -7,10 +7,11 @@ INSTALL="${HERE}/../openshell-eks"
 # shellcheck source=/dev/null
 source "${INSTALL}/env.sh"
 NS="openshell"
+LOCAL_PORT="${LOCAL_PORT:-17680}"   # part 2's port-forward; set it as you did for 05_install.sh
 ECHO_HOST="echo.echo.svc.cluster.local"
 kubectl() { command kubectl --context "$KUBE_CONTEXT" "$@"; }
 os() { openshell -g osh-eks "$@"; }   # -g before the subcommand, never after a -- command
-os status >/dev/null 2>&1 || { echo "Gateway not reachable at 127.0.0.1:17680: run ../openshell-eks/05_install.sh (or 09_scale.sh up)" >&2; exit 1; }
+os status >/dev/null 2>&1 || { echo "Gateway not reachable at 127.0.0.1:${LOCAL_PORT}: run ../openshell-eks/05_install.sh (or 09_scale.sh up)" >&2; exit 1; }
 say() { printf '\n\033[1m$ %s\033[0m\n' "$*"; }
 now() { python3 -c 'import time; print(f"{time.time():.1f}")'; }
 since() { python3 -c "import time; print(f'{time.time() - $1:.1f}')"; }
@@ -36,7 +37,7 @@ restart_pf() {
   local pidf="${INSTALL}/.port-forward.pid"
   [[ -f "$pidf" ]] && { kill "$(cat "$pidf")" 2>/dev/null; wait "$(cat "$pidf")" 2>/dev/null; }
   kubectl -n "$NS" rollout status statefulset/openshell --timeout=5m >/dev/null
-  nohup kubectl -n "$NS" port-forward svc/openshell 17680:8080 >"${INSTALL}/logs/port-forward.log" 2>&1 &
+  nohup kubectl -n "$NS" port-forward svc/openshell "${LOCAL_PORT}:8080" >"${INSTALL}/logs/port-forward.log" 2>&1 &
   echo $! >"$pidf"
   disown  # no job-control message when a later run stops it
   for _ in $(seq 1 30); do os status >/dev/null 2>&1 && return 0; sleep 1; done

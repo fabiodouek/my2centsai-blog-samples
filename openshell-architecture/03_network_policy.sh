@@ -2,6 +2,8 @@
 # Test 3: deny by default. curl may reach pypi.org; python3 may not, even to the same host;
 # nothing may reach httpbin.org until a live policy update allows it for curl.
 set -euo pipefail
+# The local gateway from 00_gateway.sh, even when another one (part 2's osh-eks) is active.
+export OPENSHELL_GATEWAY="${OPENSHELL_GATEWAY:-openshell}"
 cd "$(dirname "$0")"
 
 NAME="netdemo"

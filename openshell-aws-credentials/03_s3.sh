@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Test 2 (S3): the data-plane cases. All signed at the supervisor with the sandbox-role session.
-#   - list, small put, a 50 MB `aws s3 cp` (aws-chunked with trailer), download + checksum, boto3
+#   - list, small put, a 50 MiB `aws s3 cp` (aws-chunked with trailer), download + checksum, boto3
 #   - keys that need percent-encoding: a space, `+`, non-ASCII, and `a//b`
 #     (expect SignatureDoesNotMatch or a rewritten key — double encoding + path normalization are
 #      on for every service; this records what the client actually sees)
@@ -56,7 +56,7 @@ say "aws s3 ls (list), then a small put"
 in_sb "$NAME" bash -c 'aws s3 ls "s3://$BUCKET/" 2>&1 | sed "s/^/  /" || true'
 in_sb "$NAME" bash -c 'echo "hello from the sandbox via STS" > /tmp/small.txt; aws s3 cp --no-progress /tmp/small.txt "s3://$BUCKET/small.txt" 2>&1 | sed "s/^/  /"' 2>&1 | nocolor
 
-say "a 50 MB upload (aws-chunked, STREAMING-UNSIGNED-PAYLOAD-TRAILER), then download + checksum"
+say "a 50 MiB upload (aws-chunked, STREAMING-UNSIGNED-PAYLOAD-TRAILER), then download + checksum"
 in_sb "$NAME" bash -c '
   head -c 52428800 /dev/urandom > /tmp/big.bin
   up="$(sha256sum /tmp/big.bin | cut -d" " -f1)"

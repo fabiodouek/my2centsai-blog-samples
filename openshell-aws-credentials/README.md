@@ -11,7 +11,7 @@ Video walkthrough: [youtu.be/HV08Dzx9Zww](https://youtu.be/HV08Dzx9Zww)
 
 ## How it fits together
 
-```
+```text
 sandbox workload            supervisor (per sandbox)              gateway                AWS
   AWS_*=<placeholder>  --->  terminates TLS, strips the client's  --(EKS Pod Identity)-->
   aws / boto3 / curl         auth, re-signs with SigV4 using  --->  osh-eks-gateway
@@ -68,7 +68,7 @@ StatefulSet so the new Pod picks up its Pod Identity credentials, then restarts 
 |---|---|
 | `01_setup.sh` | terraform outputs → `env.sh`; restart the gateway for Pod Identity; import the `aws`/`aws-s3` profiles; create provider `p5-aws` (`--runtime-credentials`); `refresh configure --strategy aws-sts-assume-role`; `refresh rotate`; `refresh status` |
 | `02_identity.sh` | The `AWS_*` env vars are placeholders; `aws sts get-caller-identity` and boto3 both return the sandbox-role session |
-| `03_s3.sh` | list, small put, a 50 MB `aws s3 cp`, download + checksum, boto3; keys that need percent-encoding (space, `+`, non-ASCII, `a//b`); `s3 rm` (DELETE) vs `delete-objects` (POST); the `sigv4:body` (10 MiB cap) and `sigv4:no_body` modes |
+| `03_s3.sh` | list, small put, a 50 MiB `aws s3 cp`, download + checksum, boto3; keys that need percent-encoding (space, `+`, non-ASCII, `a//b`); `s3 rm` (DELETE) vs `delete-objects` (POST); the `sigv4:body` (10 MiB cap) and `sigv4:no_body` modes |
 | `04_bedrock.py` | Converse, ConverseStream time-to-first-token, and a model-ARN call the signer's path handling refuses |
 | `05_ca_trust.sh` | Which CA variable each client needs. OpenShell sets `REQUESTS_CA_BUNDLE`/`SSL_CERT_FILE`/`CURL_CA_BUNDLE` but **not** `AWS_CA_BUNDLE`; toggles each for the AWS CLI, boto3 and the CLI's CRT transfer client |
 | `06_cloudtrail.sh` | Session names in event history: two sandboxes on the shared provider share one name; a second provider with its own `session_name` gives a third its own attribution |
@@ -79,7 +79,7 @@ StatefulSet so the new Pod picks up its Pod Identity credentials, then restarts 
 ```bash
 ./02_identity.sh
 ./03_s3.sh
-python3 04_bedrock.py      # or: uv run python 04_bedrock.py
+python3 04_bedrock.py      # standard library only on the host (boto3 runs in the sandbox)
 ./05_ca_trust.sh
 ./06_cloudtrail.sh
 ./07_attacks.sh
@@ -98,12 +98,12 @@ interrupted. `06_cloudtrail.sh` waits on CloudTrail event history, which lags a 
 | `profiles/aws.yaml` | The endpointless `aws` profile (v0.1.6, verbatim): the three `AWS_*` credentials and the STS refresh. The main flow uses this |
 | `profiles/aws-s3.yaml` | The endpoint-bearing S3 profile (v0.1.6) with this image's binaries; `/bin/bash` dropped. Kept as the S3-only alternative |
 | `policies/aws-signing.yaml` | The signing policy: S3 bucket, Bedrock runtime (Converse/ConverseStream), regional STS, all signed and enforced. `${BUCKET}`/`${REGION}` filled in by `01_setup.sh` |
-| `logs/` | `terraform-plan.txt` and `verify.txt` (IAM simulation + Bedrock smoke test), account masked |
+| `logs/` (gitignored, written at run time) | The rendered policies `--policy` reads, and the plan and verification output (IAM simulation, Bedrock smoke test), account masked |
 
 ## What this does not solve
 
 - While the sandbox runs, it can use the role's permissions. Signing is per endpoint, not per
-  binary, and needs no placeholder — any binary a rule lets reach a signed host is signed.
+  binary, and needs no placeholder: any binary a rule lets reach a signed host is signed.
 - Nothing in OpenShell blocks credential-vending APIs; only IAM does (the sandbox role allows none and denies them explicitly).
 - One STS session per provider: sandboxes on the shared provider are indistinguishable in
   CloudTrail. Per-sandbox attribution needs one provider per sandbox (see `06_cloudtrail.sh`).

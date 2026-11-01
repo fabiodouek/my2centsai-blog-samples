@@ -5,14 +5,16 @@ Companion code for part 6 of the my2cents.ai series "OpenShell on Amazon EKS": h
 something refuses, create latency under concurrency, policy propagation, the egress overhead
 ladder, control-plane load, and noisy neighbours. Two ways of watching: a kubelet sampler every
 2 s and Container Insights. Sandboxes run on runc. Everything runs on the cluster from
-[`../openshell-eks`](../openshell-eks) (part 2), with nothing added to it.
+[`../openshell-eks`](../openshell-eks) (part 2), with nothing added to it except Container Insights
+(`00_container_insights.sh`).
 
 Video walkthrough: [youtu.be/tlbDLxuo5Z0](https://youtu.be/tlbDLxuo5Z0)
 
 ## Requirements
 
 - The `osh-eks` cluster and gateway from [`../openshell-eks`](../openshell-eks): scripts 01 to 05 done,
-  the port-forward on `127.0.0.1:17680` running (`../openshell-eks/09_scale.sh up` restarts it)
+  the port-forward on `127.0.0.1:17680` (or `$LOCAL_PORT`) running (`../openshell-eks/09_scale.sh up`
+  restarts it)
 - The echo server from [`../openshell-egress`](../openshell-egress) (`00_echo.sh`), and its
   `echo-demo` provider profile imported on the gateway (for the credential rung of test 4)
 - The OpenShell CLI 0.1.6, `kubectl`, `helm`, `jq`, Terraform (only for `00_container_insights.sh`),
@@ -28,7 +30,7 @@ isn't) and leaves it empty.
 
 | Script | What it does |
 |---|---|
-| `00_container_insights.sh on\|off` | Container Insights (metrics only) through part 2's Terraform: plans, shows the summary, asks, applies |
+| `00_container_insights.sh on\|off` | Container Insights (metrics only) through part 2's Terraform: plans, shows the summary, asks, applies. `on` also writes `container_insights.auto.tfvars` there, so re-running `../openshell-eks/01_cluster.sh` (when your public IP changes) keeps the add-on; `off` removes the file. `../openshell-eks/99_teardown.sh` deletes the log group the agent creates |
 | `sampler.py` | Every 2 s, one CSV row per node: node CPU, memory and pressure (kubelet summary API), Pods, sandbox Pods, unscheduled Pods, attached EBS volumes (VolumeAttachments), NetworkPolicies, PolicyEndpoints, the gateway's CPU, memory and SQLite volume, the shared supervisor pool's CPU and memory. `--metrics-out` adds the gateway's own `/metrics`. Most tests start it in the background and stop it at the end (`04` doesn't); it also runs on its own |
 | `01_density.py` | Creates sandboxes in batches until a create fails or one stays not Ready past a deadline, then names the cause from the stuck sandboxes' Pods, PVCs, VolumeAttachments and events. `--variant dedicated\|shared\|shared-1gi` |
 | `02_create_latency.py` | 1, 5, 10, 20, 40 creates at once; create→Ready per sandbox, stuck count, the gateway's mutation-lock wait per level. `--topology dedicated\|shared` |

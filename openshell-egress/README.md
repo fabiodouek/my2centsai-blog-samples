@@ -10,7 +10,10 @@ Video walkthrough: [youtu.be/OT9lLu1p9-U](https://youtu.be/OT9lLu1p9-U)
 
 - The `osh-eks` cluster and gateway from [`../openshell-eks`](../openshell-eks) (part 2): scripts
   01 to 05 done, the port-forward running (`../openshell-eks/09_scale.sh up` restarts it)
-- The OpenShell CLI and `openshell-prover` 0.1.6, `kubectl`, `helm`, `jq`, `python3`
+- The OpenShell CLI and `openshell-prover` 0.1.6, `kubectl`, `helm`, `jq`, `python3`; no Python
+  packages on the host, so there's no `pyproject.toml` here
+- For `06_credentials.sh`, the GitHub CLI `gh`: if a run is interrupted, it deletes the demo
+  branch from the host, using `GITHUB_TOKEN` from the environment
 - For `06_credentials.sh` only, in your environment (never on a command line):
   - `GITHUB_TOKEN`: a fine-grained token with contents read/write on one repository you own
   - `GITHUB_REPO`: that repository, as `owner/name`
