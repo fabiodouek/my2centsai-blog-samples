@@ -1,0 +1,22 @@
+# HTTPS rung "https-rest-enforce": TLS terminated, then each request checked against an
+# enforced REST rule (the benchmark only sends GET /).
+version: 1
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  s3:
+    endpoints:
+      - host: s3.us-east-1.amazonaws.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow:
+              method: GET
+              path: /
+    binaries:
+      - path: /usr/bin/python3.12

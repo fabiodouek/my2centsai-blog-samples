@@ -1,0 +1,17 @@
+# curl may reach the echo server, L4 only (no protocol field, no L7 rules).
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  echo:
+    name: echo-l4
+    endpoints:
+      - { host: echo.echo.svc.cluster.local, port: 80 }
+    binaries:
+      - { path: /usr/bin/curl }

@@ -1,0 +1,17 @@
+# A tiny HTTP server in the node's own network namespace (hostNetwork) on ${NODE}, port
+# 18080: something to aim at when testing whether a fenced pod can reach node IPs.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: listener-${SUFFIX}
+  namespace: fence-test
+  labels:
+    app: fence-listener
+spec:
+  nodeName: ${NODE}
+  hostNetwork: true
+  terminationGracePeriodSeconds: 0
+  containers:
+    - name: listener
+      image: ${IMAGE}
+      command: ["python3", "-m", "http.server", "18080"]

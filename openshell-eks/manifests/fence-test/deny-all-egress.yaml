@@ -1,0 +1,13 @@
+# The same shape as OpenShell's workload fence: pods with this label may open no
+# connections at all (no egress rules), not even DNS.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-egress
+  namespace: fence-test
+spec:
+  podSelector:
+    matchLabels:
+      fence: deny
+  policyTypes: [Egress]
+  egress: []

@@ -1,0 +1,17 @@
+# The cluster's Kubernetes API through a raw TLS tunnel (tls: skip): no termination, no inspection.
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  k8s_api:
+    name: k8s-api-passthrough
+    endpoints:
+      - { host: kubernetes.default.svc.cluster.local, port: 443, tls: skip }
+    binaries:
+      - { path: /usr/bin/curl }

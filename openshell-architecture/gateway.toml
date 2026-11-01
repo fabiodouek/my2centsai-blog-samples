@@ -1,0 +1,15 @@
+# Local gateway configuration, installed by 00_gateway.sh at ~/.config/openshell/gateway.toml.
+#
+# The Docker driver starts each sandbox's supervisor container in host network mode by default
+# and points it at 127.0.0.1:17670. On Docker Desktop for Mac, without Docker Desktop's "host
+# networking" setting, 127.0.0.1 inside that container is the Docker VM, not the Mac, and the
+# sandbox fails with "Startup configuration fetch failed ... failed to connect to OpenShell
+# server". Bridge mode reaches the gateway through host.docker.internal instead, which the
+# gateway's certificate already lists.
+[openshell]
+version = 2
+
+[openshell.gateway]
+
+[openshell.drivers.docker]
+supervisor_network_mode = "bridge"

@@ -1,0 +1,43 @@
+# 05_control_plane.py --from cluster: an API client inside the cluster, so the load reaches the
+# gateway's Service directly instead of through a kubectl port-forward from the laptop. It runs
+# the series' workload image, installs the OpenShell Python SDK 0.1.6 into /tmp/sdk, and uses the
+# same client certificate as the CLI (Secret openshell-client-tls, mounted read-only). It sits
+# on the node without the gateway (${NODE}), so its own CPU doesn't compete with the gateway's.
+# The script fills in ${NODE} and ${IMAGE}, and deletes the Pod at the end.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: p6-load
+  namespace: openshell
+  labels: {app: p6-load}
+spec:
+  nodeName: ${NODE}
+  automountServiceAccountToken: false
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: client
+      image: ${IMAGE}
+      command: ["sh", "-c", "python3 -m pip install -q --target /tmp/sdk openshell==0.1.6 && touch /tmp/ready && sleep 7200"]
+      readinessProbe:
+        exec: {command: ["test", "-f", "/tmp/ready"]}
+        periodSeconds: 2
+      resources:
+        requests: {cpu: 500m, memory: 256Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: {drop: [ALL]}
+      volumeMounts:
+        - {name: client-tls, mountPath: /etc/p6-client, readOnly: true}
+  volumes:
+    - name: client-tls
+      secret:
+        secretName: openshell-client-tls
+        items:
+          - {key: ca.crt, path: ca.crt}
+          - {key: tls.crt, path: tls.crt}
+          - {key: tls.key, path: tls.key}

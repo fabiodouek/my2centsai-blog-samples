@@ -1,0 +1,32 @@
+# 06_credentials.sh renders this into logs/github-push.yaml with your GITHUB_REPO (owner/name):
+# git may push to that one repository, and python3 may call the GitHub REST API read-only.
+# The github provider profile already allows clone/fetch for git and gh, read-only API for gh.
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  github_repository_push:
+    name: github-repository-push
+    endpoints:
+      - host: github.com
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: GET, path: "/${GITHUB_REPO}.git/info/refs*" }
+          - allow: { method: POST, path: "/${GITHUB_REPO}.git/git-upload-pack" }
+          - allow: { method: POST, path: "/${GITHUB_REPO}.git/git-receive-pack" }
+    binaries:
+      - { path: /usr/bin/git }
+  python_github_api:
+    name: python-github-api
+    endpoints:
+      - { host: api.github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce }
+    binaries:
+      - { path: /usr/bin/python3.12 }

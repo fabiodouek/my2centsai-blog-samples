@@ -1,0 +1,5 @@
+# Part 6 only (03_policy_propagation.py --delivery push): the gateway pushes configuration and
+# policy over each supervisor's session instead of supervisors polling for it every 10 s.
+gatewayConfig:
+  openshell.gateway:
+    config_delivery_mode: push

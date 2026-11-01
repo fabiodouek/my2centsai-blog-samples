@@ -1,0 +1,18 @@
+# A client pod: ${NAME}, with fence=${FENCE} (deny = under the deny-all-egress policy),
+# pinned to ${NODE}. ${COMMAND} is its whole job; "sleep infinity" keeps it for kubectl exec.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${NAME}
+  namespace: fence-test
+  labels:
+    app: fence-client
+    fence: ${FENCE}
+spec:
+  nodeName: ${NODE}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  containers:
+    - name: client
+      image: ${IMAGE}
+      command: ["sh", "-c", "${COMMAND}"]

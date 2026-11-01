@@ -1,0 +1,25 @@
+# pypi.org for curl, Python and git; a public S3 bucket for the AWS CLI (unsigned requests).
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  pypi:
+    name: pypi
+    endpoints:
+      - { host: pypi.org, port: 443 }
+    binaries:
+      - { path: /usr/bin/curl }
+      - { path: /usr/bin/python3.12 }
+      - { path: /usr/bin/git }
+  public_bucket:
+    name: public-s3-bucket
+    endpoints:
+      - { host: noaa-ghcn-pds.s3.amazonaws.com, port: 443 }
+    binaries:
+      - { path: /usr/local/aws-cli/v2/2.39.3/dist/aws }

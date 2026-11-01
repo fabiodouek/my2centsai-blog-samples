@@ -1,0 +1,17 @@
+# The same endpoint with enforcement: enforce.
+version: 1
+# The filesystem and Landlock sections match the default policy: a running sandbox accepts new
+# network rules, but not removed paths or a changed Landlock mode.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+network_policies:
+  echo:
+    name: echo-rest
+    endpoints:
+      - { host: echo.echo.svc.cluster.local, port: 80, protocol: rest, access: read-only, enforcement: enforce }
+    binaries:
+      - { path: /usr/bin/curl }

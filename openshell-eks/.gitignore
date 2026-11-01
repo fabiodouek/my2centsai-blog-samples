@@ -1,0 +1,11 @@
+.terraform/
+*.tfstate*
+.terraform.lock.hcl
+terraform/tfplan
+env.sh
+logs/
+charts/
+.env
+.port-forward.pid
+.venv/
+__pycache__/

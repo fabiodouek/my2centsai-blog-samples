@@ -1,0 +1,31 @@
+# 04_egress_ladder.py's baseline: a plain Pod (no OpenShell) on the same node as the
+# sandbox's workload, running the same benchmark script against the same destinations.
+# The script fills in ${NODE} and ${IMAGE} (the series' workload image in ECR).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: p6-direct
+  namespace: default
+  labels: {app: p6-direct}
+spec:
+  nodeName: ${NODE}
+  automountServiceAccountToken: false
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  # One DNS query per lookup, as in the sandbox: with the default ndots:5 the cluster's search
+  # domains are tried first for echo.echo.svc.cluster.local and s3.us-east-1.amazonaws.com.
+  dnsConfig:
+    options: [{name: ndots, value: "1"}]
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: client
+      image: ${IMAGE}
+      command: ["sleep", "3600"]
+      resources:
+        requests: {cpu: 50m, memory: 64Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: {drop: [ALL]}

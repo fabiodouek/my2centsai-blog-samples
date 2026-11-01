@@ -1,0 +1,130 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# Copied from NVIDIA/OpenShell v0.1.6 providers/aws-s3.yaml, with two changes for this series'
+# workload image (Ubuntu 24.04, AWS CLI v2.39.3, boto3): the `binaries` list, and `/bin/bash`
+# dropped (see below). This is an endpoint-BEARING S3 profile: it carries the six S3 host forms
+# and signs them. Part 5's main flow does NOT use it — it uses the endpointless `aws` profile
+# plus policies/aws-signing.yaml so one provider can sign S3, Bedrock and STS together. This
+# profile is here as the S3-only alternative the upstream docs show, and to lint. Import with:
+#   openshell -g osh-eks profile import -f profiles/aws-s3.yaml
+#   openshell -g osh-eks profile lint   -f profiles/aws-s3.yaml
+#
+# binaries are the least-privilege control: only a process whose kernel-resolved exe (or an
+# ancestor) matches may reach the endpoints and resolve the signed-request power. The paths are
+# the real ones in this image: aws is a PyInstaller bundle whose exe is under aws-cli/v2/<ver>/dist
+# (/usr/local/bin/aws is a symlink chain to it), python3 resolves to /usr/bin/python3.12.
+#
+# `/bin/bash` is deliberately omitted. The upstream example lists it and warns, in the same file,
+# that it matches every process descended from a shell. That would hand the signed endpoints to
+# anything a shell starts, not just the AWS clients — the opposite of binary-scoped egress — so
+# it is left out here.
+id: aws-s3
+display_name: AWS S3
+description: AWS S3 storage via STS temporary credentials
+category: other
+credentials:
+  - name: access_key_id
+    description: AWS access key ID (gateway-minted via STS)
+    env_vars: [AWS_ACCESS_KEY_ID]
+    required: true
+    refresh:
+      strategy: aws_sts_assume_role
+      refresh_before_seconds: 300
+      max_lifetime_seconds: 3600
+      # One AssumeRole call mints all three AWS credentials. The refresh is
+      # attached to access_key_id (primary); these outputs co-manage the
+      # secret key and session token on their sibling credentials.
+      additional_outputs:
+        - output: secret_access_key
+          credential: secret_access_key
+        - output: session_token
+          credential: session_token
+      material:
+        - name: role_arn
+          description: ARN of the IAM role to assume
+          required: true
+          secret: false
+        - name: session_name
+          description: Session name for CloudTrail attribution
+          required: false
+          secret: false
+        - name: external_id
+          description: External ID for cross-account role assumption
+          required: false
+          secret: false
+        - name: aws_region
+          description: AWS region for STS endpoint
+          required: false
+          secret: false
+        - name: aws_access_key_id
+          description: Long-lived IAM access key (only needed if gateway lacks ambient AWS credentials)
+          required: false
+          secret: false
+        - name: aws_secret_access_key
+          description: Long-lived IAM secret key (only needed if gateway lacks ambient AWS credentials)
+          required: false
+          secret: true
+        - name: aws_session_token
+          description: Session token for temporary source credentials (SSO or a prior AssumeRole); requires the access/secret pair
+          required: false
+          secret: true
+  - name: secret_access_key
+    description: AWS secret access key (co-managed with access_key_id)
+    env_vars: [AWS_SECRET_ACCESS_KEY]
+    required: true
+  - name: session_token
+    description: AWS session token (co-managed with access_key_id)
+    env_vars: [AWS_SESSION_TOKEN]
+    required: true
+endpoints:
+  # S3 regional endpoints. `*` matches exactly one DNS label, so the region
+  # wildcard does not cover extra labels like dualstack unless listed.
+  # us-east-1 uses the global endpoint without a region label.
+  - host: "*.s3.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+  - host: "s3.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+  - host: "*.s3.*.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+  - host: "s3.*.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+  - host: "*.s3.dualstack.*.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+  - host: "s3.dualstack.*.amazonaws.com"
+    port: 443
+    protocol: rest
+    access: read-write
+    enforcement: enforce
+    credential_signing: sigv4
+    signing_service: s3
+binaries:
+  - /usr/bin/curl
+  - /usr/local/bin/aws
+  - /usr/local/aws-cli/v2/*/dist/aws
+  - /usr/bin/python3.12

@@ -1,0 +1,118 @@
+# Sandbox policy for part 5: the supervisor signs (SigV4) every request a named binary makes to
+# the S3 bucket, the Bedrock runtime and regional STS, using the gateway-minted sandbox-role
+# session. The workload never holds a usable key. ${BUCKET} and ${REGION} are filled in by
+# 01_setup.sh from the terraform outputs (envsubst), then passed with `sandbox create --policy`.
+#
+# Why this file and not the aws-s3 profile: one provider can sign several services only when its
+# profile is endpointless. The endpointless `aws` profile (profiles/aws.yaml) carries the AWS_*
+# credentials and the STS refresh; each endpoint below binds them with credential_binding.provider
+# and turns on credential_signing. (An endpoint-bearing profile like aws-s3 would reject a policy
+# credential_binding, and its credentials would cover only its own S3 hosts.)
+#
+# enforcement: enforce on every inspected endpoint — the L7 default is audit, which would log
+# violations and forward them.
+
+version: 1
+
+# The restrictive default's filesystem and Landlock settings, carried verbatim. `policy set` on a
+# live sandbox is rejected if it drops a path the sandbox already has, so keep these as-is.
+filesystem_policy:
+  include_workdir: true
+  read_only: [/bin, /usr, /lib, /proc, /dev/urandom, /etc, /var/log]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: best_effort
+
+network_policies:
+  # --- S3: the one throwaway bucket -----------------------------------------------------------
+  # read-write preset = GET, HEAD, OPTIONS, POST, PUT, PATCH. It deliberately excludes DELETE, so
+  # `aws s3 rm` (HTTP DELETE) is denied at L7 while `aws s3api delete-objects` (POST ?delete) is
+  # allowed and then constrained by the role. Virtual-hosted regional is the AWS CLI v2 default;
+  # the global and path-style hosts are covered too.
+  s3_bucket:
+    endpoints:
+      - host: "${BUCKET}.s3.${REGION}.amazonaws.com"
+        port: 443
+        protocol: rest
+        access: read-write
+        enforcement: enforce
+        credential_binding:
+          provider: p5-aws
+        credential_signing: sigv4
+        signing_service: s3
+      - host: "${BUCKET}.s3.amazonaws.com"
+        port: 443
+        protocol: rest
+        access: read-write
+        enforcement: enforce
+        credential_binding:
+          provider: p5-aws
+        credential_signing: sigv4
+        signing_service: s3
+      - host: "s3.${REGION}.amazonaws.com"
+        port: 443
+        protocol: rest
+        access: read-write
+        enforcement: enforce
+        credential_binding:
+          provider: p5-aws
+        credential_signing: sigv4
+        signing_service: s3
+    binaries:
+      - path: /usr/bin/curl
+      - path: /usr/local/bin/aws
+      - path: /usr/local/aws-cli/v2/*/dist/aws
+      - path: /usr/bin/python3.12
+
+  # --- Bedrock runtime: Converse and ConverseStream only --------------------------------------
+  # `*` matches one path segment, so /model/*/converse covers any model id (one segment, e.g.
+  # amazon.nova-micro-v1:0 or us.amazon.nova-micro-v1:0) without allowing /model/*/invoke. The
+  # region (us-east-1) is read from the host; the service is fixed to bedrock. Converse signs its
+  # body, which SigV4 buffers (<=10 MiB); ConverseStream relays the chunked event stream.
+  bedrock_runtime:
+    endpoints:
+      - host: "bedrock-runtime.${REGION}.amazonaws.com"
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        credential_binding:
+          provider: p5-aws
+        credential_signing: sigv4
+        signing_service: bedrock
+        rules:
+          - allow:
+              method: POST
+              path: "/model/*/converse"
+          - allow:
+              method: POST
+              path: "/model/*/converse-stream"
+    binaries:
+      - path: /usr/bin/curl
+      - path: /usr/local/bin/aws
+      - path: /usr/local/aws-cli/v2/*/dist/aws
+      - path: /usr/bin/python3.12
+
+  # --- STS: GetCallerIdentity demo ------------------------------------------------------------
+  # Every STS action is POST to `/` with the action in the body, which L7 inspection cannot see.
+  # So this endpoint cannot tell GetCallerIdentity from AssumeRole: the sandbox role's explicit
+  # IAM Deny is what stops credential vending (see terraform/main.tf and 07_attacks.sh). Regional
+  # STS carries a region label, so no signing_region is needed; sts.amazonaws.com (global) would.
+  sts_identity:
+    endpoints:
+      - host: "sts.${REGION}.amazonaws.com"
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        credential_binding:
+          provider: p5-aws
+        credential_signing: sigv4
+        signing_service: sts
+        rules:
+          - allow:
+              method: POST
+              path: "/"
+    binaries:
+      - path: /usr/bin/curl
+      - path: /usr/local/bin/aws
+      - path: /usr/local/aws-cli/v2/*/dist/aws
+      - path: /usr/bin/python3.12
