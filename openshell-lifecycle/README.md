@@ -5,7 +5,7 @@ life looks like on the cluster from part 2 (restart policies, generations, stop 
 losing a Pod), and what the workload can and can't do (Landlock, seccomp, no credentials, user
 namespaces). OpenShell **0.1.6**, sandboxes on runc.
 
-Video walkthrough: [youtu.be/Pz8BrbW9U_Y](https://youtu.be/Pz8BrbW9U_Y)
+Video walkthrough: [youtu.be/o9gs5fDpBkw](https://youtu.be/o9gs5fDpBkw)
 
 ## Requirements
 

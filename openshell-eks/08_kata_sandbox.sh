@@ -3,9 +3,10 @@
 # sandbox with --driver-config-json (the values set server.drivers.kubernetes.allowDriverConfig).
 # The RuntimeClass must carry the openshell.ai/sandbox-attachable=true label (02_kata.sh adds it).
 #
-# On OpenShell 0.1.6 and these nodes this fails: the Kata VM's agent dies while the workload
-# Pod's workspace-init container seeds the workspace volume, and the sandbox never leaves
-# ConfigurationPending. The script shows that, ends the attempt after the init container fails
+# On OpenShell 0.1.6 and these nodes this fails: the workload Pod's workspace-init container
+# exits 255 with no output while it seeds the workspace volume, the Kata VM goes down (containerd
+# logs "Dead agent" and QEMU "signal: killed"; the cause is still open), and the sandbox never
+# leaves Provisioning (reason ConfigurationPending). The script shows that, ends the attempt after the init container fails
 # (instead of waiting out the 300 s provisioning timeout), then removes the label once to show
 # the admission refusal, and puts it back.
 #

@@ -8,7 +8,7 @@ ladder, control-plane load, and noisy neighbours. Two ways of watching: a kubele
 [`../openshell-eks`](../openshell-eks) (part 2), with nothing added to it except Container Insights
 (`00_container_insights.sh`).
 
-Video walkthrough: [youtu.be/tlbDLxuo5Z0](https://youtu.be/tlbDLxuo5Z0)
+Video walkthrough: [youtu.be/gw82cjH3g9M](https://youtu.be/gw82cjH3g9M)
 
 ## Requirements
 

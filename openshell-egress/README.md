@@ -4,7 +4,7 @@ Companion code for part 4 of the my2cents.ai series "OpenShell on Amazon EKS": w
 lets a sandbox reach, how it decides, and how an agent uses credentials it gets only as placeholders. Every test
 runs on the cluster from part 2, against an in-cluster echo server that prints what it receives.
 
-Video walkthrough: [youtu.be/OT9lLu1p9-U](https://youtu.be/OT9lLu1p9-U)
+Video walkthrough: [youtu.be/c_hNBdtqObU](https://youtu.be/c_hNBdtqObU)
 
 ## Requirements
 

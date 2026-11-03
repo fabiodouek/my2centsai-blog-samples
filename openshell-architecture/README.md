@@ -4,7 +4,7 @@ Companion code for part 1 of the my2cents.ai series "OpenShell on Amazon EKS": t
 gateway running locally on an Apple Silicon Mac, driving Docker Desktop, exercised with the CLI
 and the Python SDK. Everything is pinned to OpenShell **0.1.6**.
 
-Video walkthrough: https://youtu.be/NoI-68gMmtg
+Video walkthrough: https://youtu.be/7ZszPhYbmY8
 
 ## Requirements
 

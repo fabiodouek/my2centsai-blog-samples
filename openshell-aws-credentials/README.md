@@ -7,7 +7,7 @@ Identity**, mints a short-lived **STS** session for a least-privilege sandbox ro
 `AWS_*` values. S3, Bedrock (`amazon.nova-micro-v1:0`) and a GetCallerIdentity STS demo, all on
 OpenShell **0.1.6**, sandboxes on runc.
 
-Video walkthrough: [youtu.be/HV08Dzx9Zww](https://youtu.be/HV08Dzx9Zww)
+Video walkthrough: [youtu.be/22eNjm3CJTU](https://youtu.be/22eNjm3CJTU)
 
 ## How it fits together
 
