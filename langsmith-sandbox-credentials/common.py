@@ -86,12 +86,14 @@ def snapshot_id(snapshot: str = SNAPSHOT) -> str:
     return ready[0].id
 
 
-def create_sandbox(test: str, rules: list | None = None, **kw) -> Sandbox:
+def create_sandbox(test: str, rules: list | None = None, access_control: dict | None = None, **kw) -> Sandbox:
+    """access_control is this sandbox's own egress policy. On restricted-egress orgs the managed allow list
+    replaces it; with an egress exemption it is the only thing limiting where the sandbox connects."""
     if "snapshot_id" not in kw and "snapshot_name" not in kw:
         kw["snapshot_id"] = snapshot_id()
     return client.create_sandbox(
         name=name(test),
-        proxy_config=proxy_config(rules=rules or []),
+        proxy_config=proxy_config(rules=rules or [], access_control=access_control),
         idle_ttl_seconds=SAFETY_IDLE_TTL,
         delete_after_stop_seconds=SAFETY_DELETE_AFTER_STOP,
         timeout=120,

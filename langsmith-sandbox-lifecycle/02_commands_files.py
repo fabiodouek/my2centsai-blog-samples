@@ -69,8 +69,11 @@ try:
     server.kill()
 
     banner("Egress")
-    allow = rest("GET", f"/boxes/{sb.name}")["proxy_config"]["access_control"]["allow_list"]
-    print(f"{len(allow)} allow-listed patterns, e.g. {allow[:3]} ... {allow[-3:]}")
+    allow = (rest("GET", f"/boxes/{sb.name}")["proxy_config"].get("access_control") or {}).get("allow_list")
+    if allow:
+        print(f"{len(allow)} allow-listed patterns, e.g. {allow[:3]} ... {allow[-3:]}")
+    else:
+        print("no managed allow list: this organization has unrestricted egress")
     for host in ["https://pypi.org/simple/", "https://registry.npmjs.org/", "https://github.com",
                  "https://api.anthropic.com", "https://api.openai.com", "https://huggingface.co",
                  "https://registry-1.docker.io/v2/", "https://example.com", "https://httpbin.org/get",

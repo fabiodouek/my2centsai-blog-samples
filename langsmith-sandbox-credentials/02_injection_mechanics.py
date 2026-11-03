@@ -1,6 +1,6 @@
 """Test 1: how the LangSmith proxy injects headers, using GitHub as the observable endpoint.
 
-Restricted egress blocks echo services like httpbin, so every check reads GitHub's answer instead:
+Restricted egress (the non-Enterprise default) blocks echo services like httpbin, so every check reads GitHub's answer instead:
 200 vs 401 on /user, and the rate-limit bucket (60/h unauthenticated vs 5000/h authenticated).
 """
 

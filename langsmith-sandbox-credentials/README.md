@@ -1,8 +1,8 @@
 # LangSmith sandbox auth proxy: Claude Code with Anthropic, GitHub and AWS
 
-Companion code for the my2cents.ai deep dive on LangSmith sandbox credentials.
+Companion code for [LangSmith Sandbox Credentials: Hands-On with Claude Code, GitHub and the Auth Proxy](https://my2cents.ai/deep-dive/langsmith-sandbox-credentials).
 
-Video walkthrough: https://youtu.be/9JBE5jVkDnQ
+Video walkthrough: https://youtu.be/ZANEbK4AWiE
 
 Claude Code runs inside a LangSmith sandbox that never holds a real credential. The Anthropic key
 and a GitHub token are LangSmith workspace secrets. A transparent proxy on the sandbox host adds them
@@ -25,8 +25,9 @@ sandbox (placeholders only)  ──HTTPS──▶  LangSmith auth proxy  ──�
 - A throwaway GitHub repo and a fine-grained personal access token scoped to that repo only, with
   **Contents: read and write** and **Pull requests: read and write**
 - For `08_aws_role.py`: an AWS account where you can create an IAM OIDC provider, a role and a
-  bucket. On organizations with restricted egress (non-Enterprise), AWS hosts are blocked until
-  LangChain support grants an exemption.
+  bucket, and a LangSmith organization that can reach AWS. Organizations on restricted egress (the
+  non-Enterprise default) can't until LangChain support grants an exemption; the script checks and
+  stops early.
 
 ## Setup
 
@@ -69,21 +70,39 @@ EOF
 aws iam create-role --role-name my2cents-langsmith-sandbox --assume-role-policy-document file://trust.json
 ```
 
-Then attach a permissions policy with only what the sandbox needs (Bedrock invoke, and S3 on one
-prefix). The `sub` trusts every sandbox in the workspace. Use the issuer for your region
-(`/api/v1/info` → `sandbox_workload_identity_issuer`).
+Then a test bucket and an inline policy with only what the sandbox needs: Bedrock, and S3 reads and
+writes under `sandbox/`. The file under `private/` is there to show the role can't read it.
+
+```bash
+BUCKET=my2cents-langsmith-creds-${ACCT}
+aws s3 mb s3://${BUCKET}
+echo "hello from my2cents" | aws s3 cp - s3://${BUCKET}/sandbox/hello.txt
+echo "outside the role's prefix" | aws s3 cp - s3://${BUCKET}/private/secret.txt
+cat > policy.json <<EOF
+{"Version":"2012-10-17","Statement":[
+ {"Sid":"Bedrock","Effect":"Allow","Resource":"*","Action":["bedrock:InvokeModel","bedrock:InvokeModelWithResponseStream",
+   "bedrock:ListInferenceProfiles","bedrock:GetInferenceProfile","bedrock:ListFoundationModels"]},
+ {"Sid":"ListSandboxPrefix","Effect":"Allow","Action":"s3:ListBucket","Resource":"arn:aws:s3:::${BUCKET}",
+  "Condition":{"StringLike":{"s3:prefix":["sandbox/*","sandbox/"]}}},
+ {"Sid":"RWSandboxPrefix","Effect":"Allow","Action":["s3:GetObject","s3:PutObject"],"Resource":"arn:aws:s3:::${BUCKET}/sandbox/*"}]}
+EOF
+aws iam put-role-policy --role-name my2cents-langsmith-sandbox --policy-name sandbox-access --policy-document file://policy.json
+```
+
+Set `AWS_ROLE_ARN` and `AWS_LS_BUCKET` in `.env`. The `sub` trusts every sandbox in the workspace. Use the
+issuer for your region (`/api/v1/info` → `sandbox_workload_identity_issuer`).
 
 ## Scripts
 
 | Script | What it shows |
 |---|---|
-| `02_injection_mechanics.py` | Against GitHub: `Bearer {SECRET}` templating, a sandbox-sent header overwritten, `match_paths`, opaque vs workspace secrets, plain HTTP, what the API stores (including the managed egress allow list). |
+| `02_injection_mechanics.py` | Against GitHub: `Bearer {SECRET}` templating, a sandbox-sent header overwritten, `match_paths`, opaque vs workspace secrets, plain HTTP, what the API stores (including the managed egress allow list, on restricted organizations). |
 | `03_claude_code.py` | Claude Code with a placeholder key: invalid without the rule, works with it, streaming included. |
 | `04_github.py` | `gh api` and `git clone`/`git push` to a private repo with no token in the sandbox. |
 | `05_agent_task.py` | Claude Code clones the repo, commits, pushes a branch and opens a PR. |
 | `06_leak_attempts.py` | Env, files and `/proc` (hash-compared against the real values), curl verbose, echo hosts, metadata endpoint, body reflection via GitHub's markdown API, asking Claude Code. Ends with what injection does not stop. |
 | `07_rotation.py` | Change, re-apply, disable and delete the GitHub secret under a running sandbox. |
-| `08_aws_role.py` | AWS via the OIDC role: identity, S3 inside and outside the allowed prefix, Claude Code on Bedrock. Stops early if AWS is blocked by egress. |
+| `08_aws_role.py` | AWS via the OIDC role, in a sandbox whose own `access_control` allows AWS only: identity, S3 inside and outside the allowed prefix, Claude Code on Bedrock. Then the bucket as a read-only S3 mount, and what the mount's scoped credentials can and can't do. Stops early if the organization's egress policy blocks AWS. |
 | `09_cleanup.py` | Deletes demo sandboxes, the snapshot and the workspace secrets; closes demo PRs and deletes `langsmith-demo-*` branches. |
 
 Run them in order: `python 02_injection_mechanics.py`, and so on.
@@ -103,17 +122,22 @@ minutes after that, so anything a crashed script leaves behind goes away on its 
 - `env_vars` are stored and returned by the API in plaintext. Never put a real value there.
 - Sandboxes run as root. Claude Code needs `IS_SANDBOX=1` to accept `--dangerously-skip-permissions`.
 - On non-Enterprise organizations, egress is limited to a managed allow list, and an `access_control`
-  you pass at create time is silently dropped.
+  you pass at create time is silently dropped. An egress exemption from LangChain support removes the
+  list: every host becomes reachable and your own `access_control` is enforced, so set one, as
+  `08_aws_role.py` does. The organization flag `sandbox_restricted_egress` doesn't change after an
+  exemption; test from inside a sandbox.
+- A role in a proxy rule uses its full IAM permissions. The same role in `mount_config` gets a session
+  policy limited to the mount's bucket and prefix (and no writes for a read-only mount).
 
 ## Cleanup
 
 ```bash
 python 09_cleanup.py
 # AWS, if you created it:
-aws iam delete-role-policy --role-name my2cents-langsmith-sandbox --policy-name <policy>
+aws iam delete-role-policy --role-name my2cents-langsmith-sandbox --policy-name sandbox-access
 aws iam delete-role --role-name my2cents-langsmith-sandbox
 aws iam delete-open-id-connect-provider --open-id-connect-provider-arn arn:aws:iam::<acct>:oidc-provider/api.smith.langchain.com
-aws s3 rb s3://<bucket> --force
+aws s3 rb s3://my2cents-langsmith-creds-<acct> --force
 ```
 
 Then revoke the GitHub token if you no longer need it.

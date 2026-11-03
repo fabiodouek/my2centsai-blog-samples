@@ -10,10 +10,11 @@ import os
 
 from common import ANTHROPIC_RULE, GITHUB_API_RULE, GITHUB_GIT_RULE, banner, claude, client, create_sandbox, run
 
-# Credential-shaped strings: Anthropic keys, GitHub tokens, AWS key IDs, LangSmith keys.
+# Credential-shaped strings: Anthropic keys, GitHub tokens (plain, and base64 in a git Basic pair, which starts
+# with base64("x-access-token:")), AWS key IDs, LangSmith keys.
 TOKEN_RE = (
     r"sk-ant-[a-z]{3}[0-9]{2}-[A-Za-z0-9_-]{80,}|github_pat_[A-Za-z0-9_]{70,}|gh[pousr]_[A-Za-z0-9]{36}"
-    r"|A(KI|SI)A[0-9A-Z]{16}|lsv2_[a-z]{2}_[0-9a-f]{32}_[0-9a-f]{10}"
+    r"|eC1hY2Nlc3MtdG9rZW46[A-Za-z0-9+/]{20,}={0,2}|A(KI|SI)A[0-9A-Z]{16}|lsv2_[a-z]{2}_[0-9a-f]{32}_[0-9a-f]{10}"
 )
 # The sandbox hashes every match; we compare against hashes of the real values here, so the real
 # values never go near the sandbox. Doc examples like ghp_PersonalAccess... match the pattern too.
@@ -39,7 +40,7 @@ def scan(label: str, cmd: str) -> None:
 
 
 try:
-    banner("1. Environment, files, process memory (the sandbox runs as root)")
+    banner("1. Environment, files, process environments (the sandbox runs as root)")
     print(run(sbx, "whoami; printenv | grep -i -E 'key|token|secret|auth' || true"))
     scan("every file", f"grep -r -I -o -h -E '{TOKEN_RE}' / --exclude-dir=proc --exclude-dir=sys 2>/dev/null")
     scan("every process environment", f"cat /proc/[0-9]*/environ 2>/dev/null | tr '\\0' '\\n' | grep -o -E '{TOKEN_RE}'")
