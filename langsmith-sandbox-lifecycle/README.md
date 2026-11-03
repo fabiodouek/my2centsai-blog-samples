@@ -11,7 +11,7 @@ Companion code for [LangSmith Sandboxes: Hands-On with the Full Sandbox Lifecycl
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/) (or plain `pip`)
 - A LangSmith account and API key from **Settings > API Keys**. The free Developer plan includes 8 LSU of sandbox usage and up to 10 running sandboxes, far more than this walkthrough uses.
-- Sandboxes on non-Enterprise workspaces get a fixed egress allow-list (package registries, GitHub, Docker Hub, the big model APIs). `02_commands_files.py` prints it and shows what's blocked.
+- Sandboxes on non-Enterprise workspaces get a fixed egress allow-list (package registries, GitHub, Docker Hub, the big model APIs). `02_commands_files.py` prints it and shows what's blocked. Organizations with an egress exemption from LangChain support have no list at all, and the scripts say so.
 
 ## Setup
 
@@ -23,7 +23,7 @@ source .venv/bin/activate
 
 The SDK is pinned to `langsmith[sandbox]==0.14.14`. The sandbox API changes often (templates were replaced by snapshots in April 2026), so bump deliberately.
 
-The Python SDK doesn't expose labels, memory-preserving stop, memory snapshots, list filters or usage, so `common.py` has a small `rest()` helper for `https://api.smith.langchain.com/api/v2/sandboxes`. Everything else goes through `SandboxClient`.
+The Python SDK doesn't expose labels, resizing, memory-preserving stop, memory snapshots, list filters or usage, so `common.py` has a small `rest()` helper for `https://api.smith.langchain.com/api/v2/sandboxes`. Everything else goes through `SandboxClient`.
 
 ## Scripts
 
@@ -58,7 +58,7 @@ python 10_cleanup.py
 ## Safety nets
 
 - Every sandbox is named `my2cents-lc-<test>-<n>`, and the ones created over REST also carry the label `demo=my2cents-lifecycle`, so `10_cleanup.py` only touches what these scripts created. Snapshots are named `my2cents-lc-*`.
-- Every sandbox is created with `idle_ttl_seconds=300` and `delete_after_stop_seconds=600`, so anything a crashed script leaves behind stops after 5 idle minutes and is deleted 10 minutes later. Without these the server defaults are 600 s and 14 days.
+- Most sandboxes are created with `idle_ttl_seconds=300` and `delete_after_stop_seconds=600` (through `common.create()`, or passed to the SDK directly), so anything a crashed script leaves behind stops after 5 idle minutes and is deleted 10 minutes later. The exceptions are deliberate: `01_create.py` makes one sandbox with the server defaults (600 s and 14 days) to show them, and `03_lifetimes.py` and `05_idle_wake.py` set their own lifetimes.
 - Snapshots have no TTL and are billed as storage until deleted, and re-using a snapshot name doesn't replace the old one (it only moves the tag). Run `10_cleanup.py` when you're done.
 - `create_snapshot_from_dockerfile()` uploads its whole `context` directory (default: the current directory, minus `.git`, ignoring `.dockerignore`). `08_custom_snapshot.py` points it at `datasci/` so your `.env` and `.venv` aren't sent.
 

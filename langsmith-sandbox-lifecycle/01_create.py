@@ -27,7 +27,9 @@ try:
     print(f"run_config : user={sb.run_config.user} work_dir={sb.run_config.work_dir}")
     print(f"lifecycle  : idle_ttl {sb.idle_ttl_seconds}s | delete_after_stop {sb.delete_after_stop_seconds}s"
           f" | preserve_memory_on_stop {raw['preserve_memory_on_stop']} | persistent {raw.get('persistent')}")
-    print(f"egress     : {len(raw['proxy_config']['access_control']['allow_list'])} allow-listed host patterns")
+    # Restricted (non-Enterprise) orgs get the managed allow list here; an org with an egress exemption has none.
+    allow = (raw["proxy_config"].get("access_control") or {}).get("allow_list")
+    print(f"egress     : {f'{len(allow)} allow-listed host patterns' if allow else 'unrestricted (no managed allow list)'}")
 
     with timed("first run()"):
         r = sb.run("uname -r; whoami; nproc; cat /sys/fs/cgroup/cpu.max 2>/dev/null; free -m | sed -n 2p; "
