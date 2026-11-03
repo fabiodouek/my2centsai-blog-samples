@@ -7,7 +7,7 @@ port-forward (and, for one test, through an IP-restricted NLB), and Kata install
 per-sandbox VM runtime: a plain Kata Pod runs, but an OpenShell 0.1.6 sandbox under Kata doesn't
 (gate 3 below). Parts 3 to 6 of the series run on this cluster, with sandboxes on runc.
 
-Video walkthrough: https://youtu.be/ShSChGiXwmY
+Video walkthrough: https://youtu.be/I4_QRt-ww9g
 
 ## What it builds
 
@@ -86,9 +86,11 @@ Every script is safe to run again: a second run converges instead of failing or 
    *Result: passed (VPC CNI with network policy enforcement).*
 3. **Kata on nested virtualization**: `02_kata.sh` and `08_kata_sandbox.sh`.
    *Result: a plain Kata pod runs (guest kernel 6.18.35); an OpenShell 0.1.6 sandbox under Kata
-   doesn't: the Kata VM's agent dies while the workload Pod's `workspace-init` container seeds the
-   workspace volume (exit 255), with or without CPU and memory limits. The other parts of the
-   series run sandboxes on runc.*
+   doesn't: the workload Pod's `workspace-init` container exits 255 with no output while it seeds
+   the workspace volume, with or without CPU and memory limits, and the Kata VM goes down (Kata
+   logs `Dead agent` and QEMU `signal: killed`). The cause is still open: those lines have no
+   timestamps, Kata also kills QEMU when it tears down a failed Pod, and the guest's own logs
+   weren't captured. The other parts of the series run sandboxes on runc.*
 
 ## Gotchas this directory works around
 
