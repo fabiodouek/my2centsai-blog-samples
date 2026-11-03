@@ -2,7 +2,7 @@
 
 Companion code for [LangSmith Sandbox Credentials: Hands-On with Claude Code, GitHub and the Auth Proxy](https://my2cents.ai/deep-dive/langsmith-sandbox-credentials).
 
-Video walkthrough: https://youtu.be/9JBE5jVkDnQ
+Video walkthrough: https://youtu.be/ZANEbK4AWiE
 
 Claude Code runs inside a LangSmith sandbox that never holds a real credential. The Anthropic key
 and a GitHub token are LangSmith workspace secrets. A transparent proxy on the sandbox host adds them
