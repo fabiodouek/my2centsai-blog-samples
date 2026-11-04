@@ -1,0 +1,9 @@
+results/
+node_modules/
+frontend/dist/
+.venv/
+**/.venv/
+infra/.terraform/
+infra/terraform.tfstate*
+*.log
+images/sandbox/ca.crt

@@ -1,0 +1,35 @@
+# /root/.bashrc for the workspace sandbox. Read by the SHELL_INGRESS shell, by every tmux pane
+# (login shells, via /root/.profile) and by the agent's /exec.
+
+# Per-MicroVM settings written by the run hook: placeholder credentials, the CA variables, labels. No proxy
+# settings: the sandbox's VPC sends every name to its iron-proxy (transparent interception).
+[ -f /etc/sandbox.env ] && . /etc/sandbox.env
+
+# The image ENV, repeated: the shell is not guaranteed to inherit the container environment
+export LANG=C.UTF-8
+export NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/iron-proxy-demo.crt
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+export AWS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+export IS_SANDBOX=1                 # lets Claude Code use bypass permissions mode as root
+export DISABLE_AUTOUPDATER=1        # the npm registry is not on the proxy allowlist
+export EDITOR=vi PAGER=less
+# The SHELL_INGRESS shell sets TERM=xterm; the browser terminal (xterm.js) does 256 colours and true colour
+case "${TERM:-}" in ""|dumb|unknown|xterm) export TERM=xterm-256color ;; esac
+export COLORTERM=truecolor
+
+# Everything below is for interactive shells only
+[[ $- == *i* ]] || return
+
+HISTSIZE=10000
+HISTFILESIZE=20000
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend checkwinsize
+PS1='\[\e[38;5;114m\]sandbox\[\e[0m\]:\[\e[38;5;75m\]\w\[\e[0m\]\$ '
+alias ll='ls -lah --color=auto' ls='ls --color=auto' grep='grep --color=auto'
+
+# The shell starts in /; work happens in /root/work (the directory Claude Code trusts)
+case "$PWD" in /|/root) cd /root/work ;; esac
+
+# MOTD outside tmux and in the first tmux pane (not in every new window)
+if [ -z "$TMUX" ] || [ "${TMUX_PANE:-}" = "%0" ]; then cat /etc/motd; fi

@@ -1,0 +1,10 @@
+
+  my2cents workspace sandbox (Lambda MicroVM, Claude Code 2.1.317)
+
+    claude        Claude Code, ready to go: no login, no prompts (bypass permissions mode)
+    /root/work    working directory, trusted by Claude Code
+    tmux "main"   this session survives suspend/resume and reconnects; C-b d detaches
+
+  All egress goes through iron-proxy: only allowlisted hosts answer, and the API keys here
+  are placeholders that the proxy swaps for the real ones on the way out.
+

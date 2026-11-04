@@ -4,6 +4,24 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [lambda-microvm-workspace](./lambda-microvm-workspace)
+
+A deployed browser workspace on AWS Lambda MicroVMs: sign in with Cognito, create a sandbox and get a terminal with Claude Code ready to run. Every sandbox reaches the internet only through part 2's iron-proxy, in transparent mode. Panels show the proxy feed, credential use with a Revoke button, Claude Code's tokens and cost, vitals and DNS lookups. Admins change the shared proxy policy from the browser: the allowlist, injected credentials, and which of four IAM roles (plus an optional session policy) signs sandbox AWS calls. Terraform for CloudFront, Cognito, the ALB, the API on ECS Fargate and DynamoDB, a FastAPI backend and a React frontend.
+
+Blog post: [Lambda MicroVM: Hands-On Exploration of Self-Service Sandboxes](https://my2cents.ai/deep-dive/lambda-microvms-workspace)
+
+### [lambda-microvm-iron-proxy](./lambda-microvm-iron-proxy)
+
+Egress control and credential injection for AWS Lambda MicroVMs with iron-proxy on ECS Fargate, behind an internal NLB. Two VPCs: the proxy VPC (NAT, iron-proxy) and a sandbox VPC with no internet route, joined by peering, where Route 53 DNS Firewall answers every name with the proxy. Sandboxes have no proxy settings; iron-proxy swaps placeholder Anthropic and GitHub tokens for real ones from Secrets Manager and re-signs AWS SigV4 requests. Terraform plus Python test scripts, and an optional control plane (config in S3, a sidecar that reloads iron-proxy, four sandbox roles) used by the workspace.
+
+Blog post: [Lambda MicroVM: Hands-On Egress Credential Injection with iron-proxy](https://my2cents.ai/deep-dive/lambda-microvms-iron-proxy)
+
+### [lambda-microvm-lifecycle](./lambda-microvm-lifecycle)
+
+Eleven Python scripts that walk AWS Lambda MicroVMs through the sandbox lifecycle: building an image, running MicroVMs and their defaults, the endpoint, tokens, files, streaming and the shell, suspend and resume, idle auto-suspend, the maximum duration, list and reconnect, many MicroVMs from one snapshot, egress and identity, the quota and the bill, and cleanup. Each script prints timings.
+
+Blog post: [AWS Lambda MicroVMs: Hands-On with the Full Sandbox Lifecycle](https://my2cents.ai/deep-dive/lambda-microvms)
+
 ### [google-ax-stress](./google-ax-stress)
 
 Stress tests for Google AX on the two-node EKS cluster from `google-ax-eks`: density ceiling, create/resume/suspend latency under concurrency, wake-on-request bursts, control-plane throughput, noisy neighbors and a snapshot storm, with CloudWatch Container Insights and kubelet metrics, and the scripts that draw the post's charts.

@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.egg-info/
+results/
+*.log
+images/sandbox/ca.crt
+infra/.terraform/
+infra/terraform.tfstate*
+infra/*.tfplan
+infra/logs/
+infra/terraform.tfvars

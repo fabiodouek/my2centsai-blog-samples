@@ -1,0 +1,893 @@
+{
+"managed": {
+"arn:aws:iam::aws:policy/job-function/ViewOnlyAccess": {
+"name": "ViewOnlyAccess",
+"version": "v48",
+"doc": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Sid": "GeneralViewOnlyAccessStatement",
+"Effect": "Allow",
+"Action": [
+"aws-marketplace:ViewSubscriptions",
+"cloudwatch:Get*",
+"cloudwatch:List*",
+"dynamodb:DescribeBackup",
+"dynamodb:DescribeContinuousBackups",
+"dynamodb:DescribeContributorInsights",
+"dynamodb:DescribeEndpoints",
+"dynamodb:DescribeExport",
+"dynamodb:DescribeGlobalTable",
+"dynamodb:DescribeGlobalTableSettings",
+"dynamodb:DescribeImport",
+"dynamodb:DescribeKinesisStreamingDestination",
+"dynamodb:DescribeLimits",
+"dynamodb:DescribeReservedCapacity",
+"dynamodb:DescribeReservedCapacityOfferings",
+"dynamodb:DescribeStream",
+"dynamodb:DescribeTable",
+"dynamodb:DescribeTableReplicaAutoScaling",
+"dynamodb:DescribeTimeToLive",
+"dynamodb:GetAbacStatus",
+"dynamodb:GetResourcePolicy",
+"dynamodb:ListBackups",
+"dynamodb:ListContributorInsights",
+"dynamodb:ListExports",
+"dynamodb:ListGlobalTables",
+"dynamodb:ListImports",
+"dynamodb:ListStreams",
+"dynamodb:ListTables",
+"dynamodb:ListTagsOfResource",
+"ecr:DescribeRegistry",
+"ecr:DescribeRepositories",
+"ecr:ListImages",
+"elasticloadbalancing:DescribeInstanceHealth",
+"elasticloadbalancing:DescribeListeners",
+"elasticloadbalancing:DescribeLoadBalancerAttributes",
+"elasticloadbalancing:DescribeLoadBalancers",
+"elasticloadbalancing:DescribeTargetGroups",
+"elasticloadbalancing:DescribeTargetHealth",
+"elasticmapreduce:List*",
+"es:DescribeElasticsearchDomain",
+"es:DescribeElasticsearchDomains",
+"es:ListDomainNames",
+"iam:GetAccountSummary",
+"iam:GetLoginProfile",
+"iam:List*",
+"iot:List*",
+"kms:ListKeys",
+"kms:ListResourceTags",
+"lambda:GetPolicy",
+"lambda:GetProvisionedConcurrencyConfig",
+"lambda:GetResourcePolicy",
+"lambda:List*",
+"logs:Describe*",
+"logs:GetTransformer",
+"logs:ListEntitiesForLogGroup",
+"logs:ListLogGroupsForEntity",
+"logs:ListLogGroupsForQuery",
+"logs:ListTagsForResource",
+"s3:ListAllMyBuckets",
+"s3:ListBucket",
+"s3:ListMultiRegionAccessPoints",
+"ses:DescribeActiveReceiptRuleSet",
+"ses:List*",
+"ses:ListDedicatedIpPools",
+"ssm:ListAssociations",
+"ssm:ListDocuments",
+"states:ListActivities",
+"states:ListExecutions",
+"states:ListMapRuns",
+"states:ListStateMachineAliases",
+"states:ListStateMachineVersions",
+"states:ListStateMachines"
+],
+"Resource": "*"
+},
+{
+"Sid": "APIGatewayAccess",
+"Effect": "Allow",
+"Action": [
+"apigateway:GET"
+],
+"Resource": [
+"arn:aws:apigateway:*::/apis",
+"arn:aws:apigateway:*::/apis/*/authorizers/*",
+"arn:aws:apigateway:*::/apis/*/authorizers",
+"arn:aws:apigateway:*::/apis/*/cors",
+"arn:aws:apigateway:*::/apis/*/deployments/*",
+"arn:aws:apigateway:*::/apis/*/deployments",
+"arn:aws:apigateway:*::/apis/*/exports/*",
+"arn:aws:apigateway:*::/apis/*/integrations/*",
+"arn:aws:apigateway:*::/apis/*/integrations",
+"arn:aws:apigateway:*::/apis/*/models/*",
+"arn:aws:apigateway:*::/apis/*/models",
+"arn:aws:apigateway:*::/apis/*/routes/*",
+"arn:aws:apigateway:*::/apis/*/routes",
+"arn:aws:apigateway:*::/apis/*/stages",
+"arn:aws:apigateway:*::/apis/*/stages/*",
+"arn:aws:apigateway:*::/clientcertificates",
+"arn:aws:apigateway:*::/clientcertificates/*",
+"arn:aws:apigateway:*::/domainnames",
+"arn:aws:apigateway:*::/domainnames/*/apimappings",
+"arn:aws:apigateway:*::/restapis",
+"arn:aws:apigateway:*::/restapis/*/authorizers/*",
+"arn:aws:apigateway:*::/restapis/*/authorizers",
+"arn:aws:apigateway:*::/restapis/*/deployments/*",
+"arn:aws:apigateway:*::/restapis/*/deployments",
+"arn:aws:apigateway:*::/restapis/*/documentation/parts/*",
+"arn:aws:apigateway:*::/restapis/*/documentation/parts",
+"arn:aws:apigateway:*::/restapis/*/documentation/versions/*",
+"arn:aws:apigateway:*::/restapis/*/documentation/versions",
+"arn:aws:apigateway:*::/restapis/*/gatewayresponses/*",
+"arn:aws:apigateway:*::/restapis/*/gatewayresponses",
+"arn:aws:apigateway:*::/restapis/*/models/*",
+"arn:aws:apigateway:*::/restapis/*/models",
+"arn:aws:apigateway:*::/restapis/*/requestvalidators",
+"arn:aws:apigateway:*::/restapis/*/requestvalidators/*",
+"arn:aws:apigateway:*::/restapis/*/resources/*",
+"arn:aws:apigateway:*::/restapis/*/resources",
+"arn:aws:apigateway:*::/restapis/*/stages",
+"arn:aws:apigateway:*::/restapis/*/stages/*",
+"arn:aws:apigateway:*::/tags/*",
+"arn:aws:apigateway:*::/vpclinks"
+]
+}
+]
+}
+},
+"arn:aws:iam::aws:policy/ReadOnlyAccess": {
+"name": "ReadOnlyAccess",
+"version": "v191",
+"doc": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Sid": "ReadOnlyActionsGroup1",
+"Effect": "Allow",
+"Action": [
+"a4b:Get*",
+"a4b:List*",
+"a4b:Search*",
+"cloudwatch:Describe*",
+"cloudwatch:GenerateQuery",
+"cloudwatch:GenerateQueryResultsSummary",
+"cloudwatch:Get*",
+"cloudwatch:List*",
+"dynamodb:BatchGet*",
+"dynamodb:Describe*",
+"dynamodb:Get*",
+"dynamodb:List*",
+"dynamodb:PartiQLSelect",
+"dynamodb:Query",
+"dynamodb:ReadDataForReplication",
+"dynamodb:Scan",
+"dynamodb:SearchVectors",
+"ecr:BatchCheck*",
+"ecr:BatchGet*",
+"ecr:Describe*",
+"ecr:Get*",
+"ecr:List*",
+"elasticloadbalancing:Describe*",
+"elasticmapreduce:Describe*",
+"elasticmapreduce:GetBlockPublicAccessConfiguration",
+"elasticmapreduce:List*",
+"elasticmapreduce:View*",
+"es:Describe*",
+"es:ESHttpGet",
+"es:ESHttpHead",
+"es:Get*",
+"es:List*",
+"iam:Generate*",
+"iam:Get*",
+"iam:List*",
+"iam:Simulate*",
+"iot:Describe*",
+"iot:Get*",
+"iot:List*"
+],
+"Resource": "*"
+},
+{
+"Sid": "ReadOnlyActionsGroup2",
+"Effect": "Allow",
+"Action": [
+"kms:Describe*",
+"kms:Get*",
+"kms:List*",
+"lambda:Get*",
+"lambda:List*",
+"logs:Describe*",
+"logs:FilterLogEvents",
+"logs:Get*",
+"logs:ListAggregateLogGroupSummaries",
+"logs:ListAnomalies",
+"logs:ListEntitiesForLogGroup",
+"logs:ListIntegrations",
+"logs:ListLogAnomalyDetectors",
+"logs:ListLogDeliveries",
+"logs:ListLogGroupsForEntity",
+"logs:ListLogGroupsForQuery",
+"logs:ListScheduledQueries",
+"logs:ListSourcesForS3TableIntegration",
+"logs:ListTagsForResource",
+"logs:ListTagsLogGroup",
+"logs:StartLiveTail",
+"logs:StartQuery",
+"logs:StopLiveTail",
+"logs:StopQuery",
+"logs:TestMetricFilter",
+"pricing:DescribeServices",
+"pricing:GetAttributeValues",
+"pricing:GetPriceListFileUrl",
+"pricing:GetProducts",
+"pricing:ListPriceLists",
+"s3-object-lambda:GetObject",
+"s3-object-lambda:GetObjectAcl",
+"s3-object-lambda:GetObjectLegalHold",
+"s3-object-lambda:GetObjectRetention",
+"s3-object-lambda:GetObjectTagging",
+"s3-object-lambda:GetObjectVersion",
+"s3-object-lambda:GetObjectVersionAcl",
+"s3-object-lambda:GetObjectVersionTagging",
+"s3-object-lambda:ListBucket",
+"s3-object-lambda:ListBucketMultipartUploads",
+"s3-object-lambda:ListBucketVersions",
+"s3-object-lambda:ListMultipartUploadParts",
+"s3:DescribeJob",
+"s3:Get*",
+"s3:List*",
+"secretsmanager:Describe*",
+"secretsmanager:GetResourcePolicy",
+"secretsmanager:List*",
+"ses:BatchGetMetricData",
+"ses:Describe*",
+"ses:Get*",
+"ses:List*",
+"ssm:Describe*",
+"ssm:Get*",
+"ssm:List*",
+"sso:Describe*",
+"sso:Get*",
+"sso:List*",
+"states:Describe*",
+"states:GetExecutionHistory",
+"states:List*",
+"states:ValidateStateMachineDefinition",
+"sts:GetAccessKeyInfo",
+"sts:GetCallerIdentity",
+"sts:GetSessionToken"
+],
+"Resource": "*"
+}
+]
+}
+},
+"arn:aws:iam::aws:policy/PowerUserAccess": {
+"name": "PowerUserAccess",
+"version": "v12",
+"doc": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Effect": "Allow",
+"NotAction": [
+"iam:*",
+"organizations:*",
+"account:*"
+],
+"Resource": "*"
+},
+{
+"Effect": "Allow",
+"Action": [
+"account:GetAccountInformation",
+"account:GetGovCloudAccountInformation",
+"account:GetPrimaryEmail",
+"account:ListRegions",
+"iam:CreateServiceLinkedRole",
+"iam:DeleteServiceLinkedRole",
+"iam:ListRoles",
+"organizations:DescribeEffectivePolicy",
+"organizations:DescribeOrganization"
+],
+"Resource": "*"
+}
+]
+}
+}
+},
+"roles": {
+"builder": {
+"arn": "arn:aws:iam::111122223333:role/my2cents-ip-builder",
+"description": "AWS PowerUserAccess in us-east-1, minus changes to this workspace's own stack; can create billable resources.",
+"default": false,
+"managed": [
+"arn:aws:iam::aws:policy/PowerUserAccess"
+],
+"inline": {
+"sandbox-guards": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Action": "secretsmanager:GetSecretValue",
+"Effect": "Allow",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "ProxySecrets"
+},
+{
+"Action": "ssm:GetParameter*",
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoParameterValues"
+},
+{
+"Effect": "Deny",
+"NotAction": "secretsmanager:GetSecretValue",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "OnlyReadProxySecrets"
+},
+{
+"Action": "secretsmanager:*",
+"Effect": "Deny",
+"NotResource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "NoOtherSecrets"
+},
+{
+"Condition": {
+"StringNotEquals": {
+"aws:RequestedRegion": [
+"us-east-1"
+]
+}
+},
+"Effect": "Deny",
+"NotAction": [
+"a4b:*",
+"account:*",
+"acm:*",
+"aws-marketplace-management:*",
+"aws-marketplace:*",
+"aws-portal:*",
+"billing:*",
+"budgets:*",
+"ce:*",
+"chime:*",
+"cloudfront:*",
+"cur:*",
+"directconnect:*",
+"ec2:DescribeRegions",
+"ec2:DescribeTransitGateways",
+"ec2:DescribeVpnGateways",
+"fms:*",
+"freetier:*",
+"globalaccelerator:*",
+"health:*",
+"iam:*",
+"importexport:*",
+"invoicing:*",
+"networkmanager:*",
+"organizations:*",
+"payments:*",
+"pricing:*",
+"route53:*",
+"route53domains:*",
+"route53-recovery-cluster:*",
+"route53-recovery-control-config:*",
+"route53-recovery-readiness:*",
+"s3:GetAccountPublic*",
+"s3:ListAllMyBuckets",
+"s3:ListMultiRegionAccessPoints",
+"s3:PutAccountPublic*",
+"savingsplans:*",
+"shield:*",
+"sts:*",
+"support:*",
+"tax:*",
+"trustedadvisor:*",
+"waf-regional:*",
+"waf:*",
+"wafv2:*",
+"wellarchitected:*"
+],
+"Resource": "*",
+"Sid": "RegionLock"
+},
+{
+"Action": [
+"sts:AssumeRole",
+"sts:SetSourceIdentity",
+"sts:TagSession",
+"sts:GetFederationToken"
+],
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoAssumeRole"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"s3:Get*",
+"s3:List*"
+],
+"Resource": [
+"arn:aws:s3:::my2cents-*",
+"arn:aws:s3:::my2cents-*/*"
+],
+"Sid": "NoStackBuckets"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"ecs:Describe*",
+"ecs:List*"
+],
+"Resource": [
+"arn:aws:ecs:*:111122223333:cluster/my2cents-*",
+"arn:aws:ecs:*:111122223333:service/my2cents-*/*",
+"arn:aws:ecs:*:111122223333:task/my2cents-*/*",
+"arn:aws:ecs:*:111122223333:task-definition/my2cents-*:*",
+"arn:aws:ecs:*:111122223333:container-instance/my2cents-*/*",
+"arn:aws:ecs:*:111122223333:task-set/my2cents-*/*/*"
+],
+"Sid": "NoStackEcs"
+},
+{
+"Action": [
+"ecs:RunTask",
+"ecs:StartTask"
+],
+"Condition": {
+"ArnLike": {
+"ecs:cluster": "arn:aws:ecs:*:111122223333:cluster/my2cents-*"
+}
+},
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoTasksOnStackCluster"
+},
+{
+"Action": [
+"route53resolver:Associate*",
+"route53resolver:Disassociate*",
+"route53resolver:Create*",
+"route53resolver:Delete*",
+"route53resolver:Update*",
+"route53resolver:Put*",
+"route53resolver:Import*",
+"route53resolver:TagResource",
+"route53resolver:UntagResource"
+],
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoResolverChanges"
+},
+{
+"Action": [
+"ec2:Create*",
+"ec2:Delete*",
+"ec2:Modify*",
+"ec2:Replace*",
+"ec2:Authorize*",
+"ec2:Revoke*",
+"ec2:Associate*",
+"ec2:Disassociate*",
+"ec2:Attach*",
+"ec2:Detach*",
+"ec2:Accept*",
+"ec2:Reject*",
+"ec2:Enable*",
+"ec2:Disable*",
+"ec2:Allocate*",
+"ec2:Release*",
+"ec2:Assign*",
+"ec2:Unassign*",
+"ec2:RunInstances",
+"ec2:StartInstances",
+"ec2:StopInstances",
+"ec2:TerminateInstances",
+"ec2:RebootInstances"
+],
+"Condition": {
+"ArnEquals": {
+"ec2:Vpc": "arn:aws:ec2:us-east-1:111122223333:vpc/vpc-0fixture000000000"
+}
+},
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoStackNetworkInVpc"
+},
+{
+"Action": [
+"ec2:Create*",
+"ec2:Delete*",
+"ec2:Modify*",
+"ec2:Replace*",
+"ec2:Authorize*",
+"ec2:Revoke*",
+"ec2:Associate*",
+"ec2:Disassociate*",
+"ec2:Attach*",
+"ec2:Detach*",
+"ec2:Accept*",
+"ec2:Reject*",
+"ec2:Enable*",
+"ec2:Disable*",
+"ec2:Allocate*",
+"ec2:Release*",
+"ec2:Assign*",
+"ec2:Unassign*",
+"ec2:RunInstances",
+"ec2:StartInstances",
+"ec2:StopInstances",
+"ec2:TerminateInstances",
+"ec2:RebootInstances"
+],
+"Effect": "Deny",
+"Resource": "arn:aws:ec2:us-east-1:111122223333:vpc/vpc-0fixture000000000",
+"Sid": "NoStackVpc"
+},
+{
+"Action": [
+"ec2:Create*",
+"ec2:Delete*",
+"ec2:Modify*",
+"ec2:Replace*",
+"ec2:Authorize*",
+"ec2:Revoke*",
+"ec2:Associate*",
+"ec2:Disassociate*",
+"ec2:Attach*",
+"ec2:Detach*",
+"ec2:Accept*",
+"ec2:Reject*",
+"ec2:Enable*",
+"ec2:Disable*",
+"ec2:Allocate*",
+"ec2:Release*",
+"ec2:Assign*",
+"ec2:Unassign*",
+"ec2:RunInstances",
+"ec2:StartInstances",
+"ec2:StopInstances",
+"ec2:TerminateInstances",
+"ec2:RebootInstances"
+],
+"Condition": {
+"StringLike": {
+"aws:ResourceTag/project": "my2cents-*"
+}
+},
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoStackNetworkTagged"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"elasticloadbalancing:Describe*"
+],
+"Resource": [
+"arn:aws:elasticloadbalancing:*:111122223333:loadbalancer/*/my2cents-*/*",
+"arn:aws:elasticloadbalancing:*:111122223333:targetgroup/my2cents-*/*",
+"arn:aws:elasticloadbalancing:*:111122223333:listener/*/my2cents-*/*",
+"arn:aws:elasticloadbalancing:*:111122223333:listener-rule/*/my2cents-*/*"
+],
+"Sid": "NoStackLoadBalancers"
+},
+{
+"Action": [
+"lambda:CreateNetworkConnector",
+"lambda:DeleteNetworkConnector",
+"lambda:UpdateNetworkConnector"
+],
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoConnectorChanges"
+},
+{
+"Action": "lambda:PassNetworkConnector",
+"Effect": "Deny",
+"Resource": "arn:aws:lambda:us-east-1:111122223333:network-connector:nc-2553caf1-e4c7-444f-8f94-b70409149cc8",
+"Sid": "NoStackConnector"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"lambda:Get*",
+"lambda:List*"
+],
+"Resource": [
+"arn:aws:lambda:*:111122223333:microvm-image:my2cents-*",
+"arn:aws:lambda:*:111122223333:microvm-image:my2cents-*:*"
+],
+"Sid": "NoStackMicroVMs"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"dynamodb:Get*",
+"dynamodb:BatchGet*",
+"dynamodb:Query",
+"dynamodb:Scan",
+"dynamodb:Describe*",
+"dynamodb:List*"
+],
+"Resource": [
+"arn:aws:dynamodb:*:111122223333:table/my2cents-ws-*",
+"arn:aws:dynamodb:*:111122223333:table/my2cents-ws-*/*"
+],
+"Sid": "NoStackTables"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"ecr:Describe*",
+"ecr:List*",
+"ecr:Get*",
+"ecr:BatchGet*",
+"ecr:BatchCheck*"
+],
+"Resource": "arn:aws:ecr:*:111122223333:repository/my2cents-*",
+"Sid": "NoStackImages"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"logs:Describe*",
+"logs:Get*",
+"logs:List*",
+"logs:FilterLogEvents",
+"logs:StartLiveTail",
+"logs:StartQuery"
+],
+"Resource": [
+"arn:aws:logs:*:111122223333:log-group:/my2cents/*"
+],
+"Sid": "NoStackLogs"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"ssm:Describe*",
+"ssm:List*"
+],
+"Resource": "arn:aws:ssm:*:111122223333:parameter/my2cents-*",
+"Sid": "NoStackParameters"
+},
+{
+"Action": [
+"cloudfront:Create*",
+"cloudfront:Update*",
+"cloudfront:Delete*",
+"cloudfront:Associate*",
+"cloudfront:Disassociate*",
+"cloudfront:Copy*",
+"cloudfront:Publish*",
+"cloudfront:Put*",
+"cloudfront:TagResource",
+"cloudfront:UntagResource"
+],
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoCloudFrontChanges"
+},
+{
+"Effect": "Deny",
+"NotAction": [
+"cognito-idp:Describe*",
+"cognito-idp:List*",
+"cognito-idp:Get*"
+],
+"Resource": "arn:aws:cognito-idp:*:111122223333:userpool/*",
+"Sid": "NoCognitoChanges"
+}
+]
+}
+}
+},
+"data-reader": {
+"arn": "arn:aws:iam::111122223333:role/my2cents-ip-data-reader",
+"description": "Read the demo S3 bucket and the my2cents-demo-* DynamoDB tables; nothing else.",
+"default": false,
+"managed": [],
+"inline": {
+"sandbox-guards": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Action": "secretsmanager:GetSecretValue",
+"Effect": "Allow",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "ProxySecrets"
+},
+{
+"Action": "ssm:GetParameter*",
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoParameterValues"
+},
+{
+"Effect": "Deny",
+"NotAction": "secretsmanager:GetSecretValue",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "OnlyReadProxySecrets"
+},
+{
+"Action": "secretsmanager:*",
+"Effect": "Deny",
+"NotResource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "NoOtherSecrets"
+},
+{
+"Action": [
+"s3:GetObject",
+"s3:ListBucket"
+],
+"Effect": "Allow",
+"Resource": [
+"arn:aws:s3:::my2cents-ip-demo-fixture",
+"arn:aws:s3:::my2cents-ip-demo-fixture/*"
+],
+"Sid": "DemoBucket"
+},
+{
+"Action": [
+"dynamodb:GetItem",
+"dynamodb:BatchGetItem",
+"dynamodb:Query",
+"dynamodb:Scan",
+"dynamodb:DescribeTable"
+],
+"Effect": "Allow",
+"Resource": [
+"arn:aws:dynamodb:us-east-1:111122223333:table/my2cents-demo-*",
+"arn:aws:dynamodb:us-east-1:111122223333:table/my2cents-demo-*/index/*"
+],
+"Sid": "DemoTables"
+}
+]
+}
+}
+},
+"read-only": {
+"arn": "arn:aws:iam::111122223333:role/my2cents-ip-read-only",
+"description": "AWS ReadOnlyAccess: read resources and their data (objects, items, logs).",
+"default": false,
+"managed": [
+"arn:aws:iam::aws:policy/ReadOnlyAccess"
+],
+"inline": {
+"sandbox-guards": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Action": "secretsmanager:GetSecretValue",
+"Effect": "Allow",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "ProxySecrets"
+},
+{
+"Action": "ssm:GetParameter*",
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoParameterValues"
+},
+{
+"Effect": "Deny",
+"NotAction": "secretsmanager:GetSecretValue",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "OnlyReadProxySecrets"
+},
+{
+"Action": "secretsmanager:*",
+"Effect": "Deny",
+"NotResource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "NoOtherSecrets"
+}
+]
+}
+}
+},
+"view-only": {
+"arn": "arn:aws:iam::111122223333:role/my2cents-ip-view-only",
+"description": "AWS ViewOnlyAccess: list and describe resources, no data reads.",
+"default": true,
+"managed": [
+"arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
+],
+"inline": {
+"sandbox-guards": {
+"Version": "2012-10-17",
+"Statement": [
+{
+"Action": "secretsmanager:GetSecretValue",
+"Effect": "Allow",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "ProxySecrets"
+},
+{
+"Action": "ssm:GetParameter*",
+"Effect": "Deny",
+"Resource": "*",
+"Sid": "NoParameterValues"
+},
+{
+"Effect": "Deny",
+"NotAction": "secretsmanager:GetSecretValue",
+"Resource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "OnlyReadProxySecrets"
+},
+{
+"Action": "secretsmanager:*",
+"Effect": "Deny",
+"NotResource": [
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf",
+"arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/user/*"
+],
+"Sid": "NoOtherSecrets"
+}
+]
+}
+}
+}
+}
+}

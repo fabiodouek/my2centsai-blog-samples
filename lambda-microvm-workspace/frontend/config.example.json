@@ -1,0 +1,7 @@
+{
+  "region": "us-east-1",
+  "userPoolId": "us-east-1_XXXXXXXXX",
+  "clientId": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "cognitoDomain": "my2cents-ws-xxxxxxxx.auth.us-east-1.amazoncognito.com",
+  "apiBase": ""
+}

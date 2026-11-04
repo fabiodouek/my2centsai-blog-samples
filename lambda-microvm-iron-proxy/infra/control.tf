@@ -1,0 +1,179 @@
+# Part 3's proxy control plane (control_plane=true). Nothing here exists by default.
+#
+#   s3://<control bucket>/iron-proxy.yaml   iron-proxy's config. Seeded from the template once; part 3 edits it.
+#   s3://<control bucket>/aws-scope.json    the AWS access for sandbox calls: role, session policy on/off, actions
+#   s3://<control bucket>/status.json       what the sidecar applied, and when (written by the sidecar)
+#   s3://<control bucket>/credentials.json  part 3's metadata for the credentials admins add (no values)
+#
+# The `control` sidecar in the iron-proxy task (proxy.tf, control.sh) polls the bucket, writes the config and a
+# credential_process file for the chosen sandbox role (roles.tf) to a task volume, and calls iron-proxy's
+# POST /v1/reload on loopback. Terraform writes the seeds once (`ignore_changes = all`) and never puts them back
+# over part 3's edits. The config's first line carries its version, which the sidecar reports after each reload.
+
+locals {
+  control_keys = {
+    config      = "iron-proxy.yaml"
+    scope       = "aws-scope.json"
+    status      = "status.json"
+    credentials = "credentials.json"
+  }
+
+  seed_config = "# my2cents control plane: config v1, seeded by Terraform from iron-proxy.yaml.tftpl\n${local.iron_config_cp}"
+  # The default role, no session policy (the role's full permissions). `seed` tells part 3 to write the matching
+  # allowed_services and AWS hosts into the config once it has read the AWS catalog.
+  seed_scope = jsonencode({
+    version        = 1
+    updated_by     = "terraform"
+    updated_at     = null
+    role           = local.default_role
+    session_policy = false
+    actions        = []
+    statements     = []
+    seed           = true
+  })
+
+  # The sidecar's Secrets Manager guard, checked on the seed here too: iron-proxy fetches its own secrets with the
+  # same session it signs sandbox AWS calls with, so Secrets Manager must never be reachable through aws_auth.
+  # "secretsmanager" appears only in the secrets' ARNs, and aws_auth's allowed_services is never empty (iron-proxy
+  # 0.55.0 reads an empty list as every service).
+  seed_without_secret_ids = replace(local.seed_config, "/(?m)^[ \t]*secret_id:.*$/", "")
+  seed_guard_ok = (length(regexall("(?i)secretsmanager", local.seed_without_secret_ids)) == 0
+  && length(regexall("(?m)^[ \t]*allowed_services:[ \t]*\\[[ \t]*\"", local.seed_config)) > 0)
+}
+
+# ---------- Config store ----------
+resource "aws_s3_bucket" "control" {
+  count         = var.control_plane ? 1 : 0
+  bucket_prefix = "${local.name}-control-"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_versioning" "control" {
+  count  = var.control_plane ? 1 : 0
+  bucket = aws_s3_bucket.control[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "control" {
+  count  = var.control_plane ? 1 : 0
+  bucket = aws_s3_bucket.control[0].id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "control" {
+  count                   = var.control_plane ? 1 : 0
+  bucket                  = aws_s3_bucket.control[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "control" {
+  count  = var.control_plane ? 1 : 0
+  bucket = aws_s3_bucket.control[0].id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_policy" "control" {
+  count  = var.control_plane ? 1 : 0
+  bucket = aws_s3_bucket.control[0].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "TlsOnly", Effect = "Deny", Principal = "*", Action = "s3:*"
+      Resource  = [aws_s3_bucket.control[0].arn, "${aws_s3_bucket.control[0].arn}/*"]
+      Condition = { Bool = { "aws:SecureTransport" = "false" } }
+    }]
+  })
+  depends_on = [aws_s3_bucket_public_access_block.control]
+}
+
+# ---------- Seeds ----------
+resource "aws_s3_object" "config" {
+  count        = var.control_plane ? 1 : 0
+  bucket       = aws_s3_bucket.control[0].id
+  key          = local.control_keys.config
+  content      = local.seed_config
+  content_type = "application/yaml"
+  metadata     = { version = "1", updated-by = "terraform" }
+  lifecycle {
+    ignore_changes = all
+    precondition {
+      condition     = local.seed_guard_ok
+      error_message = "The seed config must not reach Secrets Manager through aws_auth (see control.tf)."
+    }
+  }
+  depends_on = [aws_s3_bucket_versioning.control]
+}
+
+resource "aws_s3_object" "scope" {
+  count        = var.control_plane ? 1 : 0
+  bucket       = aws_s3_bucket.control[0].id
+  key          = local.control_keys.scope
+  content      = local.seed_scope
+  content_type = "application/json"
+  lifecycle {
+    ignore_changes = all
+  }
+  depends_on = [aws_s3_bucket_versioning.control]
+}
+
+# ---------- Management API token ----------
+# Generated by Secrets Manager and written with a write-only argument, so it never lands in the state. ECS injects
+# it into both containers as IRON_MANAGEMENT_API_KEY. The management API listens on loopback only.
+resource "aws_secretsmanager_secret" "mgmt" {
+  count                   = var.control_plane ? 1 : 0
+  name_prefix             = "${local.name}/mgmt-token-"
+  recovery_window_in_days = 0
+}
+
+ephemeral "aws_secretsmanager_random_password" "mgmt" {
+  count               = var.control_plane ? 1 : 0
+  password_length     = 48
+  exclude_punctuation = true
+}
+
+resource "aws_secretsmanager_secret_version" "mgmt" {
+  count                    = var.control_plane ? 1 : 0
+  secret_id                = aws_secretsmanager_secret.mgmt[0].id
+  secret_string_wo         = ephemeral.aws_secretsmanager_random_password.mgmt[0].random_password
+  secret_string_wo_version = 1
+}
+
+resource "aws_iam_role_policy" "task_exec_mgmt" {
+  count = var.control_plane ? 1 : 0
+  name  = "control-plane-token"
+  role  = aws_iam_role.task_exec.id
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [{ Effect = "Allow", Action = "secretsmanager:GetSecretValue", Resource = aws_secretsmanager_secret.mgmt[0].arn }]
+  })
+}
+
+# ---------- What the sidecar does as the task role ----------
+# Assume one of the sandbox roles, read the config and scope (and status, to see whether a newer task owns it),
+# write status. iron-proxy itself runs as the assumed sandbox role (credential_process), not as the task role.
+resource "aws_iam_role_policy" "task_control" {
+  count = var.control_plane ? 1 : 0
+  name  = "control-plane"
+  role  = aws_iam_role.task.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      { Sid = "AssumeSandboxRoles", Effect = "Allow", Action = ["sts:AssumeRole", "sts:SetSourceIdentity"],
+      Resource = [for r in aws_iam_role.sandbox : r.arn] },
+      { Sid = "ReadPolicy", Effect = "Allow", Action = "s3:GetObject",
+      Resource = [for f in ["config", "scope", "status"] : "${aws_s3_bucket.control[0].arn}/${local.control_keys[f]}"] },
+      { Sid = "WriteStatus", Effect = "Allow", Action = "s3:PutObject", Resource = "${aws_s3_bucket.control[0].arn}/${local.control_keys.status}" },
+    ]
+  })
+}

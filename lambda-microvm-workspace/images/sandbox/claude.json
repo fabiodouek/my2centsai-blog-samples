@@ -1,0 +1,13 @@
+{
+  "hasCompletedOnboarding": true,
+  "hasSeenAutoDefaultNudge": true,
+  "customApiKeyResponses": {
+    "approved": ["00000000000-AAAAAAAA"],
+    "rejected": []
+  },
+  "projects": {
+    "/root/work": {
+      "hasTrustDialogAccepted": true
+    }
+  }
+}
