@@ -174,7 +174,7 @@ The first apply replaces the iron-proxy task: about 3 minutes until the new one 
 
 ## Cost and cleanup
 
-The fixed part costs about $0.096/h whether or not sandboxes run: NAT gateway ($0.045), NLB ($0.0225), a Fargate task ($0.020), a public IPv4 address ($0.005), Secrets Manager (4 secrets) and the private hosted zone. Peering has no hourly charge. Per use: DNS Firewall ($0.60 per million queries), query logs, data across AZs over the peering ($0.01/GB each way), and MicroVMs at part 1's rates.
+The fixed part costs about $0.095/h whether or not sandboxes run: NAT gateway ($0.045), NLB ($0.0225), a Fargate task ($0.020), a public IPv4 address ($0.005), Secrets Manager (4 secrets) and the private hosted zone. Peering has no hourly charge. Per use: DNS Firewall ($0.60 per million queries), query logs, data across AZs over the peering ($0.01/GB each way), and MicroVMs at part 1's rates.
 
 When you're done:
 

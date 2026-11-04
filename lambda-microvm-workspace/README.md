@@ -64,7 +64,7 @@ us-east-1 list prices, per hour:
 | | Per hour |
 |---|---|
 | This stack: ALB $0.0225, its 2 public IPv4 addresses $0.010, the API task (0.5 vCPU / 1 GB ARM) $0.0198 | ≈ $0.052 |
-| Part 2 (NAT gateway, its NLB and iron-proxy task, public IPv4, secrets) | ≈ $0.097 |
+| Part 2 (NAT gateway, its NLB and iron-proxy task, public IPv4, secrets including the control plane's token, private zone; plus about $1.50 a month of S3 requests from the sidecar) | ≈ $0.096 |
 | **Both, no sandbox running** | **≈ $0.15** (≈ $3.60 a day) |
 | Each running 2 GB sandbox | ≈ $0.126 |
 | **Both, four sandboxes running** (the account's 8 GB quota) | **≈ $0.65** |

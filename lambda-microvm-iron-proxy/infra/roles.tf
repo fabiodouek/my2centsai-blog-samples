@@ -111,7 +111,8 @@ locals {
     { Sid = "NoStackLogs", Effect = "Deny", NotAction = ["logs:Describe*", "logs:Get*", "logs:List*", "logs:FilterLogEvents", "logs:StartLiveTail", "logs:StartQuery"],
     Resource = [format(local.arn, "logs", "log-group:/my2cents*"), format(local.arn, "logs", "log-group:/aws/events/my2cents-*")] },
     # The private zones every sandbox lookup is rewritten to: no record changes, no deleting them, and no private
-    # zones attached to any VPC (one attached to a sandbox VPC could answer names before the override)
+    # zones attached to any VPC (one on the proxy VPC could change the addresses iron-proxy connects to, and one
+    # overlapping sandbox.internal could redirect the override's target)
     { Sid = "NoStackZones", Effect = "Deny", NotAction = ["route53:Get*", "route53:List*"], Resource = local.stack_zone_arns },
     { Sid    = "NoPrivateZones", Effect = "Deny",
       Action = ["route53:AssociateVPCWithHostedZone", "route53:DisassociateVPCFromHostedZone", "route53:CreateVPCAssociationAuthorization"],
