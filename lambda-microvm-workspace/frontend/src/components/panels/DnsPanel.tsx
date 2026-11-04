@@ -1,8 +1,10 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight, TriangleAlert } from 'lucide-react';
+import { api } from '../../lib/api';
 import { hub, useFeedPanel, useHub } from '../../lib/events';
 import { fmtTime } from '../../lib/format';
 import { usePref } from '../../lib/hooks';
+import { usePolicy } from '../../lib/policy';
 import { useStore } from '../../lib/store';
 import type { DnsEvent } from '../../lib/types';
 import { Empty, Note, Segmented } from '../ui/primitives';
@@ -11,6 +13,10 @@ import { FeedPendingEmpty, FeedStatus } from './FeedStatus';
 type Filter = 'all' | 'nx' | 'off';
 type Scope = 'sandboxes' | 'everything';
 const RENDER_CAP = 300;
+/** A stable empty list: a store selector that returns a fresh [] makes useSyncExternalStore re-render forever
+ *  (React #185) while /api/config hasn't loaded, which is what happened when the app opened on this tab. */
+const NO_CIDRS: string[] = [];
+const LIVE_REFRESH_MS = 30_000;
 
 function matches(name: string, pattern: string) {
   const p = pattern.toLowerCase().replace(/\.$/, '');
@@ -45,15 +51,58 @@ function inCidr(ip: string, cidr: string): boolean {
 }
 
 /**
- * Whether a name is on the proxy allowlist: exact when the backend sends proxy_allowlist,
- * otherwise inferred from the proxy feed (allowed vs rejected_by=allowlist). null = unknown.
+ * The allowlist iron-proxy enforces right now: the control plane's current config (custom hosts plus the AWS
+ * hosts the AWS access scope wrote), not the deploy-time list in /api/config. Refetched on mount, every 30 s,
+ * after a policy write from this page (tick) and when the sidecar reports a new config applied. null when the
+ * control plane is off or the call fails.
+ */
+function useLiveAllowlist(): string[] | null {
+  const tick = usePolicy((s) => s.tick);
+  const applied = usePolicy((s) => s.status?.config.version ?? null);
+  const [hosts, setHosts] = useState<string[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const load = () => {
+      api.allowlist().then(
+        (a) => {
+          if (alive) setHosts(a.hosts.map((h) => h.host));
+        },
+        () => undefined, // keep the last list (or the fallback) on an error
+      );
+    };
+    load();
+    const timer = window.setInterval(load, LIVE_REFRESH_MS);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [tick, applied]);
+  return hosts;
+}
+
+/**
+ * Whether a name is on the proxy allowlist: the live control-plane list when there is one, else the deploy-time
+ * proxy_allowlist from /api/config, else inferred from the proxy feed (allowed vs rejected_by=allowlist).
+ * null = unknown.
  */
 function useAllowCheck(): (name: string) => boolean | null {
-  const allowlist = useStore((s) => s.config?.allowlist ?? null);
+  const live = useLiveAllowlist();
+  const configured = useStore((s) => s.config?.allowlist ?? null);
+  const allowlist = live ?? configured;
   const proxy = hub.proxy;
   return useMemo(() => {
     if (allowlist && allowlist.length) {
-      return (name: string) => allowlist.some((p) => matches(name.toLowerCase(), p));
+      // The AWS scope can put hundreds of hosts on the list: match each name once
+      const seen = new Map<string, boolean>();
+      return (name: string) => {
+        const n = name.toLowerCase().replace(/\.$/, '');
+        let v = seen.get(n);
+        if (v === undefined) {
+          v = allowlist.some((p) => matches(n, p));
+          seen.set(n, v);
+        }
+        return v;
+      };
     }
     const allowed = new Set<string>();
     const denied = new Set<string>();
@@ -72,8 +121,8 @@ export function DnsPanel() {
   const [scopePref, setScope] = usePref<Scope>('ws.dnsScope.v1', 'sandboxes');
   const [open, setOpen] = useState<number | null>(null);
   const allowed = useAllowCheck();
-  const exact = useStore((s) => Boolean(s.config?.allowlist?.length));
-  const cidrs = useStore((s) => s.config?.sandboxCidrs ?? []);
+  const exact = useStore((s) => Boolean(s.config?.allowlist?.length));   // a list to check against (live or deploy-time)
+  const cidrs = useStore((s) => s.config?.sandboxCidrs ?? NO_CIDRS);
   // The query log is part 2's sandbox VPC, where only the connector's ENIs live: every query is a sandbox's, so
   // there's nothing to scope by. (Kept for a backend that logs a whole VPC: it sends the sandbox subnets.)
   const scoped = false && cidrs.length > 0;
