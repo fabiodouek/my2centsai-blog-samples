@@ -14,7 +14,7 @@ The terminal runs inside tmux in the MicroVM, so closing the tab, a network blip
 
 Companion code for [Lambda MicroVM: Hands-On Exploration of Self-Service Sandboxes](https://my2cents.ai/deep-dive/lambda-microvms-workspace), part 3 of the AWS Lambda MicroVMs series. It builds on [part 2's companion code](../lambda-microvm-iron-proxy), which must be applied first with `control_plane=true`.
 
-Video walkthrough: https://youtu.be/Jlqd6fZ01vU
+Video walkthrough: https://youtu.be/jLFOHZwmDi8
 
 ## How it fits together
 
