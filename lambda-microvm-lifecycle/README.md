@@ -18,15 +18,15 @@ Each script prints timings, so you can reproduce the numbers in the post.
 
 Companion code for [AWS Lambda MicroVMs: Hands-On with the Full Sandbox Lifecycle](https://my2cents.ai/deep-dive/lambda-microvms), part 1 of the AWS Lambda MicroVMs series.
 
-Video walkthrough: https://youtu.be/B48pTTSlJtc
+Video walkthrough: https://youtu.be/nXKKxiv0SN0
 
 ## Prerequisites
 
 - Python 3.11+ and [uv](https://docs.astral.sh/uv/) (or plain `pip`)
 - Terraform 1.6+
-- AWS credentials allowed to manage Lambda MicroVMs, IAM roles, S3 and CloudWatch Logs, in a Region with MicroVMs (the scripts default to `us-east-1`).
+- AWS credentials allowed to manage Lambda MicroVMs, IAM roles, S3 and CloudWatch Logs, and to read Service Quotas and Cost Explorer (for `10_quota_bill.py`), in a Region with MicroVMs (the scripts default to `us-east-1`).
 - AWS CLI 2.35.10+ or boto3 1.43.35+ (the first versions with `lambda-microvms`). This repo pins boto3 1.43.123.
-- Check your quotas first. The documented default is 2,048 GB of MicroVM memory and 5 `RunMicrovm` calls per second, but newer accounts can get much less: the account used for the post had **8 GB and 1 call per second**. Every script here fits in 8 GB. `10_quota_bill.py` prints your applied values next to the defaults.
+- Check your quotas first. Service Quotas lists a default of 2,048 GB of MicroVM memory and 5 `RunMicrovm` calls per second (the Lambda guide says 1,024 GB in us-east-1), but quotas are per account and new accounts can start much lower. AWS says it raises them automatically with usage. The account used for the post had **8 GB and 1 call per second**, and raising memory by hand took a support case. Every script here fits in 8 GB. `10_quota_bill.py` prints your applied values next to the defaults.
 
 ## Setup
 
@@ -67,9 +67,9 @@ Anyone holding an endpoint token for port 8080 can run any command as root in th
 | `04_suspend_resume.py` | Three suspend/resume cycles: latency, what survives (files, a background process, in-memory state, an open TCP connection), the guest clock, hooks, wrong-state calls, a request to a suspended MicroVM with auto-resume off |
 | `05_idle.py` | Idle suspend at 60 s, auto-resume latency, whether CPU work, outbound-only traffic or a held-open stream count as activity, `suspendedDurationSeconds` (~15 min) |
 | `06_duration.py` | `maximumDurationInSeconds` with and without a suspend in the middle, explicit terminate (running and suspended), which `/terminate` hooks show up in CloudWatch (~10 min) |
-| `07_list_reconnect.py` | `list-microvms` fields and filters, why you can't tag a MicroVM, the run hook payload limit, `clientToken` idempotency, a second process attaching by ID |
+| `07_list_reconnect.py` | `list-microvms` fields and filters, `run-microvm` having no tags parameter, the run hook payload limit, `clientToken` idempotency, a second process attaching by ID |
 | `08_many_from_one.py` | Three MicroVMs from one image: what they share from the snapshot (process memory, Python's `random`, build-time UUIDs) and what's unique; then a data-science image vs `pip install` at runtime, and the same image with a `/validate` warm-up |
-| `09_egress_identity.py` | Egress IPs, raw-IP and UDP traffic, DNS, and the execution role through IMDSv2 (root, non-root, a blackhole route) with and without a role |
+| `09_egress_identity.py` | Egress IPs, raw-IP traffic, DNS over UDP and TCP, and the execution role through IMDSv2 (root, non-root, a blackhole route) with and without a role |
 | `10_quota_bill.py` | Applied vs default quotas, filling the memory quota, whether suspended MicroVMs count, `RunMicrovm` throttling, Cost Explorer |
 | `11_cleanup.py` | Terminate every MicroVM from this repo's images and delete the images |
 
@@ -93,7 +93,7 @@ terraform -chdir=infra destroy
 ## Safety nets and gotchas
 
 - MicroVMs can't be tagged, so the scripts identify theirs by image name (`my2cents-lc-*`) and put the test name in the run hook payload. `11_cleanup.py` only touches MicroVMs started from `my2cents-lc-*` images.
-- `common.run()` sets `maximumDurationInSeconds=3600` and an idle policy that suspends after 10 idle minutes and terminates after 10 suspended minutes, so a crashed script can't leave a MicroVM running for long. Tests that need other values set them explicitly.
+- `common.run()` sets `maximumDurationInSeconds=3600` and an idle policy that suspends after 10 idle minutes and terminates after 10 suspended minutes. Lambda only applies that second timer after an idle suspend: a MicroVM suspended with `suspend_microvm` stays suspended until its maximum duration, so the hour is the real backstop. Tests that need other values set them explicitly. `02_run_defaults.py` starts one MicroVM with Lambda's defaults (an 8-hour cap, no idle policy) and terminates it in a `finally` block.
 - The image identifier must be the full ARN for `get-microvm-image` and `run-microvm`; a bare name returns `Invalid ARN format` (the getting-started guide shows a bare name).
 - Output is redacted: the account ID becomes `<acct>` and the bucket name `<bucket>`. Set `REDACT=0` in `.env` to see them.
 - Every MicroVM restored from the same chipset's snapshot shares what existed at build time, including Python's `random` state. Generate IDs and seeds in `/run`.

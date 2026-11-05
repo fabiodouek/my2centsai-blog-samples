@@ -51,6 +51,7 @@ def outputs(d: Path) -> dict:
 
 OUT, P2 = outputs(INFRA), outputs(P2_INFRA)
 REGION = OUT.get("region", "us-east-1")
+APPLY_TIMEOUT_S = 3 * float(P2.get("control_poll_s") or 30)
 BASE = OUT["url"].rstrip("/")
 ACCOUNT = boto3.client("sts", region_name=REGION).get_caller_identity()["Account"]
 BUCKETS = [b["Name"] for b in boto3.client("s3", region_name=REGION).list_buckets()["Buckets"]]
@@ -200,11 +201,12 @@ def main() -> int:
             t = time.time()
             r = api.put(f"{B}/aws/scope", json={"role": name, "session_policy": False, "actions": []})
             r.raise_for_status()
-            while time.time() - t < 60:
+            # part 2's sidecar checks the bucket every 30 s (control_poll_s): allow three of its intervals
+            while time.time() - t < APPLY_TIMEOUT_S:
                 st = api.get(f"{B}/status").json()
                 if st.get("applied"):
                     break
-                time.sleep(0.4)
+                time.sleep(1.0)
             # wait until the sandbox's calls are signed as the new role
             for _ in range(60):
                 rc, arn = vm.sh("aws sts get-caller-identity --query Arn --output text")

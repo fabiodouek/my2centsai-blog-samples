@@ -1,12 +1,17 @@
 import { AlertTriangle, CheckCircle2, LoaderCircle } from 'lucide-react';
 import { fmtShortTime } from '../../lib/format';
 import { useNow } from '../../lib/hooks';
-import { isPending, usePolicy } from '../../lib/policy';
+import { isPending, nextCheckIn, usePolicy } from '../../lib/policy';
+
+/** 2.3 s, 17 s */
+export function fmtSeconds(s: number): string {
+  return s < 10 ? `${s.toFixed(1)} s` : `${Math.round(s)} s`;
+}
 
 /**
- * One line that says whether the proxy runs the latest policy: applying (spinner, elapsed), applied (latency,
- * session, expiry), rejected by iron-proxy, or a sidecar that stopped reporting. `live` makes it the page's
- * aria-live region; the copy next to the AWS Apply button is a quiet duplicate.
+ * One line that says whether the proxy runs the latest policy: waiting for the sidecar's next check (spinner,
+ * countdown), applied (time since the change, session, expiry), rejected by iron-proxy, or a sidecar that stopped
+ * reporting. `live` makes it the page's aria-live region; the copy next to the AWS Apply button is a quiet duplicate.
  */
 export function ApplyStatus({ live = true, className }: { live?: boolean; className?: string }) {
   const status = usePolicy((s) => s.status);
@@ -55,18 +60,23 @@ export function ApplyStatus({ live = true, className }: { live?: boolean; classN
     const scope = target?.scopeVersion ?? status.target.scopeVersion;
     const scopeChanged = scope !== null && scope !== status.scope.version;
     const since = target?.requestedAt ?? status.target.requestedAt;
+    const left = nextCheckIn(status, now);
+    // The aria-live text changes only with the state, not every second: the countdown is aria-hidden
     text = (
       <>
-        Applying config v{cfg ?? '?'}
-        {scopeChanged ? ` and AWS scope v${scope}` : ''}…
-        {since ? <span className="apply-faint tabular"> {((now - since) / 1000).toFixed(0)} s</span> : null}
+        Config v{cfg ?? '?'}
+        {scopeChanged ? ` and AWS scope v${scope} go` : ' goes'} live at the proxy’s next check
+        <span className="apply-faint tabular" aria-hidden>
+          {left === null ? '' : left >= 1 ? ` · in ${Math.ceil(left)} s` : ' · due now'}
+          {since ? ` · ${Math.max(0, Math.round((now - since) / 1000))} s since the change` : ''}
+        </span>
       </>
     );
   } else if (status.applied) {
     tone = 'is-ok';
     icon = <CheckCircle2 size={13} aria-hidden />;
     const parts: string[] = [];
-    parts.push(status.latencyS !== null ? `Applied in ${status.latencyS.toFixed(1)} s` : 'Applied');
+    parts.push(status.latencyS !== null ? `Applied ${fmtSeconds(status.latencyS)} after the change` : 'Applied');
     if (status.scope.role) parts.push(status.scope.role);
     if (status.scope.sessionName) parts.push(`session ${status.scope.sessionName}`);
     if (status.scope.sessionPolicy !== null) parts.push(status.scope.sessionPolicy ? 'session policy' : 'no session policy');
@@ -92,7 +102,16 @@ export function ApplyStatus({ live = true, className }: { live?: boolean; classN
       aria-live={live ? 'polite' : undefined}
       aria-hidden={live ? undefined : true}
       data-testid={live ? 'apply-status' : undefined}
-      title={status?.sidecar.task ? `Reported by proxy task ${status.sidecar.task}` : undefined}
+      title={
+        status
+          ? [
+              status.sidecar.pollS ? `The proxy checks for changes every ${status.sidecar.pollS} s.` : null,
+              status.sidecar.task ? `Reported by proxy task ${status.sidecar.task}.` : null,
+            ]
+              .filter(Boolean)
+              .join(' ') || undefined
+          : undefined
+      }
     >
       {icon}
       <span className="apply-text">{text}</span>

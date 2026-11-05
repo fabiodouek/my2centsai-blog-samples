@@ -22,6 +22,15 @@ PART2_INFRA = Path(os.environ.get("PART2_INFRA", Path.home() / "Code/lambda-micr
 INFRA = ROOT / "infra"
 REGION = os.environ.get("AWS_REGION", "us-east-1")
 IMAGE_NAME = "my2cents-ws-sandbox"
+# One image per sandbox size (a MicroVM's memory is set by its image: resources[].minimumMemoryInMiB; vCPU is
+# memory / 2 GB). Medium keeps the original image name; the others add a suffix. Same code in every image.
+SIZES = {  # size -> (MiB, image name)
+    "small": (1024, IMAGE_NAME + "-1g"),
+    "medium": (2048, IMAGE_NAME),
+    "large": (4096, IMAGE_NAME + "-4g"),
+    "xlarge": (8192, IMAGE_NAME + "-8g"),
+}
+DEFAULT_SIZE = "medium"
 BASE_IMAGE = f"arn:aws:lambda:{REGION}:aws:microvm-image:al2023-1"
 MANAGED = f"arn:aws:lambda:{REGION}:aws:network-connector:aws-network-connector:"
 HTTP_INGRESS, SHELL_INGRESS = MANAGED + "HTTP_INGRESS", MANAGED + "SHELL_INGRESS"
@@ -68,8 +77,8 @@ def redact(text) -> str:
     return s.replace(account_id(), "<acct>")
 
 
-def image_arn() -> str:
-    return f"arn:aws:lambda:{REGION}:{account_id()}:microvm-image:{IMAGE_NAME}"
+def image_arn(size: str = DEFAULT_SIZE) -> str:
+    return f"arn:aws:lambda:{REGION}:{account_id()}:microvm-image:{SIZES[size][1]}"
 
 
 def settings(t: dict | None = None, extra_env: dict | None = None) -> dict:
@@ -88,6 +97,9 @@ def run_microvm(*, idle_s: int = 900, suspended_s: int = 1800, max_duration_s: i
     """Run one MicroVM from the workspace image with HTTP + SHELL ingress, on part 2's sandbox connector.
     Retries ServiceQuotaExceededException (8 GB account quota) every 60 s up to 10 times, and throttling."""
     t = part2()
+    if not t.get("connector_arn"):
+        # An empty egressNetworkConnectors isn't offline: Lambda attaches INTERNET_EGRESS (direct internet, no proxy)
+        raise RuntimeError("part 2 has no connector_arn output; refusing to run a MicroVM without it")
     payload = settings(t, extra_env)
     params = {
         "imageIdentifier": image_arn(),

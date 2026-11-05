@@ -8,18 +8,21 @@ import { AllowlistSection } from './AllowlistSection';
 import { CredentialsSection } from './CredentialsSection';
 import { AwsSection } from './AwsSection';
 import { ChangeLogSection } from './ChangeLogSection';
+import { ConfigSection } from './ConfigSection';
 
 const LABEL: Record<PolicySection, string> = {
   allowlist: 'Allowlist',
   credentials: 'Credentials',
   aws: 'AWS access',
   changes: 'Change log',
+  config: 'Config',
 };
 
-/** The global proxy policy (allowlist, credentials, AWS access, change log). Not per sandbox. */
+/** The global proxy policy (allowlist, credentials, AWS access, change log; for admins, the config). Not per sandbox. */
 export function PolicyPage({ onOpenNav }: { onOpenNav?: () => void }) {
-  const section = useStore((s) => s.policySection);
+  const chosen = useStore((s) => s.policySection);
   const me = useStore((s) => s.me);
+  const pollS = usePolicy((s) => s.status?.sidecar.pollS ?? null);
   const overview = usePolicy((s) => s.overview);
   const overviewError = usePolicy((s) => s.overviewError);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -32,18 +35,20 @@ export function PolicyPage({ onOpenNav }: { onOpenNav?: () => void }) {
   useEffect(() => (overview?.enabled ? holdStatus() : undefined), [overview?.enabled]);
 
   const editable = Boolean(overview?.editable ?? me?.isAdmin);
+  const sections = editable ? POLICY_SECTIONS : POLICY_SECTIONS.filter((s) => s !== 'config');
+  const section = sections.includes(chosen) ? chosen : 'allowlist';
 
   function onTabKey(e: React.KeyboardEvent) {
-    const i = POLICY_SECTIONS.indexOf(section);
+    const i = sections.indexOf(section);
     let next = -1;
-    if (e.key === 'ArrowRight') next = (i + 1) % POLICY_SECTIONS.length;
-    else if (e.key === 'ArrowLeft') next = (i - 1 + POLICY_SECTIONS.length) % POLICY_SECTIONS.length;
+    if (e.key === 'ArrowRight') next = (i + 1) % sections.length;
+    else if (e.key === 'ArrowLeft') next = (i - 1 + sections.length) % sections.length;
     else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = POLICY_SECTIONS.length - 1;
+    else if (e.key === 'End') next = sections.length - 1;
     if (next < 0) return;
     e.preventDefault();
-    setPolicySection(POLICY_SECTIONS[next]);
-    tabRefs.current[POLICY_SECTIONS[next]]?.focus();
+    setPolicySection(sections[next]);
+    tabRefs.current[sections[next]]?.focus();
   }
 
   let body: React.ReactNode;
@@ -76,14 +81,15 @@ export function PolicyPage({ onOpenNav }: { onOpenNav?: () => void }) {
     body = (
       <div className="policy-body" role="tabpanel" id={`policy-panel-${section}`} aria-labelledby={`policy-tab-${section}`}>
         <Note>
-          Changes apply to every sandbox on this proxy, other users’ included, as soon as iron-proxy reloads its config
-          (a few seconds).
+          Changes apply to every sandbox on this proxy, other users’ included, at the proxy’s next check for changes
+          (every {pollS ?? 30}&nbsp;s), when iron-proxy reloads its config without a restart.
           {editable ? '' : ' Only admins can change the policy; you can look.'}
         </Note>
         {section === 'allowlist' ? <AllowlistSection editable={editable} /> : null}
         {section === 'credentials' ? <CredentialsSection editable={editable} /> : null}
         {section === 'aws' ? <AwsSection editable={editable} /> : null}
         {section === 'changes' ? <ChangeLogSection /> : null}
+        {section === 'config' && editable ? <ConfigSection /> : null}
       </div>
     );
   }
@@ -110,7 +116,7 @@ export function PolicyPage({ onOpenNav }: { onOpenNav?: () => void }) {
       {overview?.enabled ? (
         <div className="policy-tabs">
           <div className="tabs policy-tablist" role="tablist" aria-label="Proxy policy sections" onKeyDown={onTabKey}>
-            {POLICY_SECTIONS.map((id) => (
+            {sections.map((id) => (
               <button
                 key={id}
                 ref={(el) => {

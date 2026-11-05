@@ -132,7 +132,7 @@ export class TerminalConnection {
         break;
       }
       case 'reconnecting':
-        this.set('reconnecting', detail || 'The sandbox connection dropped. The workspace is retrying.', {
+        this.set('reconnecting', detail || 'The sandbox connection dropped. The playground is retrying.', {
           retryBy: 'server',
           retryAt: Number.isFinite(retryIn) ? Date.now() + retryIn * 1000 : null,
           givesUpAt: Number.isFinite(givesUp) ? Date.now() + givesUp * 1000 : null,
@@ -168,7 +168,7 @@ export class TerminalConnection {
       return;
     }
     if (code === 1011) {
-      this.set('error', reason || 'The workspace gave up reconnecting to the sandbox.');
+      this.set('error', reason || 'The playground gave up reconnecting to the sandbox.');
       return;
     }
     if (code === 4401) {
@@ -177,7 +177,7 @@ export class TerminalConnection {
         this.connect('Refreshing your sign-in');
         return;
       }
-      this.set('error', 'The workspace rejected your sign-in. Reload the page to sign in again.');
+      this.set('error', 'The playground rejected your sign-in. Reload the page to sign in again.');
       return;
     }
     if (code === 4403 || code === 4404) {
@@ -185,11 +185,11 @@ export class TerminalConnection {
       return;
     }
     if (this.attempt >= MAX_CLIENT_ATTEMPTS) {
-      this.set('error', 'Could not reach the workspace after several tries.');
+      this.set('error', 'Could not reach the playground after several tries.');
       return;
     }
     const delay = backoff(this.attempt++);
-    this.set('reconnecting', reason || 'Lost the connection to the workspace.', {
+    this.set('reconnecting', reason || 'Lost the connection to the playground.', {
       retryBy: 'client',
       retryAt: Date.now() + delay * 1000,
     });

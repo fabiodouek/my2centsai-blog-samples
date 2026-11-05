@@ -3,6 +3,8 @@
 An admin (ADMIN_EMAIL, password in ADMIN_PASSWORD_FILE) works through the API exactly as the browser does. Two
 sandboxes, A and B, both on part 2's connector. Inside them, the in-VM agent's /exec runs dig, curl, gh, git, the AWS
 CLI and Claude Code; each policy change is timed from the API call to the first request in the sandbox that shows it.
+Part 2's control sidecar checks the bucket every 30 s (control_poll_s), so each change takes up to about that long:
+the waits allow three of its intervals.
 
   1. transparent: no proxy variables; every name resolves (CNAME proxy.sandbox.internal) to iron-proxy's NLB; curl,
      gh, git, the AWS CLI and Claude Code work; a raw IP is unreachable
@@ -65,6 +67,9 @@ REPO = os.environ.get("GITHUB_REPO", "fabiodouek/my2centsai-sandbox-test")
 CRED, ENV = "e2e-httpbin", "E2E_TEST_KEY"
 FAKE_VALUE = "e2e-made-up-value-" + secrets.token_hex(4)
 CURL = "curl -s -o /dev/null -w '%{http_code}' --max-time 10"
+# The sidecar's poll interval (part 2's control_poll_s; the API reports what the sidecar runs with)
+POLL_S = float(P2.get("control_poll_s") or 30)
+APPLY_TIMEOUT_S = 3 * POLL_S
 
 
 def redact(s) -> str:
@@ -119,9 +124,10 @@ class Sandbox:
         return (j.get("stdout", "") + j.get("stderr", "")).strip()
 
 
-def wait_until(label: str, probe, ok, t_start: float, timeout: float = 60, every: float = 0.5) -> float | None:
+def wait_until(label: str, probe, ok, t_start: float, timeout: float | None = None, every: float = 0.5) -> float | None:
     """Run probe until ok(result); log each distinct result; return seconds from t_start (wall clock)."""
     last = None
+    timeout = timeout or APPLY_TIMEOUT_S
     while time.time() - t_start < timeout:
         try:
             v = probe()
@@ -141,8 +147,13 @@ def wait_until(label: str, probe, ok, t_start: float, timeout: float = 60, every
 
 
 def applied(api: httpx.Client, label: str, t_start: float) -> dict:
-    while time.time() - t_start < 60:
+    first = None
+    while time.time() - t_start < APPLY_TIMEOUT_S:
         st = api.get("/api/policy/status").json()
+        if first is None and st.get("pending"):
+            first = st
+            log(f"    status: pending, next sidecar check in {st.get('sidecar', {}).get('next_poll_in_s')} s "
+                f"(every {st.get('sidecar', {}).get('poll_s')} s)")
         if st.get("applied"):
             log(f"    status: applied (write -> reload {st.get('latency_s')} s; seen by the API after "
                 f"{time.time() - t_start:.2f} s) config v{st['config']['version']}, scope v{st['scope']['version']}, "
@@ -152,8 +163,8 @@ def applied(api: httpx.Client, label: str, t_start: float) -> dict:
         if st.get("error") and not st.get("pending"):
             log("    status error:", st["error"])
             return st
-        time.sleep(0.3)
-    log("    status: not applied after 60 s")
+        time.sleep(1.0)
+    log(f"    status: not applied after {APPLY_TIMEOUT_S:.0f} s")
     return {}
 
 
@@ -287,7 +298,8 @@ def main() -> int:
         check("deny names the task role and the four sandbox roles", len(principals) == 5, ", ".join(principals))
         applied(api, "revoke demo", t)
         dt = wait_until("A: demo placeholder goes out unswapped", lambda: demo(a), lambda v: v == "placeholder", t)
-        check("revoked by reload, in seconds", dt is not None and dt < 15, f"{dt} s")
+        check(f"revoked by reload, within one sidecar check ({POLL_S:.0f} s) plus a few seconds",
+              dt is not None and dt < POLL_S + 10, f"{dt} s")
         check("B too", demo(b) == "placeholder")
         t = time.time()
         api.post("/api/credentials/demo/restore")

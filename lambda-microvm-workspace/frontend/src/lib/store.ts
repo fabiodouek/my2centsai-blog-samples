@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { api, ApiError } from './api';
 import { hub } from './events';
 import { readPref, writePref } from './hooks';
-import type { AppConfig, Me, Quota, Sandbox, SandboxState } from './types';
+import type { AppConfig, Me, NewSandbox, Quota, Sandbox, SandboxState } from './types';
 
 // App-wide workspace state: sandboxes, quota, selection, which terminals this browser has
 // attached, and toasts. A tiny external store so any component can read a slice.
@@ -18,8 +18,9 @@ export type PendingAction = 'suspend' | 'resume' | 'terminate';
 
 /** What the main area shows: the selected sandbox's terminal, or the global proxy policy page. */
 export type View = 'terminal' | 'policy';
-export type PolicySection = 'allowlist' | 'credentials' | 'aws' | 'changes';
-export const POLICY_SECTIONS: PolicySection[] = ['allowlist', 'credentials', 'aws', 'changes'];
+export type PolicySection = 'allowlist' | 'credentials' | 'aws' | 'changes' | 'config';
+/** `config` (the proxy's config as it is in the bucket against what it applied) is for admins only. */
+export const POLICY_SECTIONS: PolicySection[] = ['allowlist', 'credentials', 'aws', 'changes', 'config'];
 
 interface State {
   me: Me | null;
@@ -300,9 +301,9 @@ function patchSandbox(id: string, patch: Partial<Sandbox>) {
 
 // ---------- actions ----------
 
-export async function createSandbox(input: { name: string; idleMinutes: number; maxHours: number }): Promise<boolean> {
+export async function createSandbox(input: NewSandbox): Promise<boolean> {
   try {
-    const sb = await api.createSandbox({ name: input.name, idle_minutes: input.idleMinutes, max_hours: input.maxHours });
+    const sb = await api.createSandbox(input);
     set((s) => ({ sandboxes: [...(s.sandboxes ?? []).filter((x) => x.id !== sb.id), sb] }));
     select(sb.id);
     markActivity(sb.id);
@@ -310,8 +311,12 @@ export async function createSandbox(input: { name: string; idleMinutes: number; 
     window.setTimeout(() => void refreshSandboxes(), 2500);
     return true;
   } catch (e) {
-    if (e instanceof ApiError && e.status === 409) toast('error', 'No room for another sandbox', errText(e));
-    else toast('error', 'Could not create the sandbox', errText(e));
+    // AWS's ServiceQuotaExceededException (the backend never refuses on its own estimate): the detail quotes AWS,
+    // names the size and gives the estimate; the bar is refreshed so it shows what's live now
+    if (e instanceof ApiError && e.status === 409 && /ServiceQuotaExceeded/.test(errText(e))) {
+      toast('error', 'AWS refused it: MicroVM memory quota', errText(e));
+      void refreshQuota();
+    } else toast('error', 'Could not create the sandbox', errText(e));
     return false;
   }
 }

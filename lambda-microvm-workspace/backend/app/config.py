@@ -38,7 +38,7 @@ DEFAULT_ALLOWLIST = [
 ]
 
 DEFAULT_CONTROL_KEYS = {"config": "iron-proxy.yaml", "scope": "aws-scope.json", "status": "status.json",
-                        "credentials": "credentials.json"}
+                        "credentials": "credentials.json", "default_config": "iron-proxy.default.yaml"}
 
 MANAGED_CONNECTOR = "arn:aws:lambda:{region}:aws:network-connector:aws-network-connector:{name}"
 
@@ -49,7 +49,9 @@ class Settings:
     table_name: str | None = None
     user_pool_id: str | None = None
     client_id: str | None = None
+    # The medium (default) image; IMAGE_ARNS_JSON maps every size to its image (app/sizes.py)
     image_arn: str | None = None
+    image_arns: dict = field(default_factory=dict)
     connector_arn: str | None = None
     # Transparent interception (part 2's two VPCs): no proxy settings in the sandbox; the only mode
     proxy_mode: str = "transparent"
@@ -61,7 +63,10 @@ class Settings:
     origin_secret: str | None = None
     task_role_arn: str | None = None
     dev_auth: bool = False
+    # Fallback for the MicroVM memory quota when Service Quotas can't be read (app/quota.py reads the real one)
     quota_gb: int = 8
+    quota_service_code: str = "lambda"
+    quota_code: str = "L-CD1C0CC4"     # "Max allocated ARM_64 MicroVM memory", GB
     vm_memory_gb: int = 2
     max_duration_s: int = 28800
     proxy_allowlist: list[str] = field(default_factory=list)
@@ -74,6 +79,9 @@ class Settings:
     # Proxy control plane (part 2 applied with control_plane=true). Off when CONTROL_BUCKET is unset.
     control_bucket: str | None = None
     control_keys: dict = field(default_factory=lambda: dict(DEFAULT_CONTROL_KEYS))
+    # How often part 2's control sidecar checks the bucket (its control_poll_s). status.json reports the value it
+    # runs with; this is the fallback until it does.
+    control_poll_s: float = 30.0
     # Part 2's sandbox roles: {"view-only": {"arn", "description", "default"}, ...}
     sandbox_roles: dict = field(default_factory=dict)
     scope_baseline: dict = field(default_factory=dict)
@@ -88,6 +96,14 @@ class Settings:
     @property
     def sandbox_role_arns(self) -> list[str]:
         return [r["arn"] for r in self.sandbox_roles.values() if isinstance(r, dict) and r.get("arn")]
+
+    @property
+    def size_images(self) -> dict[str, str]:
+        """size -> image ARN for the sizes this deployment has an image ARN for (medium falls back to IMAGE_ARN)."""
+        out = {k: v for k, v in self.image_arns.items() if v}
+        if self.image_arn and "medium" not in out:
+            out["medium"] = self.image_arn
+        return out
 
     @property
     def control_plane(self) -> bool:
@@ -121,6 +137,10 @@ class Settings:
             raise ConfigError("PROXY_MODE must be 'transparent' (part 2's two-VPC design; no proxy settings in sandboxes)")
         if not 1 <= self.max_duration_s <= 28800:
             raise ConfigError("MAX_DURATION_S must be 1..28800")
+        from .sizes import SIZES
+        unknown = sorted(set(self.image_arns) - set(SIZES))
+        if unknown:
+            raise ConfigError(f"IMAGE_ARNS_JSON has unknown sizes: {', '.join(unknown)} (known: {', '.join(SIZES)})")
         if self.control_bucket and not (self.sandbox_roles and self.scope_baseline):
             raise ConfigError("CONTROL_BUCKET needs ROLES_JSON and SCOPE_BASELINE_JSON (part 2's outputs)")
         if not self.user_secret_prefix.endswith("/"):
@@ -137,6 +157,7 @@ def load(env: dict | None = None) -> Settings:
         user_pool_id=e.get("COGNITO_USER_POOL_ID") or None,
         client_id=e.get("COGNITO_CLIENT_ID") or None,
         image_arn=e.get("IMAGE_ARN") or None,
+        image_arns=_json("IMAGE_ARNS_JSON", e.get("IMAGE_ARNS_JSON")),
         connector_arn=e.get("CONNECTOR_ARN") or None,
         proxy_mode=(e.get("PROXY_MODE") or "transparent").strip().lower(),
         nlb_ips=_list(e.get("NLB_IPS")),
@@ -148,6 +169,8 @@ def load(env: dict | None = None) -> Settings:
         task_role_arn=e.get("TASK_ROLE_ARN") or None,
         dev_auth=e.get("DEV_AUTH") == "1",
         quota_gb=int(e.get("QUOTA_GB") or 8),
+        quota_service_code=e.get("QUOTA_SERVICE_CODE") or "lambda",
+        quota_code=e.get("QUOTA_CODE") or "L-CD1C0CC4",
         vm_memory_gb=int(e.get("VM_MEMORY_GB") or 2),
         max_duration_s=int(e.get("MAX_DURATION_S") or 28800),
         proxy_allowlist=allow,
@@ -158,6 +181,7 @@ def load(env: dict | None = None) -> Settings:
         proxy_ecs_service=e.get("PROXY_ECS_SERVICE") or "iron-proxy",
         control_bucket=e.get("CONTROL_BUCKET") or None,
         control_keys={**DEFAULT_CONTROL_KEYS, **_json("CONTROL_KEYS_JSON", e.get("CONTROL_KEYS_JSON"))},
+        control_poll_s=float(e.get("CONTROL_POLL_S") or 30),
         sandbox_roles=_json("ROLES_JSON", e.get("ROLES_JSON")),
         scope_baseline=_json("SCOPE_BASELINE_JSON", e.get("SCOPE_BASELINE_JSON")),
         user_secret_prefix=e.get("USER_SECRET_PREFIX") or "my2cents-ip/user/",

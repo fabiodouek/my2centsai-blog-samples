@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Deploy the workspace end to end: the sandbox image, infra (CloudFront, ALB, API service, Cognito, DynamoDB, ECR),
+# Deploy the workspace end to end: the sandbox images (one per size), infra (CloudFront, ALB, API service, Cognito, DynamoDB, ECR),
 # backend image, SPA. Idempotent; safe from an empty state or as a redeploy. Part 2 must be applied first, with
 # control_plane=true for the Proxy policy page (the config bucket, the sidecar and the four sandbox roles live there).
 #
 #   scripts/deploy.sh                    # everything
 #   SKIP_BACKEND=1 scripts/deploy.sh     # SPA only (keeps the running image tag)
 #   SKIP_FRONTEND=1 scripts/deploy.sh    # backend + infra only
-#   SKIP_IMAGE=1 scripts/deploy.sh       # don't check or build the sandbox image
+#   SKIP_IMAGE=1 scripts/deploy.sh       # don't check or build the sandbox images
 #
 # Order on a fresh deploy:
 #   1. checks: tools, part 2's state is the two-VPC stack (and whether its control plane is on)
-#   2. the sandbox image, in the background (it needs only part 2: its CA, build role and artifacts bucket);
-#      built when missing or when it was built for another CA
+#   2. the sandbox images, one per size (1, 2, 4 and 8 GB), in the background (they need only part 2: its CA, build
+#      role and artifacts bucket); each built when missing or when it was built for another CA, one after another
 #   3. the ECR repository (a targeted apply), so the backend image can be pushed before the service exists
 #   4. backend image, pushed with a timestamp tag
 #   5. terraform apply with that tag and desired_count=1 (API, ALB, CloudFront, Cognito...; ~8 min the first time)
@@ -49,7 +49,7 @@ if [[ "$CONTROL_PLANE" != "true" ]]; then
        "revoke restarts the proxy. Apply part 2 with control_plane=true, then redeploy this."
 fi
 
-# ---- 2. the sandbox image, in the background
+# ---- 2. the sandbox images, in the background
 PY="$ROOT/.venv/bin/python"
 if [[ ! -x "$PY" ]]; then
   step "creating .venv for the scripts"
@@ -59,7 +59,7 @@ fi
 IMAGE_LOG="$(mktemp -t sandbox-image.XXXXXX)"
 IMAGE_PID=""
 if [[ -z "${SKIP_IMAGE:-}" ]]; then
-  step "checking the sandbox image in the background (log: $IMAGE_LOG)"
+  step "checking the sandbox images (small, medium, large, xlarge) in the background (log: $IMAGE_LOG)"
   (cd "$ROOT" && PART2_INFRA="$PART2_INFRA" "$PY" scripts/build_sandbox_image.py --if-needed) >"$IMAGE_LOG" 2>&1 &
   IMAGE_PID=$!
 fi
@@ -68,8 +68,9 @@ step "terraform init"
 tf init -input=false >/dev/null
 
 # ---- 3. the image push needs the ECR repo; on a fresh state create just that first. (Ask the state: on a state
-# with no outputs, `terraform output -raw` prints a warning and still exits 0.)
-if ! tf state list 2>/dev/null | grep -qx 'aws_ecr_repository.backend'; then
+# with no outputs, `terraform output -raw` prints a warning and still exits 0. Not `tf state list | grep -q`: grep
+# exits at the first match, terraform gets SIGPIPE, and pipefail makes the test fail.)
+if ! grep -qx 'aws_ecr_repository.backend' <<<"$(tf state list 2>/dev/null)"; then
   step "creating the ECR repository (first run)"
   tf apply -input=false -auto-approve -target=aws_ecr_repository.backend | redact | tail -3
 fi
@@ -165,10 +166,10 @@ if [[ "$CONTROL_PLANE" == "true" ]]; then
 fi
 
 if [[ -n "$IMAGE_PID" ]]; then
-  step "waiting for the sandbox image check/build"
+  step "waiting for the sandbox images check/build"
   if ! wait "$IMAGE_PID"; then
     redact < "$IMAGE_LOG"
-    echo "the sandbox image build failed (log above); the rest is deployed" >&2
+    echo "a sandbox image build failed (log above); the rest is deployed, and the API offers only the sizes whose image is built" >&2
     exit 1
   fi
   redact < "$IMAGE_LOG" | tail -6

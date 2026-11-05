@@ -54,6 +54,18 @@ variable "control_plane" {
   default = false
 }
 
+# control_plane=true: how often the sidecar checks the control bucket for a new config or AWS scope, in seconds.
+# A change from part 3 (allowlist, credentials, revoke, AWS access) goes live at the next check: within this long,
+# plus about a second for the fetch and the reload. Each check is two conditional GETs.
+variable "control_poll_s" {
+  type    = number
+  default = 30
+  validation {
+    condition     = var.control_poll_s >= 1 && var.control_poll_s <= 300 && floor(var.control_poll_s) == var.control_poll_s
+    error_message = "control_poll_s is a whole number of seconds from 1 to 300."
+  }
+}
+
 # The sidecar's image: AWS's aws-cli image (bash, curl, jq), pinned by index digest
 variable "control_image" {
   type    = string

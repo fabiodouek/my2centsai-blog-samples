@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { Plug } from 'lucide-react';
 import { hub, useHub } from '../../lib/events';
-import { endReason, fmtDateTime, fmtDuration, fmtMb, fmtShortTime, fmtTime } from '../../lib/format';
+import { endReason, fmtDateTime, fmtDuration, fmtLifetime, fmtMb, fmtShortTime, fmtTime } from '../../lib/format';
+import { useStore } from '../../lib/store';
 import { useNow } from '../../lib/hooks';
 import type { SandboxLive } from '../../lib/live';
 import type { Sandbox, SandboxState } from '../../lib/types';
@@ -10,11 +11,25 @@ import { LineChart } from '../charts/LineChart';
 import { Empty, STATE_LABEL, StateDot, StatePill, shownState, stateTone } from '../ui/primitives';
 import { AwakeHint } from './AwakeHint';
 
-const BASELINE_MB = 2048;
+/** "Terminated after 15 min suspended", "terminated as soon as it suspends", "until the lifetime ends". */
+function suspendedText(s: number | null, maxS: number): string {
+  if (s === null || s >= maxS) return 'stays suspended until the lifetime ends';
+  // Lambda applies suspendedDurationSeconds to idle suspends only (measured): Suspend keeps it until the lifetime ends
+  if (s === 0) return 'terminated as soon as it suspends (a Suspend from here keeps it until the lifetime ends)';
+  return `terminated after ${fmtLifetime(s)} suspended (after Suspend, it stays until the lifetime ends)`;
+}
+
+export function egressText(egress: string): string {
+  if (egress === 'proxy') return 'Through iron-proxy (part 2): allowlisted hosts only, keys swapped in';
+  if (egress === 'internet') return 'Direct internet (Lambda’s managed connector), not through iron-proxy';
+  if (egress === 'none') return 'None';
+  return egress;
+}
 
 export function VitalsPanel({ sandbox, live }: { sandbox: Sandbox | null; live: SandboxLive }) {
   useHub();
   const now = useNow();
+  const config = useStore((s) => s.config);
   if (!sandbox) return <Empty title="No sandbox selected">Pick a sandbox to see its state, timers and live stats.</Empty>;
 
   const v = live.vitals.data;
@@ -29,6 +44,10 @@ export function VitalsPanel({ sandbox, live }: { sandbox: Sandbox | null; live: 
   const ended = state === 'TERMINATED' || state === 'TERMINATING';
   const latest = live.samples[live.samples.length - 1];
   const memTotal = stats?.memTotalMb ?? latest?.memTotal ?? 0;
+  const baselineMb = sandbox.memoryGb * 1024;
+  const burst = config?.burstFactor ?? 4;
+  const autoResume = idle ? idle.autoResumeEnabled : sandbox.autoResume;
+  const suspendedS = idle?.suspendedDurationS ?? sandbox.suspendedDurationS;
 
   return (
     <div className="pane">
@@ -69,10 +88,55 @@ export function VitalsPanel({ sandbox, live }: { sandbox: Sandbox | null; live: 
                 <dt>Idle policy</dt>
                 <dd>
                   Suspends after {idle ? Math.round(idle.maxIdleDurationS / 60) : sandbox.idleMinutes} min without inbound
-                  traffic{idle ? (idle.autoResumeEnabled ? '; traffic to it resumes it automatically' : '; no auto-resume') : ''}.
+                  traffic, then {suspendedText(suspendedS, maxS)}.
+                  <span className="fact-line">
+                    {autoResume
+                      ? 'Auto-resume on: traffic to it (the terminal, the agent) wakes it.'
+                      : 'Auto-resume off: only Resume wakes it; the terminal shows it suspended.'}
+                  </span>
                 </dd>
               </div>
             )}
+          </dl>
+        </section>
+
+        <section className="section" aria-labelledby="vitals-settings">
+          <h2 id="vitals-settings" className="section-title">
+            Settings
+          </h2>
+          <dl className="facts">
+            <div>
+              <dt>Size</dt>
+              <dd>
+                {sandbox.sizeLabel} <span className="tabular">· {sandbox.memoryGb} GB · {sandbox.vcpu} vCPU</span>
+                <span className="fact-sub tabular">
+                  baseline (billed, counts against the quota); bursts to {sandbox.vcpu * burst} vCPU and{' '}
+                  {sandbox.memoryGb * burst} GB, which is what nproc and free show
+                  {sandbox.usdPerHour !== null ? ` · about $${sandbox.usdPerHour.toFixed(3)}/h running` : ''}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt>Lifetime</dt>
+              <dd className="tabular">
+                {fmtLifetime(maxS)}
+                <span className="fact-sub">{Math.round(maxS / 60)} min, suspended time included</span>
+              </dd>
+            </div>
+            <div className="fact-wide">
+              <dt>Egress</dt>
+              <dd>{egressText(sandbox.egress)}</dd>
+            </div>
+            <div className="fact-wide">
+              <dt>Environment variables</dt>
+              <dd>
+                {sandbox.envNames.length ? (
+                  <span className="mono env-names">{sandbox.envNames.join(' ')}</span>
+                ) : (
+                  <span className="fact-sub">None besides the placeholders and the CA settings</span>
+                )}
+              </dd>
+            </div>
           </dl>
         </section>
 
@@ -89,7 +153,7 @@ export function VitalsPanel({ sandbox, live }: { sandbox: Sandbox | null; live: 
             <Empty icon={<Plug size={18} aria-hidden />} title={state === 'RUNNING' ? 'Attach a terminal for live stats' : `Live stats need a running sandbox`}>
               {state === 'RUNNING'
                 ? 'Stats come from an agent inside the sandbox, and reading them keeps it awake. So they are sampled only while a terminal is attached.'
-                : (v?.statsError ?? 'The workspace won’t wake a suspended sandbox just to read stats.')}
+                : (v?.statsError ?? 'The playground won’t wake a suspended sandbox just to read stats.')}
             </Empty>
           ) : (
             <>
@@ -108,19 +172,19 @@ export function VitalsPanel({ sandbox, live }: { sandbox: Sandbox | null; live: 
                 points={live.samples.map((s) => ({ t: s.t, v: s.cpu }))}
                 yMax={() => 100}
                 fmt={(n) => `${Math.round(n)}%`}
-                describe={(n) => `${n.toFixed(0)}%${stats ? ` of ${stats.cpuCount} vCPU · load ${stats.load1.toFixed(2)}` : ''}`}
+                describe={(n) => `${n.toFixed(0)}%${stats ? ` of ${stats.cpuCount} vCPU (${sandbox.vcpu} baseline) · load ${stats.load1.toFixed(2)}` : ''}`}
                 dimmed={!liveOn}
               />
               <LineChart
                 title="Memory"
                 points={live.samples.map((s) => ({ t: s.t, v: s.memUsed }))}
-                yMax={(m) => niceMb(Math.max(BASELINE_MB * 1.25, m * 1.15))}
+                yMax={(m) => niceMb(Math.max(baselineMb * 1.25, m * 1.15))}
                 fmt={(n) => (n === 0 ? '0' : `${+(n / 1024).toFixed(1)} GB`)}
                 yIncrs={[256, 512, 1024, 2048, 4096]}
                 describe={(n) => `${fmtMb(n)} used${memTotal ? ` of ${fmtMb(memTotal)}` : ''}`}
                 refLines={[
-                  { value: BASELINE_MB, label: '2 GB baseline' },
-                  ...(memTotal > BASELINE_MB * 1.5 ? [{ value: memTotal, label: `${fmtMb(memTotal)} burst ceiling` }] : []),
+                  { value: baselineMb, label: `${sandbox.memoryGb} GB baseline` },
+                  ...(memTotal > baselineMb * 1.5 ? [{ value: memTotal, label: `${fmtMb(memTotal)} burst ceiling` }] : []),
                 ]}
                 dimmed={!liveOn}
               />

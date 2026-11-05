@@ -105,6 +105,15 @@ interface Persisted {
 const persisted = new Map<string, Persisted>();
 const live = new Map<string, Set<ShellServer>>();
 
+/** What the backend's pane probe would report for this sandbox's tmux pane (vitals?live=1). */
+export function paneOf(id: string) {
+  const p = persisted.get(id);
+  if (!p) return null;
+  return p.mode === 'claude'
+    ? { command: 'claude', claude_running: true, at_shell: false }
+    : { command: 'bash', claude_running: false, at_shell: true };
+}
+
 onStateChange((sb) => {
   const sessions = live.get(sb.id);
   if (!sessions) return;
@@ -229,6 +238,15 @@ export class ShellServer implements FakeServer {
       this.sock.serverClose(4410, 'This sandbox has been terminated.');
       return;
     }
+    if ((sb.state === 'SUSPENDED' || sb.state === 'SUSPENDING') && !sb.auto_resume) {
+      // Like the backend with auto-resume off: never wake it; wait for Resume
+      this.status('suspended', 'Suspended: press Resume. Auto-resume is off for this sandbox, so the terminal won\'t wake it.', {
+        vm_state: sb.state,
+        auto_resume: false,
+      });
+      this.waitingForResume = true;
+      return;
+    }
     if (sb.state === 'SUSPENDED' || sb.state === 'SUSPENDING') {
       this.status('connecting', 'Resuming the sandbox (auto-resume on connect)');
       if (sb.state === 'SUSPENDED') setState(sb, 'PENDING');
@@ -323,6 +341,12 @@ export class ShellServer implements FakeServer {
           this.drawStatusBar();
         }
         this.prompt();
+      } else if (ch === '\x15') {
+        // C-u: delete back to the prompt
+        this.out('\b \b'.repeat(this.line.length));
+        this.line = '';
+      } else if (ch === '\x05') {
+        // C-e: already at the end of the line
       } else if (ch === '\x04') {
         if (!this.line && this.p.mode === 'shell') void this.run('exit');
       } else if (ch === '\x0c') {

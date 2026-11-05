@@ -47,10 +47,13 @@ export function Boot() {
           <LogoMark size={30} />
           <Wordmark className="gate-wordmark" />
         </div>
-        <h1 className="gate-title">Lambda MicroVM Workspace</h1>
+        {/* The wordmark above says my2cents.ai; the heading's accessible name is the whole app name */}
+        <h1 className="gate-title">
+          <span className="sr-only">My2cents.ai </span>Lambda MicroVM Playground
+        </h1>
         {phase.kind === 'config-error' ? (
           <>
-            <p className="gate-text">The workspace can’t start because its configuration is missing.</p>
+            <p className="gate-text">The playground can’t start because its configuration is missing.</p>
             <p className="gate-error" role="alert">
               {phase.message}
             </p>

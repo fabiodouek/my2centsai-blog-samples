@@ -5,9 +5,8 @@
 export type Level = 'List' | 'Read' | 'Write' | 'Permissions' | 'Tagging';
 const CODES: Record<string, Level> = { L: 'List', R: 'Read', W: 'Write', P: 'Permissions', T: 'Tagging' };
 
-export const CEILING = "outside this workspace's read-only ceiling (ReadOnlyAccess)";
 const SECRETS = 'never enabled here: iron-proxy fetches its own secrets with the same session';
-const SSM_PARAMS = "never enabled here: reads SecureString parameters, such as the workspace's own origin secret";
+const SSM_PARAMS = "never enabled here: reads SecureString parameters, such as the playground's own origin secret";
 const UNMAPPED = "can't be enabled here (no endpoint mapping)";
 
 interface Def {
@@ -148,37 +147,78 @@ export const BY_ID = new Map(SERVICES.map((s) => [s.id, s]));
 const BY_ACTION = new Map(SERVICES.flatMap((s) => s.actions.map((a) => [a.action.toLowerCase(), [a, s] as const])));
 export const TOTAL_ACTIONS = SERVICES.reduce((n, s) => n + s.actions.length, 0);
 
+const blockedAction = (a: MAction) => a.service === 'secretsmanager' || (a.service === 'ssm' && a.name.startsWith('GetParameter'));
+/** Can go in a session policy: mapped and not blocked (outside the role is fine: no effect). */
+const pickableAction = (a: MAction, s: MService) => s.enabled && !blockedAction(a);
+
 export function actionsFor(s: MService, role: RoleId) {
-  return s.actions.map((a) => ({ ...a, ...evaluate(a, s, role) }));
+  return s.actions.map((a) => {
+    const v = evaluate(a, s, role);
+    // sts:GetCallerIdentity needs no permission
+    const always = a.action === 'sts:GetCallerIdentity';
+    return { ...a, ...v, allowed: always || v.allowed, reason: always ? null : v.reason, pickable: pickableAction(a, s) };
+  });
 }
 
-const VERBS: [string, string][] = [['List', 'Every List action'], ['Describe', 'Every Describe action'], ['Get', 'Every Get action']];
+const VERBS: [string, string][] = [['', 'Every action'], ['List', 'Every List action'], ['Describe', 'Every Describe action'], ['Get', 'Every Get action']];
+
+type Covered = ReturnType<typeof actionsFor>;
+
+/** Same as the backend's coverage_of: how many of the covered actions are effective, and why not the rest. */
+export function coverageOf(covered: Covered, role: RoleId) {
+  const eff = covered.filter((a) => a.allowed);
+  const blk = covered.filter((a) => blockedAction(a));
+  const outside = covered.length - eff.length - blk.length;
+  const parts: string[] = [];
+  if (outside) parts.push(covered.length > 1 ? `${outside} outside the ${role} role` : `no effect with ${role}: ${covered.find((a) => !a.allowed)?.reason ?? ''}`);
+  if (blk.length) parts.push(`${blk.length} never enabled here (${blk.slice(0, 2).map((a) => a.action).join(', ')}${blk.length > 2 ? ', ...' : ''}), denied in the session policy`);
+  const tone = covered.length && eff.length === covered.length ? 'all' : eff.length === 0 ? 'none' : 'partial';
+  return {
+    covers: covered.length,
+    effective: eff.length,
+    limited: eff.filter((a) => a.limited).length,
+    blocked: blk.length,
+    tone,
+    reason: parts.length ? `${covered.length > 1 ? `${eff.length} of ${covered.length} effective: ` : ''}${parts.join('; ')}` : null,
+  };
+}
 
 export function wildcards(s: MService, role: RoleId) {
   const acts = actionsFor(s, role);
   return VERBS.flatMap(([verb, label]) => {
+    if (!verb && s.id === 'secretsmanager') return [];
     const covered = acts.filter((a) => a.name.startsWith(verb));
     if (!covered.length) return [];
-    const bad = covered.filter((a) => !a.allowed);
-    let reason: string | null = null;
-    if (!s.enabled) reason = UNMAPPED;
-    else if (bad.length) reason = `${bad.length} of the ${covered.length} ${verb} actions aren't allowed for ${role}; pick them one by one`;
-    return [{ action: `${s.id}:${verb}*`, label, covers: covered.length, allowed: reason === null, reason }];
+    const pickable = s.enabled && s.id !== 'secretsmanager';
+    const cov = coverageOf(covered, role);
+    const reason = !s.enabled ? UNMAPPED : s.id === 'secretsmanager' ? SECRETS : cov.reason;
+    return [{
+      action: `${s.id}:${verb}*`,
+      label,
+      covers: covered.length,
+      effective: pickable ? cov.effective : 0,
+      tone: pickable ? cov.tone : 'none',
+      pickable,
+      allowed: pickable && cov.effective === covered.length,
+      limited: pickable && cov.limited > 0,
+      reason,
+      covered,
+    }];
   });
 }
 
-/** Validation for preview/apply with a session policy: what the backend refuses with 422. */
-export function check(action: string, role: RoleId): string | null {
+/** What a pick covers, or a refusal (the backend's 422): unknown, blocked, unmapped. */
+export function resolve(action: string, role: RoleId): { covered: Covered; wildcard: boolean } | string {
   const hit = BY_ACTION.get(action.toLowerCase());
   if (hit) {
-    const v = evaluate(hit[0], hit[1], role);
-    return v.allowed ? null : `${action} (${v.reason})`;
+    const a = actionsFor(hit[1], role).find((x) => x.action === hit[0].action)!;
+    return a.pickable ? { covered: [a], wildcard: false } : `${action} (${a.reason})`;
   }
   const [svc, rest] = action.split(':');
   const s = BY_ID.get(svc);
   if (s && rest && rest.endsWith('*')) {
     const w = wildcards(s, role).find((x) => x.action === action);
-    if (w) return w.allowed ? null : `${action} (${w.reason})`;
+    if (w) return w.pickable ? { covered: w.covered, wildcard: true } : `${action} (${w.reason})`;
   }
   return `${action}: not in the Service Authorization Reference`;
 }
@@ -193,6 +233,7 @@ export function summary(s: MService, role: RoleId) {
     allowed: actionsFor(s, role).filter((a) => a.allowed).length,
     levels,
     enabled: s.enabled,
+    pickable: s.enabled && s.id !== 'secretsmanager',
     reason: s.reason,
     signing_names: s.signing,
   };
@@ -254,11 +295,11 @@ const MORE = (
   'waf wafv2 wellarchitected wisdom workdocs workmail workspaces xray'
 ).split(/\s+/);
 
-export function openLists(): { allowed_services: string[]; hosts: string[] } {
+export function openLists(role: RoleId = DEFAULT_ROLE): { allowed_services: string[]; hosts: string[] } {
   const signing = new Set<string>();
   const hosts = new Set<string>();
   for (const s of SERVICES) {
-    if (!s.enabled || s.id === 'secretsmanager') continue;
+    if (!s.enabled || s.id === 'secretsmanager' || !actionsFor(s, role).some((a) => a.allowed)) continue;
     s.signing.forEach((n) => signing.add(n));
     s.hosts.forEach((h) => hosts.add(h));
   }

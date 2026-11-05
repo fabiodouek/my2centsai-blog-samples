@@ -5,6 +5,10 @@
 > Inferred from the build brief (SPEC.md part 3, section "3. Frontend") by an agent with no way to ask the
 > user. Every fact below comes from that brief; items marked *(inferred)* are interpretation, not confirmation.
 
+## Name
+
+My2cents.ai Lambda MicroVM Playground (the sidebar lockup reads "my2cents.ai" over "Lambda MicroVM Playground").
+
 ## Platform
 
 web
@@ -13,7 +17,7 @@ web
 
 A single signed-in developer (the blog author, and readers who deploy the companion code) who runs a few
 AWS Lambda MicroVM sandboxes and works inside them through a browser terminal, usually running Claude Code.
-They are technical, AWS-literate, and use the workspace on a laptop or desktop monitor (1280-1920 px) for
+They are technical, AWS-literate, and use the playground on a laptop or desktop monitor (1280-1920 px) for
 long working sessions. *(inferred: sessions of tens of minutes to hours, alongside an editor and docs.)*
 
 ## Product Purpose

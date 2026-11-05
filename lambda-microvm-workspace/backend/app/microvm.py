@@ -30,7 +30,7 @@ GONE_STATES = ("TERMINATING", "TERMINATED")
 
 
 class QuotaExceeded(Exception):
-    pass
+    """AWS refused with ServiceQuotaExceededException; str() is AWS's own message."""
 
 
 class NotFound(Exception):
@@ -114,15 +114,34 @@ def encode_payload(payload: dict) -> str:
     return s
 
 
-def run_params(s: Settings, *, idle_minutes: int, max_duration_s: int, client_token: str, payload: str) -> dict:
+class NoEgressConnector(ValueError):
+    pass
+
+
+def egress_connectors(s: Settings) -> list[str]:
+    """The sandbox's egress: part 2's connector, always. An empty (or missing) egressNetworkConnectors isn't
+    "offline": Lambda attaches its managed INTERNET_EGRESS connector instead, so the sandbox would reach the internet
+    directly, past iron-proxy, its allowlist and its audit log. Refuse rather than send one."""
+    conn = (s.connector_arn or "").strip()
+    if not conn:
+        raise NoEgressConnector("CONNECTOR_ARN isn't set: refusing to run a MicroVM without part 2's egress connector "
+                                "(Lambda would attach INTERNET_EGRESS)")
+    if conn.endswith(":INTERNET_EGRESS"):
+        raise NoEgressConnector("CONNECTOR_ARN is Lambda's managed INTERNET_EGRESS connector, not part 2's")
+    return [conn]
+
+
+def run_params(s: Settings, *, idle_minutes: int, max_duration_s: int, client_token: str, payload: str,
+               image_arn: str | None = None, suspended_duration_s: int | None = None, auto_resume: bool = True) -> dict:
+    """RunMicrovm's parameters. Egress is always part 2's connector (egress_connectors refuses anything else)."""
     return {
-        "imageIdentifier": s.image_arn,
+        "imageIdentifier": image_arn or s.image_arn,
         "ingressNetworkConnectors": [s.http_ingress, s.shell_ingress],
-        "egressNetworkConnectors": [s.connector_arn],
-        # Suspended time counts toward maximumDuration, so letting it stay suspended "until max" is the
-        # same as never terminating early on suspension.
-        "idlePolicy": {"autoResumeEnabled": True, "maxIdleDurationSeconds": idle_minutes * 60,
-                       "suspendedDurationSeconds": max_duration_s},
+        "egressNetworkConnectors": egress_connectors(s),
+        # Suspended time counts toward maximumDuration, so letting it stay suspended "until max" (the default) is the
+        # same as never terminating early on suspension. 0 terminates it as soon as it suspends.
+        "idlePolicy": {"autoResumeEnabled": bool(auto_resume), "maxIdleDurationSeconds": idle_minutes * 60,
+                       "suspendedDurationSeconds": max_duration_s if suspended_duration_s is None else suspended_duration_s},
         "maximumDurationInSeconds": max_duration_s,
         "runHookPayload": payload,
         "clientToken": client_token,
@@ -139,6 +158,7 @@ class MicroVMs:
         self._cache: dict[str, tuple[float, dict]] = {}
         self._tokens: dict[str, tuple[str, float]] = {}
         self._lists: dict[str, tuple[float, list]] = {}
+        self._images: dict[str, tuple[float, tuple[bool, str | None]]] = {}
         self._lock = threading.Lock()
         self._run_lock = threading.Lock()
 
@@ -159,6 +179,25 @@ class MicroVMs:
         with self._lock:
             self._cache[vm_id] = (time.monotonic(), d)
         return d
+
+    def image_ready(self, arn: str, max_age: float = 300.0) -> tuple[bool, str | None]:
+        """(usable, why not) for a size's image: it must exist with an active version. Cached 5 minutes."""
+        with self._lock:
+            hit = self._images.get(arn)
+            if hit and time.monotonic() - hit[0] < max_age:
+                return hit[1]
+        try:
+            d = self.c.get_microvm_image(imageIdentifier=arn)
+            ok = bool(d.get("latestActiveImageVersion")) and "FAIL" not in str(d.get("state"))
+            res = (ok, None if ok else f"its image is {str(d.get('state')).lower().replace('_', ' ')}")
+        except ClientError as e:
+            if code(e) not in ("ResourceNotFoundException", "ValidationException"):
+                log.warning("get_microvm_image: %s", e)
+                return True, None   # don't hide a size on a transient error; RunMicrovm has the last word
+            res = (False, "its image isn't built yet (scripts/build_sandbox_image.py)")
+        with self._lock:
+            self._images[arn] = (time.monotonic(), res)
+        return res
 
     def forget(self, vm_id: str) -> None:
         with self._lock:
@@ -187,9 +226,11 @@ class MicroVMs:
             kw["nextToken"] = r["nextToken"]
 
     # ---- lifecycle ----
-    def run(self, *, idle_minutes: int, max_duration_s: int, payload: str, client_token: str | None = None) -> dict:
+    def run(self, *, idle_minutes: int, max_duration_s: int, payload: str, client_token: str | None = None,
+            image_arn: str | None = None, suspended_duration_s: int | None = None, auto_resume: bool = True) -> dict:
         params = run_params(self.s, idle_minutes=idle_minutes, max_duration_s=max_duration_s,
-                            client_token=client_token or str(uuid.uuid4()), payload=payload)
+                            client_token=client_token or str(uuid.uuid4()), payload=payload, image_arn=image_arn,
+                            suspended_duration_s=suspended_duration_s, auto_resume=auto_resume)
         # RunMicrovm is rate limited (~1/s): one at a time per process, back off on throttling.
         with self._run_lock:
             for attempt in range(6):
@@ -200,7 +241,7 @@ class MicroVMs:
                 except ClientError as e:
                     c = code(e)
                     if c == "ServiceQuotaExceededException":
-                        raise QuotaExceeded(str(e)) from e
+                        raise QuotaExceeded(e.response.get("Error", {}).get("Message") or str(e)) from e
                     if c != "ThrottlingException" or attempt == 5:
                         raise
                     time.sleep(min(8, 0.5 * 2 ** attempt) + random.random() * 0.3)
@@ -216,7 +257,7 @@ class MicroVMs:
             if c in ("ConflictException", "ValidationException"):
                 raise Conflict(e.response.get("Error", {}).get("Message") or c) from e
             if c == "ServiceQuotaExceededException":
-                raise QuotaExceeded(str(e)) from e
+                raise QuotaExceeded(e.response.get("Error", {}).get("Message") or str(e)) from e
             raise
         finally:
             self.forget(vm_id)

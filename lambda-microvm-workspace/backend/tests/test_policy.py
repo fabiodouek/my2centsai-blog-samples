@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -42,17 +43,23 @@ def err(code, op, msg=""):
 class FakeS3:
     def __init__(self):
         self.objects: dict[str, tuple[bytes, str, dict]] = {}
+        self.modified: dict[str, float] = {}
+        self.versions: dict[str, int] = {}
         self.puts: list[str] = []
         self.race: int = 0   # change the object behind the writer's back this many times
 
     def _set(self, key, body: bytes, md=None):
         self.objects[key] = (body, '"' + hashlib.md5(body).hexdigest() + '"', md or {})
+        self.modified[key] = time.time()
+        self.versions[key] = self.versions.get(key, 0) + 1
 
     def get_object(self, Bucket, Key):
         if Key not in self.objects:
             raise err("NoSuchKey", "GetObject")
         b, e, md = self.objects[Key]
-        return {"Body": io.BytesIO(b), "ETag": e, "Metadata": md}
+        return {"Body": io.BytesIO(b), "ETag": e, "Metadata": md, "ContentLength": len(b),
+                "LastModified": datetime.fromtimestamp(self.modified[Key], tz=timezone.utc),
+                "VersionId": f"ver{self.versions[Key]}"}
 
     def head_object(self, Bucket, Key):
         if Key not in self.objects:
@@ -101,7 +108,7 @@ class FakeSM:
                           "with this name is already scheduled for deletion.")
             raise err("ResourceExistsException", "CreateSecret")
         arn = f"arn:aws:secretsmanager:us-east-1:{ACCT}:secret:{Name}-Xy12Zw"
-        self.secrets[Name] = {"arn": arn, "value": SecretString, "deleted": False, "policy": None}
+        self.secrets[Name] = {"arn": arn, "value": SecretString, "deleted": False, "policy": None, "tags": list(Tags or [])}
         return {"ARN": arn, "Name": Name}
 
     def put_secret_value(self, SecretId, SecretString):
@@ -124,7 +131,7 @@ class FakeSM:
 
     def describe_secret(self, SecretId):
         d = self._find(SecretId)
-        return {"ARN": d["arn"], **({"DeletedDate": "x"} if d["deleted"] else {})}
+        return {"ARN": d["arn"], "Tags": d.get("tags", []), **({"DeletedDate": "x"} if d["deleted"] else {})}
 
     def get_resource_policy(self, SecretId):
         p = self._find(SecretId)["policy"]
@@ -446,7 +453,8 @@ def test_revoke_and_restore_by_reload(env):
     r = env.c.post("/api/credentials/demo/revoke", headers=hdr("admin"))
     assert r.status_code == 200, r.text
     out = r.json()
-    assert out["method"] == "reload" and out["apply"]["config_version"] == 2 and out["effective_after_s"] == 10
+    assert out["method"] == "reload" and out["apply"]["config_version"] == 2 and out["effective_after_s"] == 35
+    assert "within about 30 s" in out["warning"] and "still swapped in" in out["warning"]
     assert env.ecs.calls == []
     pol = json.loads(env.sm.secrets["my2cents-ip/demo"]["policy"])
     deny = [st for st in pol["Statement"] if st["Sid"] == REVOKE_SID][0]
@@ -522,8 +530,10 @@ def test_preview_matches_what_the_sidecar_sends(env):
     assert p["fits"] and p["limit"] == 2048
     r = env.c.post("/api/policy/aws/preview", json={"role": "read-only", "actions": ["secretsmanager:GetSecretValue"]}, headers=hdr("viewer"))
     assert r.status_code == 422 and "never enabled here" in r.json()["detail"]
+    # outside the role: pickable, no effect, and its service isn't given to iron-proxy
     r = env.c.post("/api/policy/aws/preview", json={"role": "read-only", "actions": ["s3:PutObject"]}, headers=hdr("viewer"))
-    assert r.status_code == 422 and "outside the read-only role" in r.json()["detail"]
+    assert r.status_code == 200 and r.json()["coverage"][0]["tone"] == "none"
+    assert r.json()["allowed_services"] == ["none"] and r.json()["effective"][0]["no_effect"] is True
     r = env.c.post("/api/policy/aws/preview", json={"role": "root", "actions": []}, headers=hdr("viewer"))
     assert r.status_code == 422 and "role must be one of" in r.json()["detail"]
 
@@ -642,10 +652,12 @@ def test_switching_role_or_policy_is_a_change(env):
     assert env.c.put("/api/policy/aws/scope", json={**body, "role": "builder"}, headers=hdr("admin")).json()["unchanged"] is False
     assert env.c.put("/api/policy/aws/scope", json={**body, "role": "builder", "session_policy": False},
                      headers=hdr("admin")).json()["unchanged"] is False
-    # an action the new role doesn't allow is refused only when the policy is on
+    # an action the new role doesn't allow is kept (no effect with it): iron-proxy isn't told about the service
     r = env.c.put("/api/policy/aws/scope", json={"role": "data-reader", "session_policy": True,
                                                  "actions": ["s3:ListAllMyBuckets"]}, headers=hdr("admin"))
-    assert r.status_code == 422 and "outside the data-reader role" in r.json()["detail"]
+    assert r.status_code == 200, r.text
+    assert r.json()["preview"]["coverage"][0]["reason"].startswith("no effect with data-reader")
+    assert ConfigDoc(env.s3.text("iron-proxy.yaml")).allowed_services() == ["none"]
 
 
 def test_config_writer_refuses_secrets_manager_whatever_it_is_given(env):

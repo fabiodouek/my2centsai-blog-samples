@@ -1,5 +1,5 @@
 
-  my2cents workspace sandbox (Lambda MicroVM, Claude Code 2.1.317)
+  My2cents.ai Lambda MicroVM Playground sandbox (Claude Code 2.1.317)
 
     claude        Claude Code, ready to go: no login, no prompts (bypass permissions mode)
     /root/work    working directory, trusted by Claude Code

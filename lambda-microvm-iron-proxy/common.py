@@ -279,7 +279,8 @@ def settings(mode: str = "transparent", extra_env: dict | None = None, placehold
     """What the run hook payload tells the agent. Nothing secret.
 
     transparent (default): no proxy variables at all. DNS sends every name to iron-proxy.
-    explicit: HTTPS_PROXY to the NLB on 8080, only for the comparisons in 11 and 14.
+    explicit: HTTPS_PROXY to the NLB on 8080, only for the comparison in 11 (14 uses curl -x from a
+    transparent MicroVM).
 
     Both get the CA settings and, unless placeholders=False, the placeholder credentials."""
     t = tf()

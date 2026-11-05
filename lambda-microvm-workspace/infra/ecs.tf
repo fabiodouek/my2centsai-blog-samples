@@ -63,16 +63,19 @@ resource "aws_iam_role_policy" "task" {
     Statement = [
       # Per the service authorization reference, every per-MicroVM action authorizes against the
       # microvm-image resource the MicroVM was launched from, so this scopes the backend to
-      # MicroVMs of its own image. ":*" covers versioned image ARNs.
+      # MicroVMs of its own images (one per size). ":*" covers versioned image ARNs.
       { Sid = "MicrovmsOfWorkspaceImage", Effect = "Allow",
         Action = [
           "lambda:RunMicrovm", "lambda:GetMicrovm", "lambda:SuspendMicrovm", "lambda:ResumeMicrovm",
           "lambda:TerminateMicrovm", "lambda:CreateMicrovmAuthToken", "lambda:CreateMicrovmShellAuthToken",
           "lambda:GetMicrovmImage",
         ],
-      Resource = [local.image_arn, "${local.image_arn}:*"] },
+      Resource = flatten([for arn in values(local.image_arns) : [arn, "${arn}:*"]]) },
       # ListMicrovms has no resource type
       { Sid = "ListMicrovms", Effect = "Allow", Action = "lambda:ListMicrovms", Resource = "*" },
+      # The account's MicroVM memory quota (app/quota.py): "Max allocated ARM_64 MicroVM memory"
+      { Sid = "MicrovmMemoryQuota", Effect = "Allow", Action = "servicequotas:GetServiceQuota",
+      Resource = "arn:aws:servicequotas:${var.region}:${local.account}:lambda/L-CD1C0CC4" },
       { Sid = "PassConnectors", Effect = "Allow", Action = "lambda:PassNetworkConnector",
       Resource = [local.p2.connector_arn, "arn:aws:lambda:${var.region}:aws:network-connector:aws-network-connector:*"] },
       { Sid = "SandboxTable", Effect = "Allow",
@@ -119,6 +122,9 @@ resource "aws_iam_role_policy" "task_control" {
       { Sid = "EditPolicy", Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"],
       Resource = [for k in ["config", "scope", "credentials"] : "arn:aws:s3:::${local.control_bucket}/${local.control_keys[k]}"] },
       { Sid = "ReadStatus", Effect = "Allow", Action = "s3:GetObject", Resource = "arn:aws:s3:::${local.control_bucket}/${local.control_keys.status}" },
+      # Part 2's deploy-time config, for the factory reset (older part 2 states have no such key: the default name)
+      { Sid = "ReadDefaultConfig", Effect = "Allow", Action = "s3:GetObject",
+      Resource = "arn:aws:s3:::${local.control_bucket}/${try(local.control_keys.default_config, "iron-proxy.default.yaml")}" },
       # Without ListBucket a missing object reads as 403 instead of 404
       { Sid = "ListControlBucket", Effect = "Allow", Action = "s3:ListBucket", Resource = "arn:aws:s3:::${local.control_bucket}" },
       { Sid = "UserCredentials", Effect = "Allow",
@@ -155,6 +161,7 @@ resource "aws_ecs_task_definition" "api" {
       { name = "COGNITO_CLIENT_ID", value = aws_cognito_user_pool_client.spa.id },
       { name = "AWS_REGION", value = var.region },
       { name = "IMAGE_ARN", value = local.image_arn },
+      { name = "IMAGE_ARNS_JSON", value = jsonencode(local.image_arns) },
       # Part 2's sandbox connector: transparent interception, no proxy settings in the sandbox
       { name = "CONNECTOR_ARN", value = local.p2.connector_arn },
       { name = "PLACEHOLDERS_JSON", value = jsonencode(local.p2.placeholders) },
@@ -173,6 +180,7 @@ resource "aws_ecs_task_definition" "api" {
       { name = "ROLES_JSON", value = jsonencode(local.sandbox_roles) },
       { name = "SCOPE_BASELINE_JSON", value = jsonencode(local.scope_baseline) },
       { name = "USER_SECRET_PREFIX", value = local.user_prefix },
+      { name = "CONTROL_POLL_S", value = tostring(local.control_poll_s) },
     ] : [])
     secrets = [{ name = "ORIGIN_SECRET", valueFrom = aws_ssm_parameter.origin_secret.arn }]
     logConfiguration = {

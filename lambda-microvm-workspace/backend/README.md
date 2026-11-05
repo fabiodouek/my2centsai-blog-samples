@@ -1,4 +1,4 @@
-# Backend: workspace API
+# Backend: playground API
 
 FastAPI on ECS Fargate (ARM64). It runs MicroVMs for signed-in users, bridges their shell to the browser,
 and streams the iron-proxy audit log and Route 53 Resolver query log to the UI. API shapes: SPEC.md
@@ -23,7 +23,11 @@ app/aws_catalog.py  the AWS access catalog: levels, per-role ceiling, IAM prefix
 app/aws_roles.py    the sandbox roles' policies and the local evaluator
 app/aws_endpoints.py  boto3 client -> signing name and us-east-1 host, generated from botocore at image build
                     (app/data/aws_endpoints.json)
-app/pricing.py      Claude token prices for the cost estimate (source and date in the file)
+app/pricing.py      Claude token prices for the cost estimate (source and date in the file), and the MicroVM
+                    per-second rates behind each size's $/h
+app/sizes.py        the four sandbox sizes (1/2/4/8 GB, one image each) and their image ARNs
+app/quota.py        the account's MicroVM memory quota from Service Quotas (cached an hour; QUOTA_GB if unreadable)
+app/sandbox_env.py  extra environment variables on create: name and value rules, reserved names, payload bytes
 app/main.py         routes, origin-header check, WebSocket handlers
 ```
 
@@ -50,7 +54,8 @@ Without `TABLE_NAME` the ownership store is in memory. In production `ORIGIN_SEC
 |---|---|
 | `TABLE_NAME` | DynamoDB table (pk `sub`, sk `id`) |
 | `COGNITO_USER_POOL_ID`, `COGNITO_CLIENT_ID`, `AWS_REGION` | ID token verification |
-| `IMAGE_ARN`, `CONNECTOR_ARN` | MicroVM image and VPC egress connector |
+| `IMAGE_ARN`, `CONNECTOR_ARN` | the medium (default) MicroVM image and the VPC egress connector |
+| `IMAGE_ARNS_JSON` | every size's image, `{"small": arn, "medium": arn, "large": arn, "xlarge": arn}`; a size without one (or whose image isn't built) isn't offered |
 | `PLACEHOLDERS_JSON` | the run-hook payload's placeholders. There are no proxy settings: part 2's sandbox VPC sends every name to iron-proxy (`PROXY_MODE` is `transparent`, the only value) |
 | `SECRET_ARNS_JSON`, `TASK_ROLE_ARN` | credential names, and the iron-proxy role that revoke denies |
 | `PROXY_ECS_CLUSTER`, `PROXY_ECS_SERVICE` | iron-proxy's ECS service, restarted by revoke (default `my2cents-ip` / `iron-proxy`) |
@@ -59,7 +64,7 @@ Without `TABLE_NAME` the ownership store is in memory. In production `ORIGIN_SEC
 | `SERVICE_REFERENCE_URL`, `CATALOG_TTL_S`, `CATALOG_CACHE_DIR` | the AWS access catalog's source (default AWS's Service Authorization Reference), cache lifetime (3600) and disk cache (`/tmp/aws-catalog`; empty for none) |
 | `CHANGES_TABLE`, `ADMIN_GROUP` | proxy policy change log (pk `pk`, sk `sk`), and the Cognito group allowed to change the policy (`admins`) |
 | `CONTROL_BUCKET`, `CONTROL_KEYS_JSON`, `ROLES_JSON`, `SCOPE_BASELINE_JSON`, `USER_SECRET_PREFIX` | part 2's control plane outputs; without `CONTROL_BUCKET` the policy routes answer 503 |
-| optional | `DEV_AUTH`, `QUOTA_GB` (8), `VM_MEMORY_GB` (2), `MAX_DURATION_S` (28800), `PROXY_ALLOWLIST`, `CORS_ORIGINS`, `TERMINAL_KEEPALIVE_S` (20) |
+| optional | `DEV_AUTH`, `QUOTA_GB` (8: the fallback when Service Quotas can't be read), `QUOTA_SERVICE_CODE` (`lambda`), `QUOTA_CODE` (`L-CD1C0CC4`), `VM_MEMORY_GB` (2: the size assumed for another user's MicroVM on an unknown image), `MAX_DURATION_S` (28800), `PROXY_ALLOWLIST`, `CORS_ORIGINS`, `TERMINAL_KEEPALIVE_S` (20) |
 
 ## Behaviour worth knowing
 
@@ -105,8 +110,9 @@ Without `TABLE_NAME` the ownership store is in memory. In production `ORIGIN_SEC
 - The backend never reads secret values. It has no `GetSecretValue` permission.
 - **With part 2's control plane on**, revoke and restore don't restart anything: the deny names both the task
   role and all four sandbox roles (iron-proxy fetches secrets as whichever is in use), and the backend writes a new
-  config version. The sidecar's `POST /v1/reload` rebuilds iron-proxy's secrets cache, so the cached value is
-  gone within a few seconds. Status is `revoking` until the sidecar reports that version applied.
+  config version. At its next check of the bucket (every 30 s, part 2's `control_poll_s`) the sidecar's
+  `POST /v1/reload` rebuilds iron-proxy's secrets cache, so the cached value is gone within about 30 s; until then
+  the revoked key is still swapped in. Status is `revoking` until the sidecar reports that version applied.
 
 ## Proxy policy (control plane)
 
@@ -118,9 +124,16 @@ can read it. Every change is global: it applies to every sandbox on the proxy. R
   `domains`, the `secrets` list or `aws_auth.allowed_services` (round-tripped with `ruamel.yaml`, so comments
   and formatting stay), bumps the version in the first line and writes it back with `If-Match` on the ETag it
   read. A concurrent edit is retried once, then refused with 409.
-- **Apply status.** Part 2's control sidecar polls the bucket every 2 s, swaps the file in, calls iron-proxy's
-  `POST /v1/reload` and writes `status.json`. `GET /api/policy/status` compares that with what's in the
-  bucket and reports the latency from the write to the reload.
+- **Apply status.** Part 2's control sidecar checks the bucket every 30 s (`control_poll_s`), swaps the file in,
+  calls iron-proxy's `POST /v1/reload` and writes `status.json` (right after a change, and every 30 s as a
+  heartbeat, with when it checks next). `GET /api/policy/status` compares that with what's in the bucket and reports
+  the latency from the write to the reload, the sync state (`in_sync`, `pending`, `refused`, `stale` after 90 s
+  without a heartbeat) and the seconds until the next check. A change takes up to about 30 s.
+- **Config view** (admins). `GET /api/policy/config` returns `iron-proxy.yaml` and `aws-scope.json` as they are in
+  the bucket (version, S3 LastModified, ETag, version ID) next to what `status.json` reports, with the same sync
+  state. Neither file holds secret values (iron-proxy reads them from Secrets Manager; the management token's
+  `api_key_env` is a variable name and `ca_key` a path), and `app/redact.py` redacts anything shaped like one before
+  it leaves the backend, keeping the placeholders.
 - **Credentials.** The value goes from the request straight to `secretsmanager:CreateSecret` as
   `my2cents-ip/user/<name>`: the request model keeps it in a `SecretStr`, validation errors never echo input,
   and it isn't logged or stored anywhere else. The backend generates a placeholder, adds a replace-mode
@@ -146,4 +159,17 @@ can read it. Every change is global: it applies to every sandbox on the proxy. R
   service from the client's credential scope and reads an empty list as every service; the config writer checks again
   whatever it is given. With a session policy, both follow the chosen services, and the policy's minified size is
   checked against STS's 2,048 characters.
+  **Picks with no effect.** Every known action of a mapped service can be picked except Secrets Manager's and
+  `ssm:GetParameter*` on its own, including actions outside the role (they have no effect with it, so a policy can be
+  built before switching role) and the wildcards `<service>:*`, `Get*`, `List*`, `Describe*`. The preview reports each
+  pick's coverage (N of M covered actions effective with the role) and the effective access per service (role ∩
+  session policy), from the catalog's RoleEvaluator verdicts. iron-proxy's lists hold only services with at least one
+  effective action. A wildcard covering `ssm:GetParameter*` adds an explicit `Deny ssm:GetParameter*` to the session
+  policy.
+- **Factory reset** (admins, `POST /api/policy/reset` with `{"confirm": "reset"}`). Removes the revoke deny statement
+  from every credential's secret, then writes the default AWS scope and a new config from part 2's
+  `iron-proxy.default.yaml` (which part 2 keeps equal to its template on every apply) with the default role's AWS
+  lists, and drops custom credentials from the config and the index while their secrets stay (adding one again under
+  the same name takes its secret back, found by its `my2cents:credential` tag, with the new value). `GET` returns
+  the plan the dialog shows.
 - **Change log.** Every write records who, when, what and the versions in DynamoDB; never a value.

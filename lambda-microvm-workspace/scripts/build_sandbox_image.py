@@ -1,18 +1,28 @@
-"""Build (or update) the workspace sandbox image `my2cents-ws-sandbox` from images/sandbox/.
+"""Build (or update) the workspace sandbox images from images/sandbox/: one image per sandbox size, all from the same
+code artifact. A MicroVM's memory comes from its image (`resources[].minimumMemoryInMiB`, vCPU = memory / 2 GB), so
+each size is its own image:
 
-Uses part 2's build role and artifacts bucket. Two files are filled in from part 2's Terraform outputs
-at zip time: ca.crt (iron-proxy's demo CA, public) and the approved-key entry in claude.json (the last
-20 characters of the Anthropic placeholder, which is what Claude Code stores for a pre-approved key).
-The build itself uses the default internet egress (apt, npm, GitHub releases), not the proxy.
+    small   1 GB  0.5 vCPU  my2cents-ws-sandbox-1g
+    medium  2 GB  1 vCPU    my2cents-ws-sandbox      (the default, and the original image)
+    large   4 GB  2 vCPU    my2cents-ws-sandbox-4g
+    xlarge  8 GB  4 vCPU    my2cents-ws-sandbox-8g   (the account's whole 8 GB MicroVM quota)
 
-The image is tagged `ca-sha256` with the first 16 hex digits of the CA's SHA-256. A new part 2 means a new CA, and
+Uses part 2's build role and artifacts bucket. Two files are filled in from part 2's Terraform outputs at zip time:
+ca.crt (iron-proxy's demo CA, public) and the approved-key entry in claude.json (the last 20 characters of the
+Anthropic placeholder, which is what Claude Code stores for a pre-approved key). The build itself uses the default
+internet egress (apt, npm, GitHub releases), not the proxy.
+
+Each image is tagged `ca-sha256` with the first 16 hex digits of the CA's SHA-256. A new part 2 means a new CA, and
 sandboxes built for the old one would refuse every iron-proxy certificate, so `--if-needed` (what deploy.sh uses)
-rebuilds when the tag doesn't match part 2's CA, or when there is no image yet, and does nothing otherwise.
+rebuilds an image when its tag doesn't match part 2's CA, or when it doesn't exist yet, and skips it otherwise.
+Images are built one after another (an 8 GB build alone fills the account's MicroVM quota).
 
-  .venv/bin/python scripts/build_sandbox_image.py
-  .venv/bin/python scripts/build_sandbox_image.py --if-needed
+  .venv/bin/python scripts/build_sandbox_image.py                      # every size
+  .venv/bin/python scripts/build_sandbox_image.py --size medium        # one size (repeat --size for more)
+  .venv/bin/python scripts/build_sandbox_image.py --if-needed          # only missing or stale images
 """
 
+import argparse
 import hashlib
 import io
 import json
@@ -20,7 +30,7 @@ import sys
 import time
 import zipfile
 
-from mvm import BASE_IMAGE, IMAGE_NAME, ROOT, image_arn, mvm, part2, redact, s3
+from mvm import BASE_IMAGE, IMAGE_NAME, ROOT, SIZES, image_arn, mvm, part2, redact, s3
 
 SRC = ROOT / "images" / "sandbox"
 SKIP = {"ca.crt", "README.md", ".gitignore", "__pycache__", ".DS_Store"}
@@ -60,57 +70,48 @@ def ca_tag(ca_pem: str) -> str:
     return hashlib.sha256(ca_pem.strip().encode()).hexdigest()[:16]
 
 
-def current() -> dict | None:
+def current(size: str) -> dict | None:
     try:
-        return mvm.get_microvm_image(imageIdentifier=image_arn())
+        return mvm.get_microvm_image(imageIdentifier=image_arn(size))
     except mvm.exceptions.ResourceNotFoundException:
         return None
 
 
-def main() -> None:
-    t = part2()
-    want = ca_tag(t["ca_cert_pem"])
-    if "--if-needed" in sys.argv[1:]:
-        d = current()
-        have = ((d or {}).get("tags") or {}).get("ca-sha256")
-        if d and d.get("state") in ("CREATED", "UPDATED") and d.get("latestActiveImageVersion") and have == want:
-            print(f"sandbox image is up to date (built for part 2's CA {want}); nothing to do")
-            return
-        print("building the sandbox image: " + ("none yet" if not d else
+def up_to_date(size: str, want: str) -> bool:
+    d = current(size)
+    have = ((d or {}).get("tags") or {}).get("ca-sha256")
+    ok = bool(d and d.get("state") in ("CREATED", "UPDATED") and d.get("latestActiveImageVersion") and have == want)
+    if not ok:
+        print(f"{size}: building: " + ("none yet" if not d else
               f"it was built for CA {have or 'unknown'}, part 2's is {want}" if have != want else f"state {d.get('state')}"))
-    data = build_zip(t)
-    key = f"{IMAGE_NAME}-{int(time.time())}.zip"
-    s3.put_object(Bucket=t["artifacts_bucket"], Key=key, Body=data)
-    print(f"uploaded {len(data) / 1024:.0f} KiB code artifact")
-    params = {"codeArtifact": {"uri": f"s3://{t['artifacts_bucket']}/{key}"}, "baseImageArn": BASE_IMAGE,
-              "buildRoleArn": t["build_role_arn"], "resources": [{"minimumMemoryInMiB": 2048}], "hooks": HOOKS,
+    return ok
+
+
+def build(size: str, artifact_uri: str, t: dict, want: str) -> bool:
+    mib, name = SIZES[size]
+    arn = image_arn(size)
+    params = {"codeArtifact": {"uri": artifact_uri}, "baseImageArn": BASE_IMAGE,
+              "buildRoleArn": t["build_role_arn"], "resources": [{"minimumMemoryInMiB": mib}], "hooks": HOOKS,
               "environmentVariables": {"VALIDATE_CMD": VALIDATE_CMD}}
-    try:
-        existing = mvm.get_microvm_image(imageIdentifier=image_arn())["state"]
-    except mvm.exceptions.ResourceNotFoundException:
-        existing = None
+    existing = (current(size) or {}).get("state")
     if existing == "CREATE_FAILED":
         # An image whose first version never built has nothing to keep: delete it and start again
-        print("previous create failed; deleting the image first")
-        mvm.delete_microvm_image(imageIdentifier=image_arn())
-        while True:
-            try:
-                mvm.get_microvm_image(imageIdentifier=image_arn())
-                time.sleep(5)
-            except mvm.exceptions.ResourceNotFoundException:
-                existing = None
-                break
+        print(f"{size}: previous create failed; deleting the image first")
+        mvm.delete_microvm_image(imageIdentifier=arn)
+        while current(size):
+            time.sleep(5)
+        existing = None
     t0 = time.perf_counter()
     if existing:
-        mvm.update_microvm_image(imageIdentifier=image_arn(), **params)
+        mvm.update_microvm_image(imageIdentifier=arn, **params)
         action = "update"
     else:
-        mvm.create_microvm_image(name=IMAGE_NAME, tags={"demo": "my2cents-workspace", "ca-sha256": want}, **params)
+        mvm.create_microvm_image(name=name, tags={"demo": "my2cents-workspace", "size": size, "ca-sha256": want}, **params)
         action = "create"
-    print(f"{action} submitted for {redact(image_arn())}")
+    print(f"{size}: {action} submitted for {redact(arn)} ({mib} MiB)")
     last = None
     while True:
-        d = mvm.get_microvm_image(imageIdentifier=image_arn())
+        d = mvm.get_microvm_image(imageIdentifier=arn)
         if d["state"] != last:
             print(f"  [{time.perf_counter() - t0:6.1f}s] {d['state']}")
             last = d["state"]
@@ -118,15 +119,40 @@ def main() -> None:
             break
         time.sleep(5)
     print(redact({k: d.get(k) for k in ("imageArn", "state", "stateReason", "latestActiveImageVersion", "updatedAt") if k in d}))
-    versions = mvm.list_microvm_image_versions(imageIdentifier=image_arn()).get("items", [])
+    versions = mvm.list_microvm_image_versions(imageIdentifier=arn).get("items", [])
     for v in sorted(versions, key=lambda v: str(v.get("createdAt")))[-3:]:
         print(f"  version {v.get('imageVersion')}: state={v.get('state')} status={v.get('status')}")
-    print(f"build took {time.perf_counter() - t0:.0f}s")
+    print(f"{size}: build took {time.perf_counter() - t0:.0f}s")
     if "FAIL" in d["state"] or not d.get("latestActiveImageVersion"):
+        return False
+    # Record which CA this image trusts and its size (an update keeps the tags from the create)
+    mvm.tag_resource(Resource=arn, Tags={"ca-sha256": want, "size": size})
+    print(f"{size}: tagged ca-sha256={want}")
+    return True
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--size", action="append", choices=list(SIZES), help="build only this size (repeatable)")
+    ap.add_argument("--if-needed", action="store_true", help="skip images that exist and trust part 2's CA")
+    a = ap.parse_args()
+    sizes = a.size or list(SIZES)
+    t = part2()
+    want = ca_tag(t["ca_cert_pem"])
+    if a.if_needed:
+        sizes = [s for s in sizes if not up_to_date(s, want)]
+        if not sizes:
+            print(f"sandbox images are up to date (built for part 2's CA {want}); nothing to do")
+            return
+    # One code artifact for every size
+    data = build_zip(t)
+    key = f"{IMAGE_NAME}-{int(time.time())}.zip"
+    s3.put_object(Bucket=t["artifacts_bucket"], Key=key, Body=data)
+    print(f"uploaded {len(data) / 1024:.0f} KiB code artifact for {', '.join(sizes)}")
+    failed = [s for s in sizes if not build(s, f"s3://{t['artifacts_bucket']}/{key}", t, want)]
+    if failed:
+        print(f"failed: {', '.join(failed)}")
         sys.exit(1)
-    # Record which CA this image trusts (an update keeps the tags from the create)
-    mvm.tag_resource(Resource=image_arn(), Tags={"ca-sha256": want})
-    print(f"tagged ca-sha256={want}")
 
 
 if __name__ == "__main__":

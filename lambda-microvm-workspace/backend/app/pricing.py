@@ -103,7 +103,23 @@ def with_costs(usage: dict) -> dict:
     return out
 
 
+# ---------------------------------------------------------------- Lambda MicroVM compute
+
+# Lambda MicroVMs, us-east-1, per second while running: vCPU and memory (GB), from the size's baseline (an image's
+# minimumMemoryInMiB, vCPU = memory / 2 GB). Medium (1 vCPU, 2 GB) is about $0.126/h. Bursts above the baseline and
+# requests aren't counted; this is an estimate, not a bill.
+MICROVM_VCPU_SECOND = 0.0000276944
+MICROVM_GB_SECOND = 0.0000036667
+MICROVM_PRICING_NOTE = "Lambda MicroVMs, us-east-1: $0.0000276944 per vCPU-second plus $0.0000036667 per GB-second while running"
+
+
+def microvm_hourly(vcpu: float, memory_gb: float) -> float:
+    """USD per hour of running at the size's baseline."""
+    return round((vcpu * MICROVM_VCPU_SECOND + memory_gb * MICROVM_GB_SECOND) * 3600, 4)
+
+
 def public_pricing() -> dict:
     return {"source": PRICING_SOURCE, "as_of": PRICING_AS_OF, "note": PRICING_NOTE, "unit": "USD per 1M tokens",
             "notes": "cache_write = 5-minute TTL rate (1.25x input); estimates only",
-            "models": {k: {f: v[f] for f in ("input", "output", "cache_read", "cache_write")} for k, v in PRICING.items()}}
+            "models": {k: {f: v[f] for f in ("input", "output", "cache_read", "cache_write")} for k, v in PRICING.items()},
+            "microvm": {"vcpu_second": MICROVM_VCPU_SECOND, "gb_second": MICROVM_GB_SECOND, "note": MICROVM_PRICING_NOTE}}

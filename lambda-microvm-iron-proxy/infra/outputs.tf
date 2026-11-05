@@ -67,6 +67,7 @@ output "control_plane" { value = var.control_plane }
 output "control_bucket" { value = one(aws_s3_bucket.control[*].bucket) }
 output "control_bucket_arn" { value = one(aws_s3_bucket.control[*].arn) }
 output "control_keys" { value = var.control_plane ? local.control_keys : null }
+output "control_poll_s" { value = var.control_plane ? var.control_poll_s : null }
 output "sandbox_roles" {
   value = var.control_plane ? { for k, r in aws_iam_role.sandbox : k => {
     arn = r.arn, name = r.name, description = r.description, default = local.sandbox_roles[k].default

@@ -10,7 +10,7 @@ The MicroVMs run in a separate VPC where the only reachable address is that NLB,
 
 Companion code for [Lambda MicroVM: Hands-On Egress Credential Injection with iron-proxy](https://my2cents.ai/deep-dive/lambda-microvms-iron-proxy), part 2 of the AWS Lambda MicroVMs series.
 
-Video walkthrough: https://youtu.be/An3nIGVDxs4
+Video walkthrough: https://youtu.be/SwzVNwo_OPs
 
 ## Two VPCs, and why
 
@@ -26,7 +26,7 @@ A MicroVM's network is chosen at `run-microvm` time: here, a VPC egress connecto
 **Peering joins them.** A VPC peering connection (same account, same region) carries the sandboxes' traffic to the NLB:
 
 - **Routes.** The sandbox VPC's route table has `local` and the NLB's two /32s, pointing at the peering connection. Nothing else. Peering isn't transitive, so the sandbox VPC can't use the proxy VPC's NAT or internet gateway even in principle. The proxy subnets have a return route to the two connector subnets.
-- **Security groups.** They reference each other across the peering. The connector's group may send TCP 80, 443 and 8080 to the NLB's group, and the NLB's group accepts those ports from the connector's group. Nothing else in the proxy VPC is reachable: not the NAT, not the iron-proxy task directly, not the proxy VPC's resolver.
+- **Security groups.** They reference each other across the peering. The connector's group may send TCP 80, 443 and 8080 to the NLB's group, and the NLB's group accepts those ports from the connector's group. Nothing else in the proxy VPC is reachable: not the NAT, not the iron-proxy task directly, not the proxy VPC's resolver (the routes stop these before the groups do).
 
 **How DNS Firewall turns every name into the proxy.** The sandbox VPC has three pieces of DNS:
 
@@ -82,7 +82,7 @@ The real credentials go from `.env` straight to Secrets Manager. Terraform only 
 - placeholders: `ANTHROPIC_API_KEY`, `GH_TOKEN`, `DEMO_TOKEN`;
 - placeholder AWS keys plus `AWS_EC2_METADATA_DISABLED=true` (without keys the AWS CLI refuses to send anything, and `aws_auth` has nothing to re-sign);
 - the CA settings: `NODE_EXTRA_CA_CERTS`, `SSL_CERT_FILE`, `REQUESTS_CA_BUNDLE`, `AWS_CA_BUNDLE`;
-- no proxy variables. `run(mode="explicit")` adds `HTTPS_PROXY` to the NLB on 8080, only for the comparisons in `11` and `14`.
+- no proxy variables. `run(mode="explicit")` adds `HTTPS_PROXY` to the NLB on 8080, only for the comparison in `11`; `14` uses `curl -x` from a transparent MicroVM.
 
 ## Layout
 
@@ -134,6 +134,7 @@ Each writes `results/NN_name.log`, with the account ID, bucket names, secret ARN
 | `az_ids` | `["use1-az4", "use1-az6"]` | The two AZs, by ID |
 | `proxy_generation` | `1` | Bump to force a new iron-proxy task |
 | `control_plane` | `false` | Part 3's control plane (below) |
+| `control_poll_s` | `30` | With `control_plane`: how often, in seconds, the sidecar checks the bucket for changes |
 | `user_secret_prefix` | `my2cents-ip/user/` | With `control_plane`: the prefix of part 3's added credentials, the only other secrets the sandbox roles may read |
 
 The outputs include what [part 3's workspace](../lambda-microvm-workspace) builds on: the proxy VPC and its subnets and route tables, the NAT gateway, the ECS cluster, the NLB's security group, iron-proxy's task and execution roles, the CA secret, the injected secrets, and the sandbox VPC.
@@ -142,8 +143,9 @@ The outputs include what [part 3's workspace](../lambda-microvm-workspace) build
 
 `control_plane=true` exists for [part 3's workspace](../lambda-microvm-workspace), which edits the proxy's policy from its web UI. It's off by default; part 2's post and every script here assume it's off (with it on, `07_aws.py` sees a sandbox role instead of the task role, and edits from part 3 change what the other tests expect).
 
-- **Config in S3.** Terraform seeds `iron-proxy.yaml` (this template plus a management API on loopback) and `aws-scope.json` into a private, versioned bucket once, then leaves them alone: part 3 changes the allowlist, the secrets and the AWS access there.
-- **A `control` sidecar** in the iron-proxy task ([`infra/control.sh`](infra/control.sh), AWS's aws-cli image) polls the bucket every 2 s. On a change it swaps the file in and calls iron-proxy's `POST /v1/reload` on `127.0.0.1:9092` with a token from Secrets Manager. It reports what it applied in `status.json`, including the session's `SessionTokenUtilization` and `SessionTokenSize`. iron-proxy keeps its old pipeline if a new config doesn't validate.
+- **Config in S3.** Terraform seeds `iron-proxy.yaml` (this template plus a management API on loopback) and `aws-scope.json` into a private, versioned bucket once, then leaves them alone: part 3 changes the allowlist, the secrets and the AWS access there. It also keeps `iron-proxy.default.yaml`, the template as the current apply renders it, which part 3's factory reset goes back to; the sidecar ignores it.
+- **A `control` sidecar** in the iron-proxy task ([`infra/control.sh`](infra/control.sh), AWS's aws-cli image) polls the bucket every 30 s (`control_poll_s`). On a change it swaps the file in and calls iron-proxy's `POST /v1/reload` on `127.0.0.1:9092` with a token from Secrets Manager. It reports what it applied in `status.json`, including the session's `SessionTokenUtilization` and `SessionTokenSize`, right after a change and every 30 s as a heartbeat. iron-proxy keeps its old pipeline if a new config doesn't validate.
+- **Changes take up to about 30 s.** A change made from part 3 (an allowlist entry, a credential, AWS access) goes live at the sidecar's next check: within `control_poll_s` seconds, plus about a second for the fetch and the reload. That includes a revoke, which is a deny statement plus a reload, so a revoked key can keep being swapped in for up to about 30 s. Lower `control_poll_s` for faster changes; each check is two conditional GETs.
 - **A different AWS identity.** Sandbox AWS calls are signed as a `my2cents-ip-<role>` session (`proxy-<role>-v<scope version>`), not the task role. The four roles trust only the task role:
   - `view-only` (the default): AWS's ViewOnlyAccess;
   - `read-only`: ReadOnlyAccess;
@@ -160,7 +162,7 @@ terraform -chdir=infra apply                            # adds the bucket, the t
 
 The first apply replaces the iron-proxy task: about 3 minutes until the new one (iron-proxy plus the sidecar) serves. Switching it off again removes all of it and puts the task back to the plain config.
 
-**Cost.** The sidecar shares the existing Fargate task (0.5 vCPU, 1 GB), so compute doesn't change. What it adds is about $1.90/month: S3 requests (two conditional GETs every 2 s, about $1.05, and a status PUT every 30 s, about $0.45) and the management token in Secrets Manager ($0.40). The roles, STS and the on-demand demo table cost nothing at this scale; the polls through the NAT gateway are a few MB a day.
+**Cost.** The sidecar shares the existing Fargate task (0.5 vCPU, 1 GB), so compute doesn't change. What it adds is about $0.95/month: S3 requests (two conditional GETs every 30 s, about $0.07; a status PUT every 30 s, about $0.45; and a GET of `status.json` before each PUT, about $0.04) and the management token in Secrets Manager ($0.40). At `control_poll_s = 2` the GETs cost about $1.05. The roles, STS and the on-demand demo table cost nothing at this scale; the polls through the NAT gateway are a few MB a day.
 
 ## Gotchas
 
@@ -168,13 +170,13 @@ The first apply replaces the iron-proxy task: about 3 minutes until the new one 
 - **`"*."`, not `"*"`.** AWS stores the wildcard domain as `*.`; writing `*` leaves a permanent diff.
 - **The ECS endpoint.** `upstream_deny_cidrs` replaces iron-proxy's defaults. The defaults don't include `169.254.170.2`, where Fargate serves the task role's credentials, so the config lists it, along with both VPCs.
 - **Waiting for a deploy.** After a config change, ECS's `services-stable` waiter can return while the old task is still serving the old config. `apply_infra()` waits for one deployment with `rolloutState=COMPLETED` and healthy targets.
-- **API limits.** `RunMicrovm` is about 1 TPS per account, so `run()` backs off on its own; every other MicroVM call uses a retrying client.
+- **API limits.** `RunMicrovm` was held at 1 TPS on my account (the Service Quotas default is 5), so `run()` backs off on its own; every other MicroVM call uses a retrying client.
 - **httpbin's rate limit.** httpbin.org allows 2 echo requests per second per client IP. The scripts pause between echoes.
 - **No retries after 403.** With `require: true`, git's first unauthenticated request gets a 403 instead of a 401, so git never retries with credentials. Send the placeholder up front with `http.extraHeader`.
 
 ## Cost and cleanup
 
-The fixed part costs about $0.095/h whether or not sandboxes run: NAT gateway ($0.045), NLB ($0.0225), a Fargate task ($0.020), a public IPv4 address ($0.005), Secrets Manager (4 secrets) and the private hosted zone. Peering has no hourly charge. Per use: DNS Firewall ($0.60 per million queries), query logs, data across AZs over the peering ($0.01/GB each way), and MicroVMs at part 1's rates.
+The fixed part costs about $0.095/h whether or not sandboxes run: NAT gateway ($0.045), NLB ($0.0225), a Fargate task ($0.020), a public IPv4 address ($0.005), Secrets Manager (4 secrets) and the private hosted zone. With the control plane on, add about $0.95 a month for it (the token secret, $0.40, and about $0.55 of S3 requests), for about $0.096/h. Peering has no hourly charge. Per use: DNS Firewall ($0.60 per million queries), query logs, data across AZs over the peering ($0.01/GB each way), and MicroVMs at part 1's rates.
 
 When you're done:
 

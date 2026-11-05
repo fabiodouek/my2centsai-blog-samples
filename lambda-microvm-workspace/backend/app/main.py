@@ -27,12 +27,15 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 from starlette.websockets import WebSocketDisconnect, WebSocketState
 
 from . import pricing
+from . import sandbox_env
+from . import sizes as sz
+from .quota import MemoryQuota
 from .auth import AuthError, CognitoVerifier, DevVerifier, User, bearer, http_jwks_fetcher
 from .config import Settings, load
 from .credentials import Credentials
 from .events import Hub, LogTail, offer
-from .microvm import (GONE_STATES, MAX_PAYLOAD, Conflict, MicroVMs, NotFound, QuotaExceeded, build_run_payload,
-                      encode_payload, env_safe_name, iso, now_iso)
+from .microvm import (GONE_STATES, MAX_PAYLOAD, Conflict, MicroVMs, NoEgressConnector, NotFound, QuotaExceeded,
+                      build_run_payload, egress_connectors, encode_payload, env_safe_name, iso, now_iso)
 from .policy import PolicyError, ProxyPolicy
 from .store import DynamoStore, MemoryStore
 from .terminal import TerminalBridge, UpstreamClosed
@@ -231,8 +234,20 @@ class VmControl:
 
 class CreateSandbox(BaseModel):
     name: str = Field(min_length=1, max_length=64)
+    # small | medium | large | xlarge (app/sizes.py): one image per size
+    size: str = Field(default=sz.DEFAULT_SIZE, max_length=16)
+    # Idle policy: suspend after this many idle minutes; terminate after `suspended_minutes` suspended (None: only
+    # when the lifetime ends; 0: as soon as it suspends); auto-resume on endpoint traffic (terminal, agent).
+    # Measured: Lambda applies suspendedDurationSeconds to idle suspends only; after SuspendMicrovm (the Suspend
+    # button) a sandbox stays suspended until its lifetime ends.
     idle_minutes: int = Field(default=15, ge=1, le=480)
-    max_hours: float = Field(default=8, gt=0, le=8)
+    suspended_minutes: int | None = Field(default=None, ge=0, le=480)
+    auto_resume: bool = True
+    # Lifetime in minutes (1-480); max_hours is the older field, still accepted
+    max_minutes: int | None = Field(default=None, ge=1, le=480)
+    max_hours: float | None = Field(default=None, gt=0, le=8)
+    # Extra variables for /etc/sandbox.env (app/sandbox_env.py): not for secrets
+    env: dict[str, str] = Field(default_factory=dict, max_length=sandbox_env.MAX_VARS)
 
     @field_validator("name")
     @classmethod
@@ -263,6 +278,10 @@ class RotateBody(BaseModel):
     value: SecretStr
 
 
+class ResetBody(BaseModel):
+    confirm: str = Field(max_length=32)
+
+
 class ScopeBody(BaseModel):
     role: str | None = Field(default=None, max_length=32)
     session_policy: bool = True
@@ -279,7 +298,7 @@ def payload_bytes(s: Settings, extra: dict) -> int:
 
 def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = None, store=None, verifier=None,
                credentials: Credentials | None = None, hub: Hub | None = None, agent: Agent | None = None,
-               shell_connect=None, policy: ProxyPolicy | None = None) -> FastAPI:
+               shell_connect=None, policy: ProxyPolicy | None = None, quota: MemoryQuota | None = None) -> FastAPI:
     s = settings or load()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     mv = microvms or MicroVMs(s)
@@ -290,6 +309,7 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
     creds = credentials or Credentials(s, catalog=policy.credential_catalog, policy=policy)
     hub = hub or Hub(lambda emit: LogTail(s, emit, names=creds.names))
     agent = agent or Agent(mv)
+    mem_quota = quota or MemoryQuota(s)
     activity = Activity()
     bridges: dict[str, set[TerminalBridge]] = {}
     connect_for = shell_connect or (lambda endpoint: shell_connector(endpoint, s.terminal_keepalive_s))
@@ -301,6 +321,8 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
 
     @asynccontextmanager
     async def lifespan(app):
+        # Read the MicroVM memory quota once now (cached for an hour), so the first page doesn't wait on it
+        threading.Thread(target=mem_quota.get, name="quota-warm", daemon=True).start()
         if policy.aws_catalog is not None:
             # Fetch the Service Authorization Reference and ReadOnlyAccess now, so the first visitor doesn't wait
             def warm():
@@ -319,7 +341,7 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
         hub.shutdown()
         await agent.aclose()
 
-    app = FastAPI(title="my2cents workspace API", version="0.1.0", lifespan=lifespan,
+    app = FastAPI(title="My2cents.ai Lambda MicroVM Playground API", version="0.1.0", lifespan=lifespan,
                   docs_url="/api/docs" if s.dev_auth else None, redoc_url=None, openapi_url="/api/openapi.json" if s.dev_auth else None)
     app.state.settings, app.state.microvms, app.state.store, app.state.hub = s, mv, db, hub
     app.state.activity, app.state.agent, app.state.credentials = activity, agent, creds
@@ -383,19 +405,56 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
         return item
 
     # ---- views ----
+    def size_of(item: dict, d: dict) -> str:
+        """The sandbox's size: stored at create; for an older record, from the image it runs; else medium."""
+        size = item.get("size")
+        if size in sz.SIZES:
+            return size
+        return sz.size_of_arn(s.size_images, d.get("imageArn")) or sz.DEFAULT_SIZE
+
+    def egress_of(d: dict) -> str | None:
+        conns = d.get("egressNetworkConnectors")
+        if conns is None:
+            return None
+        if s.connector_arn and s.connector_arn in conns:
+            return "proxy"
+        return "internet" if any(str(c).endswith(":INTERNET_EGRESS") for c in conns) else ("none" if not conns else "other")
+
+    def end_reason(d: dict, expires) -> str | None:
+        """Lambda reports "MicroVM exceeded maximum lifetime." for a sandbox its idle policy terminated after
+        suspendedDurationSeconds too; say which it was when it ended well before its lifetime."""
+        reason = d.get("stateReason")
+        ended = d.get("terminatedAt")
+        if (reason and "maximum lifetime" in reason and isinstance(ended, datetime) and expires is not None
+                and ended < expires - timedelta(seconds=30)):
+            susp = (d.get("idlePolicy") or {}).get("suspendedDurationSeconds")
+            return ("Terminated by its idle policy after " + (f"{susp // 60} min" if susp and susp >= 60 else f"{susp or 0} s")
+                    + " suspended")
+        return reason
+
     def view(item: dict, d: dict) -> dict:
         started = d.get("startedAt")
         max_s = d.get("maximumDurationInSeconds") or item.get("max_duration_s")
         expires = (started + timedelta(seconds=max_s)) if isinstance(started, datetime) and max_s else None
         idle = d.get("idlePolicy") or {}
+        size = size_of(item, d)
+        info = sz.describe(size, mem_quota.peek())
+        auto_resume = idle.get("autoResumeEnabled")
+        susp = idle.get("suspendedDurationSeconds")
         return {
             "id": item["id"], "name": item.get("name"), "state": d.get("state"),
             "created_at": item.get("created_at"), "started_at": iso(started) or item.get("started_at"),
             "max_duration_s": max_s,
             "idle_minutes": (idle.get("maxIdleDurationSeconds") // 60) if idle.get("maxIdleDurationSeconds") else item.get("idle_minutes"),
             "image_version": d.get("imageVersion") or item.get("image_version"),
-            "expires_at": iso(expires), "state_reason": d.get("stateReason"),
+            "expires_at": iso(expires), "state_reason": end_reason(d, expires),
             "terminated_at": item.get("terminated_at") if d.get("state") in GONE_STATES else None,
+            "size": size, "size_label": info["label"], "memory_gb": info["memory_gb"], "vcpu": info["vcpu"],
+            "usd_per_hour": info["usd_per_hour"],
+            "egress": egress_of(d) or item.get("egress") or "proxy",
+            "auto_resume": auto_resume if isinstance(auto_resume, bool) else item.get("auto_resume", True),
+            "suspended_duration_s": susp if isinstance(susp, int) else item.get("suspended_duration_s", max_s),
+            "env_names": item.get("env_names") or [],
             **activity.info(item["id"]),
         }
 
@@ -434,12 +493,51 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
     async def me(user: User = Depends(current_user)):
         return user.public(s.admin_group)
 
+    async def custom_env() -> dict:
+        """Custom credentials' placeholders, each in the env var chosen for it (control plane only)."""
+        try:
+            return await asyncio.to_thread(policy.custom_env)
+        except Exception as e:
+            log.warning("custom credentials: %s", e)
+            return {}
+
+    async def size_options(quota_gb: float) -> list[dict]:
+        images = s.size_images
+        out = []
+        for size in sz.SIZES:
+            d = sz.describe(size, quota_gb)
+            arn = images.get(size)
+            # Only a missing or unbuilt image makes a size unavailable. The quota is an estimate: the size's note
+            # and the form say when it may not fit, and AWS decides (create always calls RunMicrovm).
+            if not arn:
+                d.update(available=False, unavailable_reason="no image configured for this size")
+            else:
+                ok, why = await asyncio.to_thread(mv.image_ready, arn)
+                d.update(available=ok, unavailable_reason=why)
+            d["default"] = size == sz.DEFAULT_SIZE
+            out.append(d)
+        return out
+
     @app.get("/api/config")
     async def config(user: User = Depends(current_user)):
-        return {"proxy_mode": s.proxy_mode, "quota_gb": s.quota_gb, "max_duration_s": s.max_duration_s,
+        custom = await custom_env()
+        reserved = sandbox_env.reserved_names(s.placeholders, s.region, custom)
+        max_min = s.max_duration_s // 60
+        quota_gb, quota_source = await asyncio.to_thread(mem_quota.get)
+        return {"proxy_mode": s.proxy_mode, "quota_gb": quota_gb, "quota_source": quota_source,
+                "max_duration_s": s.max_duration_s,
                 "vm_memory_gb": s.vm_memory_gb, "default_idle_minutes": 15, "pricing": pricing.public_pricing(),
                 "proxy_allowlist": s.proxy_allowlist, "sandbox_cidrs": s.sandbox_cidrs, "feed_scope_note": FEED_SCOPE,
-                "secrets": sorted(s.secret_arns), "dev_auth": s.dev_auth, "control_plane": s.control_plane}
+                "secrets": sorted(s.secret_arns), "dev_auth": s.dev_auth, "control_plane": s.control_plane,
+                "sizes": await size_options(quota_gb), "default_size": sz.DEFAULT_SIZE, "burst_factor": sz.BURST,
+                "lifetime": {"min_minutes": 1, "max_minutes": max_min, "default_minutes": max_min},
+                "idle": {"min_minutes": 1, "max_minutes": max_min - 1, "default_minutes": 15},
+                "suspended": {"min_minutes": 0, "max_minutes": max_min, "default": "lifetime"},
+                "env": {"name_pattern": sandbox_env.NAME_RE.pattern, "max_vars": sandbox_env.MAX_VARS,
+                        "value_max": sandbox_env.VALUE_MAX, "forbidden_chars": "".join(sorted(sandbox_env.FORBIDDEN_CHARS)),
+                        "reserved": sorted(reserved), "reserved_prefixes": list(sandbox_env.RESERVED_PREFIXES)},
+                # Bytes the payload already takes with the longest name; each variable adds len(name)+len(value)+6
+                "run_payload": {"limit": MAX_PAYLOAD, "used_bytes": payload_bytes(s, custom)}}
 
     @app.get("/api/sandboxes")
     async def list_sandboxes(user: User = Depends(current_user)):
@@ -447,38 +545,65 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
 
     @app.post("/api/sandboxes", status_code=201)
     async def create_sandbox(body: CreateSandbox, user: User = Depends(current_user)):
-        if not (s.image_arn and s.connector_arn):
-            raise HTTPException(503, "IMAGE_ARN and CONNECTOR_ARN must be configured")
-        max_s = min(int(body.max_hours * 3600), s.max_duration_s)
-        if body.idle_minutes * 60 >= max_s:
-            raise HTTPException(422, "idle_minutes must be shorter than max_hours")
-        # Custom credentials' placeholders, each in the env var chosen for it (control plane only)
         try:
-            custom = await asyncio.to_thread(policy.custom_env)
-        except Exception as e:
-            log.warning("custom credentials: %s", e)
-            custom = {}
+            egress_connectors(s)      # never run without part 2's connector: Lambda would attach INTERNET_EGRESS
+        except NoEgressConnector as e:
+            raise HTTPException(503, str(e))
+        if body.size not in sz.SIZES:
+            raise HTTPException(422, f"size must be one of {', '.join(sz.SIZES)}")
+        image = s.size_images.get(body.size)
+        label = sz.SIZES[body.size]["label"]
+        if not image:
+            raise HTTPException(409, f"{label} isn't available: no image configured for it")
+        ok, why = await asyncio.to_thread(mv.image_ready, image)
+        if not ok:
+            raise HTTPException(409, f"{label} isn't available: {why}")
+        if body.max_minutes is not None:
+            max_s = body.max_minutes * 60
+        elif body.max_hours is not None:
+            max_s = int(body.max_hours * 3600)
+        else:
+            max_s = s.max_duration_s
+        max_s = min(max_s, s.max_duration_s)
+        if body.idle_minutes * 60 >= max_s:
+            raise HTTPException(422, "the idle time before suspending must be shorter than the lifetime")
+        suspended_s = None if body.suspended_minutes is None else body.suspended_minutes * 60
+        if suspended_s is not None and suspended_s > max_s:
+            raise HTTPException(422, "the time suspended before terminating can't be longer than the lifetime")
+        custom = await custom_env()
+        try:
+            extra = sandbox_env.check(body.env, sandbox_env.reserved_names(s.placeholders, s.region, custom))
+        except sandbox_env.EnvError as e:
+            raise HTTPException(422, f"environment variables: {e}")
         # Transparent: no proxy settings. Part 2's sandbox VPC answers every name with iron-proxy's load balancer.
-        run_env = build_run_payload(s.placeholders, s.region, {**custom, "SANDBOX_NAME": env_safe_name(body.name)})
+        run_env = build_run_payload(s.placeholders, s.region, {**custom, **extra, "SANDBOX_NAME": env_safe_name(body.name)})
         try:
             payload = encode_payload(run_env)
         except ValueError:
             n = len(json.dumps(run_env, separators=(",", ":")).encode())
-            raise HTTPException(409, f"run hook payload would be {n:,} bytes (limit {MAX_PAYLOAD:,}): it carries every "
-                                     "custom credential's placeholder; delete one under Proxy policy")
+            mine = sum(sandbox_env.entry_bytes(k, v) for k, v in extra.items())
+            raise HTTPException(409, f"run hook payload would be {n:,} bytes (limit {MAX_PAYLOAD:,}); your variables "
+                                     f"take {mine:,}" + ("" if not custom else ", custom credentials' placeholders take "
+                                     f"{sum(sandbox_env.entry_bytes(k, v) for k, v in custom.items()):,}") +
+                                     ". Remove some variables.")
         try:
             r = await asyncio.to_thread(mv.run, idle_minutes=body.idle_minutes, max_duration_s=max_s, payload=payload,
-                                        client_token=str(uuid.uuid4()))
-        except QuotaExceeded:
-            raise HTTPException(409, f"MicroVM quota reached: the account allows {s.quota_gb} GB of MicroVM memory "
-                                     f"({s.quota_gb // s.vm_memory_gb} sandboxes of {s.vm_memory_gb} GB) and suspended "
-                                     "sandboxes count. Terminate one and try again.")
+                                        client_token=str(uuid.uuid4()), image_arn=image,
+                                        suspended_duration_s=suspended_s, auto_resume=body.auto_resume)
+        except QuotaExceeded as e:
+            # No pre-check: AWS is the judge. Say what it said, the size and what we estimate now.
+            raise HTTPException(409, f"AWS refused {label} ({sz.gb(body.size):g} GB) with ServiceQuotaExceededException: "
+                                     f"“{str(e).rstrip('.')}”. {await quota_estimate_text(user)} Pick a smaller size or terminate a sandbox.")
         item = {"sub": user.sub, "id": r["microvmId"], "name": body.name, "created_at": now_iso(),
                 "endpoint": r.get("endpoint"), "image_version": r.get("imageVersion"), "idle_minutes": body.idle_minutes,
-                "max_duration_s": max_s, "started_at": iso(r.get("startedAt")), "email": user.email}
+                "max_duration_s": max_s, "started_at": iso(r.get("startedAt")), "email": user.email,
+                "size": body.size, "memory_mib": sz.SIZES[body.size]["memory_mib"], "egress": "proxy",
+                "auto_resume": body.auto_resume, "suspended_duration_s": max_s if suspended_s is None else suspended_s,
+                # Stored as the form warns: values are visible in the sandbox and kept with its record
+                "env": extra, "env_names": list(extra)}
         await asyncio.to_thread(db.put, item)
         hub.poke(user.sub)
-        log.info("run %s for %s (%s)", r["microvmId"], user.sub, body.name)
+        log.info("run %s for %s (%s, %s)", r["microvmId"], user.sub, body.name, body.size)
         return view(item, r)
 
     # The control plane can still report the old state right after the call; report the transition.
@@ -514,8 +639,9 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
             raise HTTPException(404, "sandbox no longer exists")
         except Conflict as e:
             raise HTTPException(409, f"can't {verb} now: {e}")
-        except QuotaExceeded:
-            raise HTTPException(409, "MicroVM quota reached")
+        except QuotaExceeded as e:
+            raise HTTPException(409, f"AWS refused to {verb} it with ServiceQuotaExceededException: “{str(e).rstrip('.')}”. "
+                                     f"{await quota_estimate_text(user)} Terminate a sandbox, then try again.")
         wake_bridges(vm_id)
         done, budget = settled[verb]
         d = dict(await settle(user, item, verb, budget, 0.25))
@@ -591,14 +717,32 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
 
     @app.get("/api/quota")
     async def quota(user: User = Depends(current_user)):
+        return await quota_view(user)
+
+    async def quota_estimate_text(user: User) -> str:
+        """Our current estimate, for a ServiceQuotaExceededException message. Never raises."""
+        try:
+            q = await quota_view(user)
+        except Exception as e:      # the message must still go out
+            log.info("quota estimate: %s", e)
+            return f"This account's MicroVM memory quota is {mem_quota.peek():g} GB as we read it."
+        where = "in the account" if q.get("scope") == "account" else "in your sandboxes (others' aren't readable)"
+        return (f"Our estimate: {q['used_gb']:g} of {q['quota_gb']:g} GB of MicroVM memory in use {where}, "
+                f"{q['free_gb']:g} GB free; suspended sandboxes count.")
+
+    async def quota_view(user: User) -> dict:
         pairs = await user_sandboxes(user)
         own = {item["id"] for item, _ in pairs}
         # The user's own sandboxes are counted from get_microvm (at most 2 s old), never from the cached account
         # list, which can still show one they just terminated as RUNNING and would bill it to "other users".
         # TERMINATING still counts as theirs until it's gone.
-        mine = [d for _, d in pairs if d.get("state") not in ("TERMINATED", "UNKNOWN")]
-        out = {"quota_gb": s.quota_gb, "vm_memory_gb": s.vm_memory_gb, "user_microvms": len(mine),
-               "user_gb": len(mine) * s.vm_memory_gb}
+        mine = [(item, d) for item, d in pairs if d.get("state") not in ("TERMINATED", "UNKNOWN")]
+        segments = [{"id": item["id"], "name": item.get("name"), "state": d.get("state"), "mine": True,
+                     "gb": sz.gb(size_of(item, d))} for item, d in mine]
+        user_gb = sum(x["gb"] for x in segments)
+        quota_gb, quota_source = await asyncio.to_thread(mem_quota.get)
+        out = {"quota_gb": quota_gb, "quota_source": quota_source, "vm_memory_gb": s.vm_memory_gb,
+               "user_microvms": len(mine), "user_gb": user_gb}
         live, scope = None, "user"
         for kw, sc in (({}, "account"), ({"imageIdentifier": s.image_arn}, "image")):
             if sc == "image" and not s.image_arn:
@@ -610,11 +754,21 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
             except Exception as e:
                 log.info("list_microvms (%s): %s", sc, e)
         if live is not None:
-            others = {i["microvmId"] for i in live if i["microvmId"] not in own}
-            n = len(others) + len(mine)
-            out.update(account_microvms=n, other_microvms=len(others), used_gb=n * s.vm_memory_gb, scope=scope)
+            others = [i for i in live if i["microvmId"] not in own]
+            unknown = 0
+            for i in others:
+                size = sz.size_of_arn(s.size_images, i.get("imageArn"))
+                unknown += size is None
+                # Someone else's image: its size isn't readable here (GetMicrovmImage doesn't return it); count 2 GB
+                segments.append({"id": None, "name": None, "state": i.get("state"), "mine": False,
+                                 "gb": sz.gb(size) if size else float(s.vm_memory_gb)})
+            used = sum(x["gb"] for x in segments)
+            out.update(account_microvms=len(others) + len(mine), other_microvms=len(others), used_gb=used,
+                       other_gb=used - user_gb, other_unknown_size=unknown, scope=scope)
         else:
-            out.update(account_microvms=None, used_gb=out["user_gb"], scope="user")
+            out.update(account_microvms=None, used_gb=user_gb, other_gb=0, other_unknown_size=0, scope="user")
+        out["free_gb"] = max(0.0, quota_gb - out["used_gb"])
+        out["segments"] = segments
         return out
 
     @app.get("/api/credentials")
@@ -746,6 +900,29 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
     async def policy_status(user: User = Depends(current_user)):
         return await asyncio.to_thread(policy.status)
 
+    @app.get("/api/policy/config")
+    async def policy_config(user: User = Depends(admin_user)):
+        """Admins only: iron-proxy.yaml and aws-scope.json as they are in the bucket, against what the sidecar
+        applied. Never cached: it's what an admin checks when something looks out of step."""
+        return JSONResponse(await asyncio.to_thread(policy.config_view), headers={"Cache-Control": "no-store"})
+
+    @app.get("/api/policy/reset")
+    async def policy_reset_plan(user: User = Depends(admin_user)):
+        """Admins: what a factory reset would change."""
+        revoked = await asyncio.to_thread(creds.revoked_names)
+        return await asyncio.to_thread(policy.reset_plan, revoked)
+
+    @app.post("/api/policy/reset")
+    async def policy_reset(body: ResetBody, user: User = Depends(admin_user)):
+        """Admins: back to part 2's deploy-time policy. The body must say {"confirm": "reset"}."""
+        if body.confirm.strip().lower() != "reset":
+            raise HTTPException(422, 'type "reset" to confirm')
+        await asyncio.to_thread(policy._default_doc)          # fail before touching anything without a template
+        revoked = await asyncio.to_thread(creds.clear_denies)
+        out = await asyncio.to_thread(policy.reset, user, revoked)
+        creds.invalidate()
+        return out
+
     @app.get("/api/policy/changes")
     async def policy_changes(limit: int = Query(50, ge=1, le=200), user: User = Depends(current_user)):
         return await asyncio.to_thread(policy.recent_changes, limit)
@@ -760,10 +937,14 @@ def create_app(settings: Settings | None = None, *, microvms: MicroVMs | None = 
         item = await asyncio.to_thread(db.get, user.sub, vm_id)
         if not item:
             return await ws.close(4404, "sandbox not found")
-        endpoint = item.get("endpoint") or (await asyncio.to_thread(mv.get, vm_id, 0)).get("endpoint")
+        d = await asyncio.to_thread(mv.get, vm_id, 2.0)
+        endpoint = item.get("endpoint") or d.get("endpoint")
         if not endpoint:
             return await ws.close(4410, "sandbox terminated")
+        auto = (d.get("idlePolicy") or {}).get("autoResumeEnabled")
+        auto_resume = auto if isinstance(auto, bool) else item.get("auto_resume", True)
         bridge = TerminalBridge(FastAPIBrowser(ws), VmControl(mv, vm_id), connect_for(endpoint),
+                                auto_resume=auto_resume,
                                 on_attach=lambda: activity.attach(vm_id), on_detach=lambda: activity.detach(vm_id),
                                 on_input=lambda: activity.touch(vm_id))
         log.info("terminal open %s", vm_id)

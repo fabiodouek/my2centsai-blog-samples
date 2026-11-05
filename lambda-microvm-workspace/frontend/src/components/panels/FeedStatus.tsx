@@ -59,7 +59,7 @@ export function FeedPendingEmpty({ what }: { what: string /* lowercase noun: "re
     <div role="status">
       <Empty title={pending === 'connecting' ? 'Connecting to the feed…' : 'Starting the feed…'}>
         {pending === 'connecting'
-          ? `New ${what} appear once the connection to the workspace backend is back.`
+          ? `New ${what} appear once the connection to the playground’s backend is back.`
           : `Backfilling recent ${what} from CloudWatch Logs (up to 10 minutes back), then streaming live.`}
       </Empty>
       <SkeletonRows rows={5} />

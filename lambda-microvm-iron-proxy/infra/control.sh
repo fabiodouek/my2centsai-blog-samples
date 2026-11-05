@@ -7,16 +7,17 @@
 #                            (`role`, default $DEFAULT_ROLE), assumed with no session policy, or, when the scope's
 #                            `session_policy` is true, with its statements plus the proxy's baseline (its own secrets)
 #
-# Every $POLL_S seconds it fetches both objects if their ETag changed. When the config changed, or the scope
+# Every $POLL_S seconds (30 by default) it fetches both objects if their ETag changed. When the config changed, or the scope
 # changed, or the session is 40 minutes old (role chaining caps it at an hour), it updates the files atomically
-# and calls iron-proxy's POST /v1/reload on loopback. Then it writes what it applied to s3://$BUCKET/$STATUS_KEY.
+# and calls iron-proxy's POST /v1/reload on loopback. Then it writes what it applied to s3://$BUCKET/$STATUS_KEY,
+# right away after a change and every $HEARTBEAT_S seconds otherwise (its updated_at is the heartbeat), and sleeps.
 # Session names are $SESSION_PREFIX-<role>-v<scope version> (proxy-view-only-v7), so CloudTrail shows the scope.
 #
 # A config that would let sandbox AWS calls reach Secrets Manager is refused (guard, below): iron-proxy fetches its
 # own secrets with the same session it signs those calls with. The last good config stays in place.
 #
 # AWS requests are signed by curl (--aws-sigv4) with the task role's credentials from the ECS endpoint: an aws
-# CLI call costs about a second of CPU, too much every 2 s on a 0.5 vCPU task that also runs the proxy.
+# CLI call costs about a second of CPU, a lot for a 0.5 vCPU task that also runs the proxy.
 set -uo pipefail
 
 : "${BUCKET:?}" "${ROLE_ARNS_JSON:?}" "${BASELINE_JSON:?}" "${IRON_MANAGEMENT_API_KEY:?}"
@@ -27,7 +28,8 @@ CONFIG_KEY=${CONFIG_KEY:-iron-proxy.yaml}
 SCOPE_KEY=${SCOPE_KEY:-aws-scope.json}
 STATUS_KEY=${STATUS_KEY:-status.json}
 SESSION_PREFIX=${SESSION_PREFIX:-ws}
-POLL_S=${POLL_S:-2}
+POLL_S=${POLL_S:-30}
+RETRY_S=${RETRY_S:-2}   # the next round's delay while a reload is still owed (iron-proxy not listening yet, an error)
 RENEW_S=${RENEW_S:-2400}
 HEARTBEAT_S=${HEARTBEAT_S:-30}
 MGMT_URL=${MGMT_URL:-http://127.0.0.1:9092/v1/reload}
@@ -92,7 +94,7 @@ renew_at=0
 # applied_*_at: when that version first went live (a renewal or repeat reload doesn't move it)
 applied_cfg="" applied_scope="" cfg_applied_at="" scope_applied_at=""
 reload_at="" reload_http="" reload_ok="" reload_error="" reload_pending=1
-dirty=1 last_status=0 owner_logged=0
+dirty=1 last_status=0 owner_logged=0 nap=$POLL_S
 
 # ---- the Secrets Manager guard
 # guard <file>: prints why a config must not be applied, or nothing. Refused:
@@ -254,6 +256,7 @@ write_status() {
     return
   fi
   jq -n --arg updated_at "$(now)" --arg task "$TASK" --arg started_at "$STARTED_AT" --arg poll_s "$POLL_S" \
+    --arg next_poll_at "$(date -u -d "+$nap seconds" +%Y-%m-%dT%H:%M:%S.%3NZ)" \
     --arg cfg_version "$cfg_version" --arg cfg_etag "$cfg_etag" --arg cfg_synced_at "$cfg_synced_at" \
     --arg applied_cfg "$applied_cfg" --arg applied_scope "$applied_scope" \
     --arg cfg_applied_at "$cfg_applied_at" --arg scope_applied_at "$scope_applied_at" \
@@ -266,6 +269,7 @@ write_status() {
     def s: if . == "" then null else . end;
     def n: if . == "" then null else tonumber end;
     {updated_at: $updated_at, task: ($task | s), started_at: $started_at, poll_s: ($poll_s | n),
+     next_poll_at: $next_poll_at,
      config: {synced_version: ($cfg_version | n), etag: ($cfg_etag | s), synced_at: ($cfg_synced_at | s),
               applied_version: ($applied_cfg | n), applied_at: ($cfg_applied_at | s), rejected_version: ($cfg_rejected | n),
               refused_reason: ($cfg_refused | s)},
@@ -289,7 +293,8 @@ write_status() {
   fi
 }
 
-# bash is PID 1 here, which ignores SIGTERM unless trapped: stop when ECS stops the task
+# bash is PID 1 here, which ignores SIGTERM unless trapped: stop when ECS stops the task. The sleep runs in the
+# background so the trap fires at once instead of after up to $POLL_S seconds (ECS kills the container after 30 s).
 trap 'log stopping; exit 0' TERM INT
 log started --arg task "$TASK" --arg bucket_key "$CONFIG_KEY" --arg poll_s "$POLL_S"
 while :; do
@@ -300,8 +305,13 @@ while :; do
   if (( reload_pending )) && [[ -s $SHARED/iron-proxy.yaml && -s $SHARED/creds.json ]]; then
     reload
   fi
+  # A reload still owed (at start iron-proxy isn't listening until this container is healthy) is retried soon,
+  # so status.json doesn't wait a whole interval to report a config iron-proxy already runs
+  nap=$POLL_S
+  (( reload_pending && RETRY_S < POLL_S )) && nap=$RETRY_S
   if (( dirty || $(date +%s) - last_status >= HEARTBEAT_S )); then
     task_creds && write_status
   fi
-  sleep "$POLL_S"
+  sleep "$nap" &
+  wait $!
 done

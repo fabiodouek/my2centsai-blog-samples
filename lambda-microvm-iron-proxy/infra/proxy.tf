@@ -186,8 +186,9 @@ locals {
   })
 
   # control_plane=true: the sidecar (control.sh). Syncs the config and the AWS scope from the control bucket every
-  # 2 s, assumes the chosen sandbox role, writes a credential_process file, reloads iron-proxy on loopback, and
-  # reports status.json.
+  # control_poll_s (30 s by default), assumes the chosen sandbox role, writes a credential_process file, reloads
+  # iron-proxy on loopback, and reports status.json (also every 30 s as a heartbeat; part 3 calls a sidecar silent
+  # for over 90 s stale).
   control_sidecar = {
     name       = "control"
     image      = var.control_image
@@ -206,6 +207,8 @@ locals {
       { name = "BASELINE_JSON", value = jsonencode(local.scope_baseline) },
       { name = "SESSION_PREFIX", value = "proxy" },
       { name = "SHARED", value = "/control" },
+      { name = "POLL_S", value = tostring(var.control_poll_s) },
+      { name = "HEARTBEAT_S", value = "30" },
     ]
     secrets     = [{ name = "IRON_MANAGEMENT_API_KEY", valueFrom = one(aws_secretsmanager_secret.mgmt[*].arn) }]
     mountPoints = [{ sourceVolume = "control", containerPath = "/control", readOnly = false }]

@@ -1,9 +1,10 @@
 // Mock of the proxy control plane (backend/API.md "Proxy policy"). Every value is synthetic. Writes bump the
-// config/scope version and the fake sidecar "applies" them 1.5-2.5 s later, like the real S3 poll + reload.
+// config/scope version and the fake sidecar applies them at its next check, like part 2's: it checks the bucket
+// every 30 s (?poll=5 for a faster mock) and reloads about a second later.
 
 import { delay, http, HttpResponse } from 'msw';
 import { ALLOWLIST, db, gates, PLACEHOLDERS } from './db';
-import { actionsFor, BY_ID, check, DEFAULT_ROLE, openLists, roleOf, ROLES, search, SERVICES, summary, TOTAL_ACTIONS, wildcards, type Level, type RoleId } from './awsCatalog';
+import { actionsFor, BY_ID, coverageOf, DEFAULT_ROLE, openLists, resolve, roleOf, ROLES, search, SERVICES, summary, TOTAL_ACTIONS, wildcards, type Level, type RoleId } from './awsCatalog';
 
 const REGION = 'us-east-1';
 const ACCOUNT = '111122223333'; // AWS's documentation example account
@@ -14,6 +15,7 @@ const iso = (ms: number | null) => (ms === null ? null : new Date(ms).toISOStrin
 const hex = (n: number) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
 export const IS_ADMIN = !VIEWER;
+const POLL_S = Math.max(1, Number(new URLSearchParams(window.location.search).get('poll')) || 30);
 
 // ---------------------------------------------------------------- catalog (see awsCatalog.ts)
 
@@ -27,23 +29,62 @@ const BASELINE = {
 function preview(role: RoleId, sessionPolicy: boolean, actions: string[]) {
   const acts = [...new Set(actions)].sort();
   if (!sessionPolicy) {
-    // No session policy: the role's full permissions; iron-proxy gets the explicit "everything but Secrets Manager" lists
-    const open = openLists();
-    return { role, session_policy: false, actions: acts, services: [], ...open, policy: null, policy_json: null, chars: 0, limit: 2048, fits: true };
+    // No session policy: the role's full permissions; iron-proxy gets the services the role allows something in
+    const open = openLists(role);
+    const effective = SERVICES.filter((s) => s.enabled && s.id !== 'secretsmanager')
+      .map((s) => {
+        const acts2 = actionsFor(s, role);
+        const ok = acts2.filter((a) => a.allowed);
+        return { service: s.id, name: s.name, asked: null, effective: ok.length, role_allows: ok.length, total: acts2.length, limited: ok.filter((a) => a.limited).length, actions: null, limited_actions: null, no_effect: false, reason: null };
+      })
+      .filter((r) => r.effective > 0);
+    return { role, session_policy: false, actions: acts, services: [], ...open, policy: null, policy_json: null, chars: 0, limit: 2048, fits: true, coverage: [], effective, deny_ssm: false };
   }
-  const problems = acts.map((a) => check(a, role)).filter((x): x is string => x !== null);
+  const resolved = acts.map((a) => [a, resolve(a, role)] as const);
+  const problems = resolved.filter(([, r]) => typeof r === 'string').map(([, r]) => r as string);
   if (problems.length) return { error: `actions: can't be applied: ${problems.join('; ')}` };
-  const ids = [...new Set(acts.map((a) => a.split(':')[0]))].sort();
-  const svcs = ids.map((id) => BY_ID.get(id)!).filter(Boolean);
+  const coverage = [];
+  const asked = new Map<string, Map<string, ReturnType<typeof actionsFor>[number]>>();
+  let deny = false;
+  for (const [a, r] of resolved) {
+    if (typeof r === 'string') continue;
+    const cov = coverageOf(r.covered, role);
+    deny = deny || cov.blocked > 0;
+    coverage.push({ action: a, kind: r.wildcard ? 'wildcard' : 'action', covers: cov.covers, effective: cov.effective, limited: cov.limited, tone: cov.tone, reason: cov.reason });
+    const sid = a.split(':')[0];
+    const m = asked.get(sid) ?? new Map();
+    for (const c of r.covered) m.set(c.action, c);
+    asked.set(sid, m);
+  }
+  const effective = [...asked.entries()].sort(([x], [y]) => x.localeCompare(y)).map(([sid, m]) => {
+    const s = BY_ID.get(sid)!;
+    const covered = [...m.values()];
+    const ok = covered.filter((c) => c.allowed);
+    return {
+      service: sid,
+      name: s.name,
+      asked: covered.length,
+      effective: ok.length,
+      role_allows: actionsFor(s, role).filter((a) => a.allowed).length,
+      total: s.actions.length,
+      limited: ok.filter((c) => c.limited).length,
+      actions: ok.map((c) => c.action).sort(),
+      limited_actions: ok.filter((c) => c.limited).map((c) => c.action).sort(),
+      no_effect: ok.length === 0,
+      reason: ok.length ? null : `no effect with ${role}: no picked action in it is allowed, so iron-proxy refuses its calls (a bare 403) before they reach AWS`,
+    };
+  });
+  const svcs = effective.filter((r) => r.effective > 0).map((r) => BY_ID.get(r.service)!);
   const statements: Record<string, unknown>[] = [BASELINE];
   if (acts.length) statements.push({ Sid: 'Scope', Effect: 'Allow', Action: acts, Resource: '*' });
+  if (acts.length && deny) statements.push({ Sid: 'NoParameterValues', Effect: 'Deny', Action: ['ssm:GetParameter*'], Resource: '*' });
   const policy = { Version: '2012-10-17', Statement: statements };
   const json = JSON.stringify(policy);
   return {
     role,
     session_policy: true,
     actions: acts,
-    services: ids,
+    services: [...asked.keys()].sort(),
     allowed_services: svcs.length ? [...new Set(svcs.flatMap((s) => s.signing))].sort() : ['none'],
     hosts: [...new Set(svcs.flatMap((s) => s.hosts))],
     policy,
@@ -51,6 +92,9 @@ function preview(role: RoleId, sessionPolicy: boolean, actions: string[]) {
     chars: json.length,
     limit: 2048,
     fits: json.length <= 2048,
+    deny_ssm: deny,
+    coverage,
+    effective,
   };
 }
 
@@ -180,10 +224,25 @@ gates.awsService = (signing) => {
 // ---------------------------------------------------------------- the fake sidecar
 
 const sidecarTask = hex(32);
+const sidecarStarted = t0 - 3 * 3600_000 - 17_000;
+/** Checks happen every POLL_S on a fixed cadence from the task's start; each round reports right after. */
+const roundAt = (k: number) => sidecarStarted + k * POLL_S * 1000;
+function lastRound(now = Date.now()) {
+  return roundAt(Math.floor((now - sidecarStarted) / (POLL_S * 1000)));
+}
+function nextRound(now = Date.now()) {
+  return lastRound(now) + POLL_S * 1000;
+}
 
 function pending() {
   return state.applied.config < state.config || state.applied.scope < state.scope;
 }
+
+const etagOf = (s: string) => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193) >>> 0;
+  return `"${h.toString(16).padStart(8, '0')}${(h ^ 0x5bd1e995).toString(16).padStart(8, '0')}${s.length.toString(16).padStart(8, '0')}"`;
+};
 
 function write(kind: string, summary: string, detail: Record<string, unknown>, scope = false): { change: MChange; apply: Record<string, unknown> } {
   state.config += 1;
@@ -203,6 +262,8 @@ function write(kind: string, summary: string, detail: Record<string, unknown>, s
   const cfg = state.config;
   const sc = state.scope;
   const requested = state.requestedAt;
+  // The next check after this write, plus the fetch and reload
+  const applyAt = nextRound(requested) + 600 + Math.random() * 500;
   window.setTimeout(() => {
     if (state.config !== cfg || state.scope !== sc) return; // a newer change applies both
     const now = Date.now();
@@ -228,8 +289,142 @@ function write(kind: string, summary: string, detail: Record<string, unknown>, s
         c.op = null;
       }
     }
-  }, 1500 + Math.random() * 1000);
+  }, applyAt - Date.now());
   return { change, apply: { config_version: state.config, scope_version: state.scope, requested_at: iso(state.requestedAt) } };
+}
+
+function sidecarView() {
+  const now = Date.now();
+  const updated = lastRound(now) + 350;
+  const shown = updated > now ? updated - POLL_S * 1000 : updated;
+  const next = shown + POLL_S * 1000 - 350;
+  return {
+    task: sidecarTask,
+    started_at: iso(sidecarStarted),
+    updated_at: iso(shown),
+    heartbeat_age_s: Math.round((now - shown) / 100) / 10,
+    stale: false,
+    stale_after_s: 90,
+    poll_s: POLL_S,
+    next_poll_at: iso(next),
+    next_poll_in_s: Math.max(0, Math.round((next - now) / 100) / 10),
+  };
+}
+
+function scopeDoc() {
+  const p = current();
+  const sp = !('error' in p) && p.session_policy;
+  return {
+    version: state.scope,
+    updated_at: iso(state.scopeAt),
+    updated_by: state.scopeBy,
+    role: state.role,
+    session_policy: state.sessionPolicy,
+    actions: state.sessionPolicy ? state.actions : [],
+    services: sp ? (p as { services: string[] }).services : [],
+    statements: sp ? [{ Sid: 'Scope', Effect: 'Allow', Action: state.actions, Resource: '*' }] : [],
+  };
+}
+
+/** iron-proxy.yaml as the backend writes it: the header line, part 2's template, this mock's lists. */
+function configYaml(): string {
+  const p = current();
+  const services = 'error' in p ? ['none'] : p.allowed_services;
+  const q = (s: string) => JSON.stringify(s);
+  const secret = (c: MCred) =>
+    [
+      '        - source:',
+      '            type: aws_sm',
+      `            secret_id: ${q(`arn:aws:secretsmanager:${REGION}:${ACCOUNT}:secret:my2cents-ip/${c.kind === 'custom' ? `user/${c.name}` : c.name}-AbCdEf`)}`,
+      '            ttl: "30s"',
+      ...(c.kind === 'custom' ? ['            failure_ttl: "5s"'] : []),
+      '          replace:',
+      `            proxy_value: ${q(c.placeholder)}`,
+      `            match_headers: [${c.headers.map(q).join(', ')}]`,
+      ...(c.query ? ['            match_query: true'] : []),
+      ...(c.body ? ['            match_body: true'] : []),
+      '          rules:',
+      ...c.hosts.map((h) => `            - host: ${q(h)}`),
+    ].join('\n');
+  return [
+    `# my2cents control plane: config v${state.config}, ${iso(state.requestedAt)}, ${state.changes[0]?.actor ?? MOCK_EMAIL}`,
+    'dns:',
+    '  # iron-proxy\'s own DNS server stays off: DNS Firewall in the sandbox VPC answers every name with a CNAME to the NLB.',
+    '  enabled: false',
+    '',
+    'proxy:',
+    '  http_listen: ":80"',
+    '  https_listen: ":443"',
+    '  tunnel_listen: ":8080"',
+    '  upstream_response_header_timeout: "5m"',
+    '  upstream_deny_cidrs:',
+    ...['169.254.169.254/32', '169.254.170.2/32', 'fd00:ec2::254/128', '127.0.0.0/8', '::1/128', '10.50.0.0/16', '10.51.0.0/16', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'].map((c) => `    - ${q(c)}`),
+    '',
+    'tls:',
+    '  mode: "mitm"',
+    '  ca_cert: "/etc/iron-proxy/ca.crt"',
+    '  ca_key: "/etc/iron-proxy/ca.key"',
+    '',
+    'metrics:',
+    '  listen: ":9090"',
+    '',
+    '# control_plane=true: the control sidecar calls POST /v1/reload here after it syncs a new config or new',
+    '# credentials. Loopback only, so it is never reachable through the NLB.',
+    'management:',
+    '  listen: "127.0.0.1:9092"',
+    '  api_key_env: "IRON_MANAGEMENT_API_KEY"',
+    '',
+    'transforms:',
+    '  - name: allowlist',
+    '    config:',
+    '      domains:',
+    ...currentAllowlist().map((h) => `        - ${q(h)}`),
+    '',
+    '  - name: secrets',
+    '    config:',
+    '      secrets:',
+    ...state.creds.map(secret),
+    '',
+    '  - name: aws_auth',
+    '    config:',
+    '      credentials_provider:',
+    '        type: workload_identity',
+    `        region: ${q(REGION)}`,
+    `      allowed_services: [${services.map(q).join(', ')}]`,
+    `      allowed_regions: [${q(REGION)}, "us-east-1"]`,
+    '      rules:',
+    '        - host: "*.amazonaws.com"',
+    '',
+    'log:',
+    '  level: "info"',
+    '',
+  ].join('\n');
+}
+
+/** The mock's factory-reset plan, same shape as the backend's. */
+function resetPlan() {
+  const seeded = ALLOWLIST.filter((h) => !h.endsWith('.amazonaws.com'));
+  const custom = state.creds.filter((c) => c.kind === 'custom');
+  const revoked = state.creds.filter((c) => db.revoked.has(c.name) || c.op?.op === 'revoke').map((c) => c.name);
+  const from = { role: state.role, session_policy: state.sessionPolicy, actions: state.actions };
+  const to = { role: DEFAULT_ROLE, session_policy: false, actions: [] as string[] };
+  const awsChanges = from.role !== to.role || from.session_policy || from.actions.length > 0;
+  const remove = state.allow.filter((h) => !seeded.includes(h));
+  const add = seeded.filter((h) => !state.allow.includes(h));
+  return {
+    config_version: state.config,
+    next_config_version: state.config + 1,
+    allowlist: { remove, add, after: seeded },
+    credentials: {
+      reactivate: revoked,
+      remove: custom.map((c) => ({ name: c.name, env: c.env, hosts: c.hosts, secret_name: `my2cents-ip/user/${c.name}`, in_config: true })),
+      builtin_changed: [],
+      builtin: state.creds.filter((c) => c.kind === 'builtin').map((c) => c.name),
+    },
+    aws: { from, to, changes: awsChanges },
+    changes: remove.length + add.length + custom.length + revoked.length + (awsChanges ? 1 : 0),
+    note: `Applies to every sandbox on this proxy, running ones included, at the proxy's next check (within about ${POLL_S} s).`,
+  };
 }
 
 function credStatus(c: MCred) {
@@ -336,8 +531,74 @@ export const policyHandlers = [
         error: null,
       },
       reload: { at: iso(a.at), ok: a.reloadOk, http_status: a.reloadOk ? 200 : 422, error: a.reloadError },
-      sidecar: { task: sidecarTask, updated_at: iso(Date.now() - 1200), heartbeat_age_s: 1.2, stale: false },
+      sidecar: sidecarView(),
+      sync: { state: p ? 'pending' : 'in_sync', behind: [a.config < state.config ? 'config' : null, a.scope < state.scope ? 'scope' : null].filter(Boolean) },
       error: null,
+    });
+  }),
+
+  http.get('/api/policy/reset', async () => {
+    await latency();
+    if (!IS_ADMIN) return forbidden();
+    return HttpResponse.json(resetPlan());
+  }),
+
+  http.post('/api/policy/reset', async ({ request }) => {
+    await latency();
+    if (!IS_ADMIN) return forbidden();
+    const b = (await request.json()) as { confirm?: string };
+    if ((b.confirm ?? '').trim().toLowerCase() !== 'reset') return problem(422, 'type "reset" to confirm');
+    const plan = resetPlan();
+    state.allow = ALLOWLIST.filter((h) => !h.endsWith('.amazonaws.com'));
+    state.creds = state.creds.filter((c) => c.kind === 'builtin');
+    for (const c of state.creds) c.op = null;
+    db.revoked.clear();
+    state.role = DEFAULT_ROLE as RoleId;
+    state.sessionPolicy = false;
+    state.actions = [];
+    state.scopeAt = Date.now();
+    state.scopeBy = MOCK_EMAIL;
+    const w = write('policy.reset', 'Reset the proxy policy to its defaults', { reactivated: plan.credentials.reactivate }, true);
+    return HttpResponse.json({ plan, ...w });
+  }),
+
+  http.get('/api/policy/config', async () => {
+    await latency();
+    if (!IS_ADMIN) return forbidden();
+    const p = pending();
+    const a = state.applied;
+    const yaml = configYaml();
+    const scope = JSON.stringify(scopeDoc(), null, 2);
+    const scopeVersion = state.scope;
+    const cfgAt = iso(state.requestedAt);
+    return HttpResponse.json({
+      enabled: true,
+      server_time: iso(Date.now()),
+      bucket: 'my2cents-ip-control-example',
+      desired: {
+        config: { key: 'iron-proxy.yaml', version: state.config, last_modified: cfgAt, etag: etagOf(yaml), version_id: `${hex(8)}.${hex(20)}`, size: yaml.length, updated_at: cfgAt, updated_by: state.changes[0]?.actor ?? MOCK_EMAIL },
+        scope: { key: 'aws-scope.json', version: scopeVersion, last_modified: iso(state.scopeAt), etag: etagOf(scope), version_id: `${hex(8)}.${hex(20)}`, size: scope.length, updated_at: iso(state.scopeAt), updated_by: state.scopeBy, role: state.role, session_policy: state.sessionPolicy, seed: false },
+      },
+      applied: {
+        status_key: 'status.json',
+        status_last_modified: iso(lastRound()),
+        config: { version: a.config, synced_version: a.config, synced_at: iso(a.at - 400), etag: p ? etagOf(`v${a.config}`) : etagOf(yaml), applied_at: iso(a.at), rejected_version: null, refused_reason: null },
+        scope: { version: a.scope, synced_version: a.scope, role: a.role, session_policy: a.sessionPolicy, session_name: `proxy-${a.role}-v${a.scope}`, applied_at: iso(a.at), assumed_at: iso(a.assumedAt), expiration: iso(a.expiration), error: null },
+        reload: { at: iso(a.at), ok: a.reloadOk, http_status: a.reloadOk ? 200 : 422, error: a.reloadError, pending: false },
+        sidecar: sidecarView(),
+        latency_s: p ? null : Math.round(a.latency * 10) / 10,
+      },
+      sync: {
+        state: p ? 'pending' : 'in_sync',
+        behind: [a.config < state.config ? 'config' : null, a.scope < scopeVersion ? 'scope' : null].filter(Boolean),
+        detail: p
+          ? `The bucket has config v${state.config}; the sidecar applies it at its next check (every ${POLL_S} s).`
+          : `iron-proxy runs config v${state.config} and AWS scope v${scopeVersion}, the versions in the bucket.`,
+        etag_match: !p,
+      },
+      error: null,
+      content: { config: yaml, scope },
+      redactions: { config: [], scope: [] },
     });
   }),
 
@@ -496,7 +757,7 @@ export const policyHandlers = [
         signing_names: s.signing,
         hosts: s.hosts,
         actions: actionsFor(s, role),
-        wildcards: wildcards(s, role),
+        wildcards: wildcards(s, role).map(({ covered, ...w }) => w),
       },
       { headers: { 'Cache-Control': 'private, max-age=3600' } },
     );

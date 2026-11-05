@@ -56,6 +56,9 @@ locals {
   account = data.aws_caller_identity.me.account_id
 
   image_arn = "arn:aws:lambda:${var.region}:${local.account}:microvm-image:${var.sandbox_image_name}"
+  # One image per sandbox size (backend/app/sizes.py, scripts/build_sandbox_image.py): medium is the original image
+  image_arns = { for size, suffix in { small = "-1g", medium = "", large = "-4g", xlarge = "-8g" } :
+  size => "${local.image_arn}${suffix}" }
 
   # Part 2's proxy control plane (control_plane=true there); null when it's off
   control_bucket = try(local.p2.control_bucket, null)
@@ -64,6 +67,8 @@ locals {
   sandbox_roles  = try(local.p2.sandbox_roles, null)
   scope_baseline = try(local.p2.scope_baseline, null)
   user_prefix    = coalesce(try(local.p2.user_secret_prefix, null), "my2cents-ip/user/")
+  # How often part 2's control sidecar checks the bucket (older part 2 states have no output: its old 2 s)
+  control_poll_s = coalesce(try(local.p2.control_poll_s, null), 2)
 
   # Log group ARNs without the trailing ":*" (StartLiveTail wants this form)
   proxy_log_group_arn = "arn:aws:logs:${var.region}:${local.account}:log-group:${local.p2.proxy_log_group}"

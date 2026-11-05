@@ -162,6 +162,24 @@ def drain(q):
     return out
 
 
+def saw_idle(evs) -> bool:
+    return any(e["type"] == "status" and e["source"] == "idle" for e in evs)
+
+
+async def drain_until(q, done, timeout=1.0):
+    """Drain q until done(events) holds (or the timeout passes). LogTail's status changes reach the queues through
+    loop.call_soon_threadsafe(publish): when the Hub's grace timer stops the tail, the "idle" publish is queued for the
+    loop's next turn, and a test that sees `not running()` can resume ahead of it in that same turn. Draining at once
+    could then miss "idle" (or find it in a later drain), so wait for it instead."""
+    out = []
+    deadline = time.monotonic() + timeout
+    while True:
+        out += drain(q)
+        if done(out) or time.monotonic() >= deadline:
+            return out
+        await asyncio.sleep(0.01)
+
+
 async def test_connections_alone_start_nothing_and_lifecycle_still_flows():
     fake = FakeLogs()
     hub = make_hub(fake)
@@ -199,7 +217,7 @@ async def test_interest_is_counted_per_connection():
     assert len(fake.live_calls) == 1 and fake.streams[0].closed.is_set()
     # Every connection, interested or not, saw the status changes and the proxy events.
     for q in (q1, q2, q3):
-        evs = drain(q)
+        evs = await drain_until(q, saw_idle)
         assert [e["source"] for e in evs if e["type"] == "status"] == ["starting", "live_tail", "idle"]
         assert any(e["type"] == "proxy" and e["host"] == "live.example" for e in evs)
     assert hub.status()["source"] == "idle"
@@ -241,7 +259,7 @@ async def test_restart_backfills_the_gap_before_live_tail_answers():
     hub.want_feeds(q, False)
     assert await wait_until(lambda: not hub.tail.running(), 1.0)
     hub.tail._thread.join(5)
-    drain(q)
+    assert saw_idle(await drain_until(q, saw_idle))         # everything up to the stop, "idle" included
     fake.gap_line = proxy("while-stopped.example")            # logged while nobody watched
     fake.live_gate.clear()                                    # and StartLiveTail is slow this time
     hub.want_feeds(q, True)

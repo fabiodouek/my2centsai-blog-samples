@@ -10,6 +10,7 @@ import type { AwsAction, AwsCatalog, AwsServiceDetail, AwsWildcard } from './typ
 
 export interface KnownAction {
   allowed: boolean;
+  pickable: boolean;
   limited: boolean;
   reason: string | null;
 }
@@ -50,8 +51,8 @@ export function remember(items: (AwsAction | AwsWildcard)[], role: string | null
     const k = `${roleKey(role)}|${a.action}`;
     const limited = 'limited' in a ? a.limited : false;
     const prev = known.get(k);
-    if (!prev || prev.allowed !== a.allowed || prev.reason !== a.reason || prev.limited !== limited) {
-      known.set(k, { allowed: a.allowed, limited, reason: a.reason });
+    if (!prev || prev.allowed !== a.allowed || prev.pickable !== a.pickable || prev.reason !== a.reason || prev.limited !== limited) {
+      known.set(k, { allowed: a.allowed, pickable: a.pickable, limited, reason: a.reason });
       changed = true;
     }
   }

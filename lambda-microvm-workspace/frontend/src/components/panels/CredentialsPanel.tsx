@@ -3,7 +3,7 @@ import { RefreshCw, RotateCcw, ShieldOff } from 'lucide-react';
 import { api, normApply, warningOf } from '../../lib/api';
 import { fmtAgo } from '../../lib/format';
 import { useNow, usePolling } from '../../lib/hooks';
-import { ensureOverview, noteWrite, usePolicy } from '../../lib/policy';
+import { ensureOverview, noteWrite, usePolicy, usePollS } from '../../lib/policy';
 import { openPolicy, toast, useStore } from '../../lib/store';
 import type { Credential } from '../../lib/types';
 import { Button, ConfirmDialog, Empty, KeyFob, Note, SkeletonRows } from '../ui/primitives';
@@ -19,9 +19,11 @@ export function CredentialsPanel() {
   const [busy, setBusy] = useState(false);
   const me = useStore((s) => s.me);
   const isAdmin = Boolean(me?.isAdmin);
-  // With part 2's control plane on, revoke/restore reload iron-proxy (seconds) instead of restarting it.
+  // With part 2's control plane on, revoke/restore reload iron-proxy at the control sidecar's next check (every 30 s)
+  // instead of restarting it.
   useEffect(() => ensureOverview(), []);
   const reload = usePolicy((s) => Boolean(s.overview?.enabled));
+  const pollS = usePollS();
 
   async function run() {
     if (!confirm) return;
@@ -34,7 +36,7 @@ export function CredentialsPanel() {
       toast(
         'success',
         byReload
-          ? `${action === 'revoke' ? 'Revoking' : 'Restoring'} ${cred.name}: a few seconds`
+          ? `${action === 'revoke' ? 'Revoking' : 'Restoring'} ${cred.name}: up to about ${pollS} s`
           : action === 'revoke'
             ? `Revoking ${cred.name}: about 3 minutes`
             : `Restoring ${cred.name}: about a minute`,
@@ -115,7 +117,8 @@ export function CredentialsPanel() {
           <>
             <p>
               iron-proxy will be denied access to the <strong>{confirm.cred.name}</strong> secret and reloads its config,
-              which drops its cached copy. It takes <strong>a few seconds</strong>, with no restart.
+              which drops its cached copy, at its next check for changes. It takes <strong>up to about {pollS} s</strong>,
+              with no restart; until then the key is still swapped in.
             </p>
             <p>
               It affects every sandbox on this proxy, including ones you don’t own. Afterwards their placeholder goes
@@ -144,7 +147,7 @@ export function CredentialsPanel() {
             </p>
             <p className="dialog-faint">
               {reload
-                ? 'iron-proxy reloads and fetches the key again within a few seconds.'
+                ? `iron-proxy reloads and fetches the key again at its next check, within about ${pollS} s.`
                 : 'No restart: the proxy fetches the key again within about a minute.'}
             </p>
           </>

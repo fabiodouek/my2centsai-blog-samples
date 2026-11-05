@@ -30,23 +30,25 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
   return (
     <aside className="sidebar" aria-label="Sandboxes">
       <header className="sidebar-head">
-        <div className="brand">
+        <div className="brand" title="My2cents.ai Lambda MicroVM Playground">
           <LogoMark className="brand-logo" size={20} />
           <span className="brand-text">
             <Wordmark className="brand-name" />
-            <span className="brand-sub">MicroVM workspace</span>
+            <span className="brand-sub">Lambda MicroVM Playground</span>
           </span>
         </div>
+        {/* Icon-only so the whole name fits beside it at 252 px */}
         <Button
           variant={creating ? 'ghost' : 'secondary'}
           size="sm"
+          iconOnly
           icon={creating ? <X size={14} aria-hidden /> : <Plus size={14} aria-hidden />}
           onClick={() => setCreating(!creating)}
           aria-expanded={creating}
           aria-controls="new-sandbox"
-        >
-          {creating ? 'Cancel' : 'New'}
-        </Button>
+          aria-label={creating ? 'Cancel new sandbox' : 'New sandbox'}
+          title={creating ? 'Cancel' : 'New sandbox'}
+        />
         <button type="button" className="sidebar-close" aria-label="Close sandbox list" onClick={onClose}>
           <X size={16} aria-hidden />
         </button>

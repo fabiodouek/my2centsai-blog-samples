@@ -3,6 +3,7 @@ import { Terminal, type ITheme } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Copy, Menu, Moon, PanelRightClose, PanelRightOpen, Play, Plug, Power, SquareTerminal, Unplug } from 'lucide-react';
+import { api } from '../lib/api';
 import { TerminalConnection, type TermStatus } from '../lib/terminalConnection';
 import { getState, observeState, runAction, setTerminalLink, toast, useStore } from '../lib/store';
 import { fmtDuration } from '../lib/format';
@@ -41,17 +42,21 @@ const THEME: ITheme = {
 
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
 
-/** After a click, the button stays off until a pane sample taken this much later says the shell is back. */
-const START_SETTLE_MS = 3000;
+/** A pane sample older than this doesn't block the button: the click checks the pane again anyway. */
+const PANE_FRESH_MS = 12_000;
+/** After typing `claude`, how long to look for it in the pane before giving up (and re-enabling the button). */
+const CLAUDE_WATCH_MS = 15_000;
+const CLAUDE_POLL_MS = 1_500;
+const sleep = (ms: number) => new Promise((r) => window.setTimeout(r, ms));
 
-/** Why Start Claude Code can't type into the terminal right now, or null when it can. */
-function startClaudeBlocker(attached: boolean, pane: Pane | null, paneAt: number | null, startedAt: number | null): string | null {
+/**
+ * Why Start Claude Code is off right now, or null when it can be pressed. Only a recent pane sample that shows Claude
+ * Code running blocks it; anything else is checked on click, so a stale sample can never leave it stuck.
+ */
+function startClaudeBlocker(attached: boolean, pane: Pane | null, paneAt: number | null, starting: boolean, now: number): string | null {
   if (!attached) return 'Attach a terminal first';
-  const fresh = pane && paneAt && (!startedAt || paneAt > startedAt + START_SETTLE_MS) ? pane : null;
-  if (startedAt && !fresh) return 'Claude Code is already running';
-  if (!fresh) return null; // no pane info (older backend): allow, as before
-  if (fresh.claudeRunning) return 'Claude Code is already running';
-  if (!fresh.atShell && fresh.command) return `${fresh.command} is running in the terminal; Start Claude Code types into a shell prompt`;
+  if (starting) return 'Starting Claude Code…';
+  if (pane && paneAt && now - paneAt < PANE_FRESH_MS && pane.claudeRunning) return 'Claude Code is already running';
   return null;
 }
 
@@ -86,10 +91,10 @@ export function Workbench({
   const [confirmTerminate, setConfirmTerminate] = useState(false);
   /** When the user pressed Resume; drives the compact "Resuming… 0.8 s" overlay until attached. */
   const [resumeAt, setResumeAt] = useState<number | null>(null);
-  /** When this browser last pressed Start Claude Code; holds the button off until a later pane sample. */
-  const [claudeStartedAt, setClaudeStartedAt] = useState<number | null>(null);
+  /** Start Claude Code is checking the pane, typing, or watching for Claude to show up (always ends). */
+  const [starting, setStarting] = useState(false);
+  const startingRef = useRef(false);
   const pending = useStore((s) => s.pending[id]);
-  const vmGb = useStore((s) => s.quota?.vmMemoryGb ?? s.config?.vmMemoryGb ?? 2);
   const now = useNow();
 
   // ---- xterm + connection, one pair per sandbox (the component is keyed by id)
@@ -243,17 +248,60 @@ export function Workbench({
 
   const detach = useCallback(() => connRef.current?.detach(), []);
 
-  const startClaude = useCallback(() => {
-    if (connRef.current?.send('claude\n')) {
-      setClaudeStartedAt(Date.now());
+  /**
+   * Checks what runs in the tmux pane first (a fresh sample from the in-VM agent), refuses if it isn't a shell
+   * prompt, clears whatever is typed at the prompt (C-e, C-u), types `claude` and Enter, then watches the pane for up
+   * to 15 s. Whatever happens, the button comes back.
+   */
+  const startClaude = useCallback(async () => {
+    if (startingRef.current) return;
+    startingRef.current = true;
+    setStarting(true);
+    try {
+      let p: Pane | null = null;
+      try {
+        p = (await api.vitals(id, true)).pane;
+      } catch {
+        p = null; // the agent didn't answer: type anyway, and the watch below says if it didn't work
+      }
+      if (p?.claudeRunning) {
+        toast('info', 'Claude Code is already running', 'It’s in the terminal’s tmux pane.');
+        return;
+      }
+      if (p && !p.atShell && p.command) {
+        toast('error', `Something is running in the terminal (${p.command})`, 'Exit it first, then press Start Claude Code again.');
+        return;
+      }
+      // C-e C-u: to the end of the line, then delete back to the prompt, so text already typed there doesn't run
+      // together with `claude`
+      if (!connRef.current?.send('\x05\x15claude\r')) {
+        toast('error', 'The terminal isn’t connected', 'Attach it, then try again.');
+        return;
+      }
       termRef.current?.focus();
+      const until = Date.now() + CLAUDE_WATCH_MS;
+      let last: Pane | null = p;
+      while (Date.now() < until) {
+        await sleep(CLAUDE_POLL_MS);
+        try {
+          last = (await api.vitals(id, true)).pane;
+        } catch {
+          /* keep watching */
+        }
+        if (last?.claudeRunning) return;
+      }
+      toast(
+        'error',
+        'Claude Code didn’t start',
+        last?.command
+          ? `After ${CLAUDE_WATCH_MS / 1000} s the terminal still shows ${last.command}. Check it for an error, then try again.`
+          : `No sign of it after ${CLAUDE_WATCH_MS / 1000} s. Check the terminal, then try again.`,
+      );
+    } finally {
+      startingRef.current = false;
+      setStarting(false);
     }
-  }, []);
-
-  // Once a pane sample from after the click is in, it decides (Claude may have exited since).
-  useEffect(() => {
-    if (claudeStartedAt && paneAt && paneAt > claudeStartedAt + START_SETTLE_MS) setClaudeStartedAt(null);
-  }, [claudeStartedAt, paneAt]);
+  }, [id]);
 
   const copySelection = useCallback(async () => {
     const t = termRef.current;
@@ -280,7 +328,7 @@ export function Workbench({
   const expiresAt = sandbox.expiresAt ?? (sandbox.startedAt ? sandbox.startedAt + sandbox.maxDurationS * 1000 : null);
   const left = expiresAt ? Math.max(0, expiresAt - now) : null;
   const copyKeys = IS_MAC ? '⌘C / ⌘V' : 'Ctrl+Shift+C / Ctrl+Shift+V';
-  const claudeBlocked = startClaudeBlocker(attached, pane, paneAt, claudeStartedAt);
+  const claudeBlocked = startClaudeBlocker(attached, pane, paneAt, starting, now);
 
   return (
     <section className="workbench" aria-label={`Sandbox ${sandbox.name}`}>
@@ -289,7 +337,7 @@ export function Workbench({
           <Button variant="ghost" size="sm" iconOnly icon={<Menu size={16} aria-hidden />} aria-label="Show sandboxes" onClick={onOpenNav} />
         ) : null}
         <div className="toolbar-id">
-          <h1 className="toolbar-name" title={sandbox.id}>
+          <h1 className="toolbar-name" title={`${sandbox.id} · ${sandbox.sizeLabel}, ${sandbox.memoryGb} GB, ${sandbox.vcpu} vCPU`}>
             {sandbox.name}
           </h1>
           <StatePill state={pending === 'resume' ? 'RESUMING' : pending === 'suspend' ? 'SUSPENDING' : shownState(sandbox)} />
@@ -305,11 +353,17 @@ export function Workbench({
             variant="primary"
             size="sm"
             icon={<SquareTerminal size={14} aria-hidden />}
-            onClick={claudeBlocked ? undefined : startClaude}
+            onClick={claudeBlocked ? undefined : () => void startClaude()}
+            loading={starting}
             disabled={!attached}
             // Blocked while attached: aria-disabled keeps the tooltip (and focus) that a disabled button may lose.
             aria-disabled={attached && claudeBlocked ? true : undefined}
-            title={claudeBlocked ?? 'Types `claude` and Enter into the shell'}
+            title={
+              claudeBlocked ??
+              (pane && !pane.atShell && pane.command
+                ? `${pane.command} is running in the terminal: exit it first`
+                : 'Clears the shell prompt, then types `claude` and Enter')
+            }
             className="btn-collapsible"
             aria-label="Start Claude Code"
           >
@@ -426,7 +480,7 @@ export function Workbench({
       >
         <p>
           The MicroVM stops for good. Anything in <code>/root/work</code> that isn’t pushed somewhere is lost. This
-          frees {vmGb} GB of the account quota.
+          frees {sandbox.memoryGb} GB of the account quota.
         </p>
       </ConfirmDialog>
     </section>

@@ -162,7 +162,7 @@ export function DnsPanel() {
           {scoped ? (
             <>
               Route 53 Resolver query log. <strong>Sandboxes</strong>: lookups from the sandbox subnets (
-              {cidrs.join(', ')}), not tied to one sandbox. <strong>Everything</strong> adds the workspace backend’s
+              {cidrs.join(', ')}), not tied to one sandbox. <strong>Everything</strong> adds the playground backend’s
               and iron-proxy’s own. A warning icon marks names off the proxy allowlist.
             </>
           ) : (
@@ -285,7 +285,7 @@ export function DnsPanel() {
                               {scoped && e.srcaddr
                                 ? fromSandbox(e.srcaddr)
                                   ? ' · a sandbox subnet'
-                                  : ' · not a sandbox subnet (workspace backend or iron-proxy)'
+                                  : ' · not a sandbox subnet (playground backend or iron-proxy)'
                                 : ''}
                             </dd>
                             <dt>Result</dt>

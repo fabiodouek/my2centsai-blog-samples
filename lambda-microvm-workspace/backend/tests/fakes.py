@@ -54,25 +54,39 @@ class FakeVerifier:
 
 
 class FakeMicroVMs:
-    def __init__(self):
+    def __init__(self, connector: str = "arn:conn"):
         self.vms: dict[str, dict] = {}
         self.calls: list[tuple] = []
+        self.runs: list[dict] = []          # every run's keyword arguments
         self.n = 0
-        self.quota_full = False
+        self.quota_full = False             # RunMicrovm and ResumeMicrovm answer ServiceQuotaExceededException
+        self.quota_message = "Fake AWS: the MicroVM memory quota for this account is exhausted."
+        self.missing_images: set[str] = set()
+        self.connector = connector
 
-    def run(self, *, idle_minutes, max_duration_s, payload, client_token=None):
+    def run(self, *, idle_minutes, max_duration_s, payload, client_token=None, image_arn=None,
+            suspended_duration_s=None, auto_resume=True):
         from app.microvm import QuotaExceeded
         self.calls.append(("run", idle_minutes, max_duration_s, payload))
+        self.runs.append({"idle_minutes": idle_minutes, "max_duration_s": max_duration_s, "payload": payload,
+                          "image_arn": image_arn, "suspended_duration_s": suspended_duration_s,
+                          "auto_resume": auto_resume})
         if self.quota_full:
-            raise QuotaExceeded("ServiceQuotaExceededException")
+            raise QuotaExceeded(self.quota_message)
         self.n += 1
         vm_id = f"microvm-{self.n:04d}"
         d = {"microvmId": vm_id, "state": "PENDING", "endpoint": f"{vm_id}.example", "imageVersion": "1.0",
+             "imageArn": image_arn, "egressNetworkConnectors": [self.connector],
              "startedAt": datetime.now(timezone.utc), "maximumDurationInSeconds": max_duration_s,
-             "idlePolicy": {"autoResumeEnabled": True, "maxIdleDurationSeconds": idle_minutes * 60,
-                            "suspendedDurationSeconds": max_duration_s}}
+             "idlePolicy": {"autoResumeEnabled": auto_resume, "maxIdleDurationSeconds": idle_minutes * 60,
+                            "suspendedDurationSeconds": max_duration_s if suspended_duration_s is None else suspended_duration_s}}
         self.vms[vm_id] = d
         return dict(d)
+
+    def image_ready(self, arn, max_age=300.0):
+        if arn in self.missing_images:
+            return False, "its image isn't built yet (scripts/build_sandbox_image.py)"
+        return True, None
 
     def get(self, vm_id, max_age=2.0):
         d = self.vms.get(vm_id)
@@ -89,6 +103,9 @@ class FakeMicroVMs:
         self._set(vm_id, "SUSPENDED")
 
     def resume(self, vm_id):
+        if self.quota_full:
+            from app.microvm import QuotaExceeded
+            raise QuotaExceeded(self.quota_message)
         self._set(vm_id, "RUNNING")
 
     def terminate(self, vm_id):
@@ -98,7 +115,7 @@ class FakeMicroVMs:
         return self.list_all(**kw)
 
     def list_all(self, **kw):
-        return [{"microvmId": k, "state": v["state"]} for k, v in self.vms.items()]
+        return [{"microvmId": k, "state": v["state"], "imageArn": v.get("imageArn")} for k, v in self.vms.items()]
 
     def endpoint_token(self, vm_id):
         return "endpoint-token"

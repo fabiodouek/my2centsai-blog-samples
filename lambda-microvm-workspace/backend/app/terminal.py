@@ -80,13 +80,16 @@ class TerminalBridge:
                  watch_interval: float = 3.0, suspended_poll: float = 2.0, init_timeout: float = 10.0,
                  first_resize_wait: float = 1.5, on_attach: Callable[[], None] | None = None,
                  on_detach: Callable[[], None] | None = None, on_input: Callable[[], None] | None = None,
-                 heartbeat_s: float = 25.0):
+                 heartbeat_s: float = 25.0, auto_resume: bool = True):
         self.browser, self.cp, self.connect = browser, cp, connect
         self.sleep, self.clock = sleep, clock
         self.watch_interval, self.suspended_poll = watch_interval, suspended_poll
         self.init_timeout, self.first_resize_wait = init_timeout, first_resize_wait
         self.on_attach, self.on_detach, self.on_input = on_attach, on_detach, on_input
         self.heartbeat_s = heartbeat_s
+        # The sandbox's idlePolicy.autoResumeEnabled. Off: opening the terminal never resumes it (and the endpoint
+        # answers 502 while it's suspended); the browser is told it's suspended until someone presses Resume.
+        self.auto_resume = auto_resume
         self.size: tuple[int, int] | None = None
         self._got_size = asyncio.Event()
         self.up: Upstream | None = None
@@ -257,7 +260,9 @@ class TerminalBridge:
             await self._nap(FAST_POLL if self.clock() - start < fast_for else poll)
 
     async def _session(self) -> None:
-        may_resume = True       # opening a terminal on a suspended sandbox resumes it; a suspend seen later doesn't
+        # Opening a terminal on a suspended sandbox resumes it (unless its auto-resume is off); a suspend seen later
+        # doesn't
+        may_resume = self.auto_resume
         fail_since: float | None = None
         attempt = 0
         await self.status("connecting", "checking sandbox state")
@@ -278,7 +283,11 @@ class TerminalBridge:
                     await self._wait_state(lambda s: s != "SUSPENDED", 0.25, timeout=30)
                     may_resume = False
                 else:
-                    await self.status("suspended", "sandbox is suspended; resume it to reconnect", vm_state=st)
+                    if self.auto_resume:
+                        await self.status("suspended", "sandbox is suspended; resume it to reconnect", vm_state=st)
+                    else:
+                        await self.status("suspended", "Suspended: press Resume. Auto-resume is off for this sandbox, "
+                                          "so the terminal won't wake it.", vm_state=st, auto_resume=False)
                     await self._wait_state(lambda s: s not in SUSPENDED, self.suspended_poll, fast_for=FAST_WINDOW_S)
                     await self.status("connecting", "sandbox resumed")
                     fail_since, attempt = None, 0

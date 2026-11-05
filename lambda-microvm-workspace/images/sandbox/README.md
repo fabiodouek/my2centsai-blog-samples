@@ -1,20 +1,23 @@
-# Sandbox image v2 (`my2cents-ws-sandbox`)
+# Sandbox image v2 (`my2cents-ws-sandbox`, one per size)
 
-The image every workspace sandbox runs. It starts from part 2's sandbox (Claude Code 2.1.317, gh, git, the
+The image every playground sandbox runs, built four times from the same code because a MicroVM's memory comes from its
+image (`resources[].minimumMemoryInMiB`; vCPU = memory / 2 GB): `my2cents-ws-sandbox-1g` (Small, 1 GB),
+`my2cents-ws-sandbox` (Medium, 2 GB, the default), `-4g` (Large, 4 GB) and `-8g` (X-Large, 8 GB). It starts from part 2's sandbox (Claude Code 2.1.317, gh, git, the
 AWS CLI, no credentials, the iron-proxy demo CA trusted by every client) and adds what an interactive,
 browser-driven session needs: tmux, a shell setup, Claude Code pre-configured to start with no prompts,
 VM vitals and Claude Code token usage from the in-VM agent, and a `/validate` warm-up.
 
 ```bash
 uv venv && uv pip install boto3==1.43.123 websockets==15.0.1 httpx python-dotenv
-.venv/bin/python scripts/build_sandbox_image.py   # create or update the image (~3.5 min)
+.venv/bin/python scripts/build_sandbox_image.py   # create or update the four images, one after another (~3 min each)
+.venv/bin/python scripts/build_sandbox_image.py --size medium   # just one size
 .venv/bin/python scripts/smoke_sandbox.py         # end-to-end test, 1 MicroVM, writes results/smoke_sandbox.log
 ```
 
 Both scripts read part 2's Terraform outputs fresh on every run (`PART2_INFRA` overrides the path): build role,
-artifacts bucket, `ca_cert_pem`, the placeholders and part 2's sandbox connector (the one every workspace sandbox
+artifacts bucket, `ca_cert_pem`, the placeholders and part 2's sandbox connector (the one every playground sandbox
 uses). The image is tagged `ca-sha256` with the CA it trusts; `--if-needed` (what `deploy.sh` runs)
-rebuilds only when that doesn't match part 2's current CA.
+rebuilds an image only when it's missing or that doesn't match part 2's current CA.
 
 ## What's in the image
 

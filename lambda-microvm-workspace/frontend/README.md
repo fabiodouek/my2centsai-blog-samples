@@ -1,4 +1,4 @@
-# Frontend: Lambda MicroVM Workspace UI
+# Frontend: My2cents.ai Lambda MicroVM Playground UI
 
 React + TypeScript + Vite single-page app, built to static files in `dist/` and served from S3 through
 CloudFront. It talks to the backend's REST API under `/api/*` and its WebSockets under `/ws/*` (same
@@ -7,19 +7,29 @@ origin by default).
 What's on the screen:
 
 - **Sidebar**: your sandboxes (state, an 8 h lifetime bar on one shared scale, time left, idle countdown when
-  running with no terminal attached), **New** (name, idle-suspend minutes, lifetime), and the account's MicroVM
-  memory quota as one cell per 2 GB sandbox.
+  running with no terminal attached), **New** (scrolls inside the sidebar or the drawer, with the quota line and
+  Create pinned at the bottom; name; size, each with memory, vCPU and $/h, every built size
+  selectable, with a warning when the quota estimate says it may not fit (AWS decides: Create stays enabled, and a
+  refusal shows AWS's message, the size and the estimate); idle suspend; lifetime in minutes; terminate when suspended; resume on
+  connect; extra environment variables with the payload bytes left and a not-for-secrets warning), and the
+  account's MicroVM memory quota as one cell per GB (a 4 GB sandbox takes four), informational only. The quota comes from Service
+  Quotas; its tooltip says so (or that the QUOTA_GB fallback is in use).
 - **Terminal** (xterm.js): one tmux session per sandbox. The overlay shows connecting, suspended (with
-  **Resume**), reconnecting (with a countdown), detached, shell exited, terminated and error states. Toolbar:
-  **Start Claude Code** (types `claude` and Enter; unavailable while the tmux pane runs Claude Code or anything
-  other than a shell, per the `pane` field of `vitals?live=1`), Suspend/Resume, Detach/Attach, Copy, Terminate (confirm),
+  **Resume**; "Suspended: press Resume" when the sandbox's auto-resume is off, since opening the terminal won't wake
+  it), reconnecting (with a countdown), detached, shell exited, terminated and error states. Toolbar:
+  **Start Claude Code** (on click it reads the tmux pane through `vitals?live=1`: refuses with a toast when Claude
+  Code or anything else but a shell runs there, e.g. "Something is running in the terminal (vim). Exit it first";
+  at a shell prompt it sends C-e C-u to clear what's typed there, then `claude` and Enter, and watches the pane every
+  1.5 s for up to 15 s; if Claude Code doesn't show up it says so, and the button always comes back), Suspend/Resume,
+  Detach/Attach, Copy, Terminate (confirm),
   and a toggle for the side panel. Dragging the splitter resizes the terminal and sends a resize to the shell.
 - **Side panel**: Proxy feed (filters, requests per minute by host), Credentials (revoke/restore with a confirm
-  that says it affects every sandbox), Claude Code token usage, Vitals and timers (CPU and memory charts, idle
-  policy, lifecycle timeline), and DNS queries (by default only lookups from the sandbox subnets; **Everything**
-  adds the workspace backend's and iron-proxy's own; click a row for the full name and source). Proxy rows
+  that says it affects every sandbox), Claude Code token usage, Vitals and timers (CPU and memory charts against
+  the size's baseline, idle policy, the sandbox's settings: size, lifetime, egress and env variable names; lifecycle
+  timeline), and DNS queries (by default only lookups from the sandbox subnets; **Everything**
+  adds the playground backend's and iron-proxy's own; click a row for the full name and source). Proxy rows
   where iron-proxy's `aws_auth` acted carry an **aws** badge with the service (oxide when it refused the call).
-- **Proxy policy** (sidebar entry above the quota meter; `#policy/allowlist|credentials|aws|changes`): the
+- **Proxy policy** (sidebar entry above the quota meter; `#policy/allowlist|credentials|aws|changes|config`): the
   global iron-proxy policy, for every sandbox on the proxy, when part 2 runs with `control_plane=true`.
   Allowlist editor (AWS endpoints are locked to AWS access), credentials (add with a write-only value, rotate,
   revoke/restore by reload, delete), AWS access, and the change log. AWS access starts with the role sandbox
@@ -29,13 +39,29 @@ What's on the screen:
   but Secrets Manager). On, it lists every service and action in AWS's Service Authorization Reference (fetched
   and cached by the backend), evaluated for the selected role: a search box over service and action names with
   an access-level filter (List, Read, Write, Permissions, Tagging) searches on the server; a service's actions
-  load when it is opened. Actions outside the role, blocked ones (Secrets Manager, `ssm:GetParameter*`) and
-  services with no endpoint mapping are listed but disabled, with the reason; actions the role allows only on
-  some resources are tagged "limited". The selection shows as chips, next to a live session-policy preview with
-  its size against the 2,048-character STS limit, and Apply. A status line follows each change until the
-  proxy's control sidecar reports it applied ("Applied in 1.9 s · view-only · session ws-view-only-v29 · no
-  session policy · token 18% · expires 02:40"). Only members of the Cognito `admins` group can change anything; everyone else
-  sees it read-only. The terminal stays connected (hidden) while the page is open.
+  load when it is opened. Each service starts with its wildcards (`<service>:*` "Every action", then `List*`,
+  `Describe*`, `Get*`), each showing "N of M effective" with a filled, half or empty verdigris/grey dot (the reason in
+  its tooltip) and a legend. Actions outside the role can be picked and say "no effect with <role>"; blocked ones
+  (Secrets Manager, `ssm:GetParameter*`) and services with no endpoint mapping are listed but disabled, with the
+  reason; actions the role allows only on some resources are tagged "limited". A selection is kept when the role
+  changes, and its counts follow the role. The selection shows as chips with the same dot and count (`s3:* ◐ 41/180`),
+  next to a live session-policy preview with its size against the 2,048-character STS limit, two tabs (**Session
+  policy**, the JSON, with the explicit `ssm:GetParameter*` Deny when a pick covers it; **Effective access**, "Role
+  <role> ∩ session policy = effective": per service Effective, Asked and Role allows, each row opening to the
+  effective action names, limited ones flagged, no-effect services flagged as refused by iron-proxy), and Apply. With
+  no session policy, the same table lists the role's own allowed actions by service. The proxy's control sidecar checks for changes every
+  30 s, so a status line follows each change with a countdown to its next check ("Config v30 goes live at the
+  proxy's next check · in 18 s") until it reports it applied ("Applied 17 s after the change · view-only · session
+  proxy-view-only-v29 · no session policy · token 18% · expires 02:40"); the status is polled just after that check,
+  not every second. Only members of the Cognito `admins` group can change anything; everyone else sees it read-only.
+  Admins also get **Config**: `iron-proxy.yaml` and `aws-scope.json` as they are in the control bucket (version, S3
+  last-modified, ETag; the file in a line-numbered viewer with a refresh) beside what the sidecar's `status.json`
+  reports (applied versions and times, the reload, a refusal and its reason, the heartbeat, the poll interval), with
+  a badge: **In sync**, **Pending** (with the seconds to the next check), **Refused** or **Stale** (no heartbeat for
+  90 s), and a **Factory reset**: a dialog lists exactly what goes back to part 2's defaults (hosts removed or added,
+  revoked credentials made active again, custom credentials taken out of the config with their secrets kept, AWS
+  access back to the default role without a session policy) and only resets after you type `reset`. The terminal
+  stays connected (hidden) while the page is open.
 
 Live CPU/memory (`vitals?live=1`) and Claude Code usage are only requested while a terminal for that sandbox
 is attached in this browser, because any request to the MicroVM endpoint keeps it awake. Everything else uses
@@ -68,10 +94,10 @@ drops and the client reconnects). Revoke the `anthropic` credential, then send a
 session to see the 401.
 
 The proxy policy endpoints are simulated too (`src/mock/policy.ts`): writes bump the config/scope version and a
-fake sidecar applies them 1.5 to 2.5 s later.
+fake sidecar applies them at its next check, every 30 s like part 2's (`?poll=5` checks every 5 s).
 
 Scenarios: add `?mock=empty` for a first-run account with no sandboxes, `?mock=full` to start with the 8 GB
-quota full, `?viewer=1` to see the workspace as a non-admin. Mock code is loaded only when `VITE_MOCK=1`; production builds don't contain it. All mock data is
+quota full (Create still goes through to the mock's "AWS", which refuses it), `?viewer=1` to see the playground as a non-admin. Mock code is loaded only when `VITE_MOCK=1`; production builds don't contain it. All mock data is
 synthetic and the sidebar shows a "Mock data" badge.
 
 ### Against a backend

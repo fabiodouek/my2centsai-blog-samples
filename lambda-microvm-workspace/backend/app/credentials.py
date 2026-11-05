@@ -12,8 +12,9 @@ again, or 90 s pass.
 
 With the proxy control plane on (part 2's control_plane=true), iron-proxy fetches secrets as the sandbox role in
 use, so the deny names all four roles too, and revoke/restore write a new config version instead of restarting the proxy:
-the control sidecar's POST /v1/reload rebuilds iron-proxy's secrets cache in place. Status stays "revoking"
-until the sidecar reports that version applied."""
+the control sidecar's POST /v1/reload rebuilds iron-proxy's secrets cache in place. The sidecar checks the bucket
+every 30 s (part 2's control_poll_s), so that takes up to about 30 s. Status stays "revoking" until the sidecar
+reports that version applied."""
 
 from __future__ import annotations
 
@@ -39,7 +40,7 @@ PAGE_BUDGET_S = 8.0   # stop paginating after this; the counts are then a lower 
 
 REVOKE_EFFECTIVE_S = 180
 RESTORE_EFFECTIVE_S = 60
-RELOAD_EFFECTIVE_S = 10
+RELOAD_MARGIN_S = 5   # a reload is in effect within the sidecar's poll interval plus this
 RESTORE_GIVE_UP_S = 90
 SERVICE_CACHE_S = 3
 
@@ -48,11 +49,12 @@ REVOKE_WARNING = ("Revoking for every sandbox on this proxy: iron-proxy is resta
                   "placeholder goes out unswapped and the upstream rejects it.")
 RESTORE_WARNING = ("Restored for every sandbox on this proxy. No restart: iron-proxy fetches the key again within "
                    "about a minute.")
-RELOAD_REVOKE_WARNING = ("Revoking for every sandbox on this proxy: iron-proxy reloads its policy (a few seconds, "
-                         "no restart) and drops its cached copy of the key. After that, sandboxes' placeholder goes "
-                         "out unswapped and the upstream rejects it.")
-RELOAD_RESTORE_WARNING = ("Restored for every sandbox on this proxy: iron-proxy reloads its policy and fetches the "
-                          "key again on the next request.")
+RELOAD_REVOKE_WARNING = ("Revoking for every sandbox on this proxy: at its next check (within about {poll} s) the "
+                         "proxy reloads its policy, with no restart, and drops its cached copy of the key. Until then "
+                         "the key is still swapped in; after that, sandboxes' placeholder goes out unswapped and the "
+                         "upstream rejects it.")
+RELOAD_RESTORE_WARNING = ("Restored for every sandbox on this proxy: at its next check (within about {poll} s) the "
+                          "proxy reloads its policy and fetches the key again on the next request.")
 WARNING = REVOKE_WARNING  # kept for imports
 
 
@@ -122,6 +124,27 @@ class Credentials:
             else:
                 self.sm.delete_resource_policy(SecretId=arn)
 
+    def revoked_names(self) -> list[str]:
+        """Credentials (built-in and custom) whose secret carries the revoke deny statement now."""
+        out = []
+        for name, c in self.catalog().items():
+            try:
+                if self.is_revoked(c["arn"]):
+                    out.append(name)
+            except ClientError as e:
+                log.warning("resource policy %s: %s", name, e.response.get("Error", {}).get("Code"))
+        return sorted(out)
+
+    def clear_denies(self) -> list[str]:
+        """Factory reset: take the deny statement off every credential's secret. Returns the names it was on."""
+        names = self.revoked_names()
+        for name in names:
+            self._drop_deny(self.arn(name))
+        with self._lock:
+            self._ops.clear()
+        self.invalidate()
+        return names
+
     def arn(self, name: str) -> str:
         c = self.catalog().get(name)
         if not c:
@@ -152,11 +175,13 @@ class Credentials:
                                    "config_version": r["apply"]["config_version"]}
             self.invalidate()
             log.info("revoke %s: deny policy in place, config v%s", name, r["apply"]["config_version"])
+            poll = self.policy.poll_s()
             return {"name": name, "state": "revoking", "revoked": "pending", "method": "reload",
-                    "effective_after_s": RELOAD_EFFECTIVE_S, "since": ms_iso(now * 1000), "apply": r["apply"],
+                    "effective_after_s": round(poll + RELOAD_MARGIN_S), "since": ms_iso(now * 1000), "apply": r["apply"],
                     "change": r["change"],
-                    "detail": "Deny policy in place; iron-proxy reloads its policy and drops its cached copy of the key.",
-                    "warning": RELOAD_REVOKE_WARNING}
+                    "detail": ("Deny policy in place; at its next check (within about "
+                               f"{poll:g} s) iron-proxy reloads its policy and drops its cached copy of the key."),
+                    "warning": RELOAD_REVOKE_WARNING.format(poll=f"{poll:g}")}
         try:
             r = self.ecs.update_service(cluster=self.s.proxy_ecs_cluster, service=self.s.proxy_ecs_service,
                                         forceNewDeployment=True)
@@ -188,11 +213,13 @@ class Credentials:
                                    "config_version": r["apply"]["config_version"]}
             self.invalidate()
             log.info("restore %s: deny policy removed, config v%s", name, r["apply"]["config_version"])
+            poll = self.policy.poll_s()
             return {"name": name, "state": "restoring", "revoked": False, "method": "reload",
-                    "effective_after_s": RELOAD_EFFECTIVE_S, "since": ms_iso(now * 1000), "apply": r["apply"],
+                    "effective_after_s": round(poll + RELOAD_MARGIN_S), "since": ms_iso(now * 1000), "apply": r["apply"],
                     "change": r["change"],
-                    "detail": "Deny policy removed; iron-proxy reloads its policy and fetches the key again.",
-                    "warning": RELOAD_RESTORE_WARNING}
+                    "detail": ("Deny policy removed; at its next check (within about "
+                               f"{poll:g} s) iron-proxy reloads its policy and fetches the key again."),
+                    "warning": RELOAD_RESTORE_WARNING.format(poll=f"{poll:g}")}
         with self._lock:
             self._ops[name] = {"op": "restore", "since": now, "method": "restart"}
         self.invalidate()

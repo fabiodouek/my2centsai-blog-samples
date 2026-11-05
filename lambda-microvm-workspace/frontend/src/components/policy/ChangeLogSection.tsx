@@ -16,6 +16,7 @@ const KIND_LABEL: Record<string, string> = {
   'credential.revoke': 'Credential',
   'credential.restore': 'Credential',
   'aws.scope': 'AWS access',
+  'policy.reset': 'Reset',
 };
 
 function when(ts: number | null, now: number): string {

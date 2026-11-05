@@ -1,6 +1,6 @@
 ## Infra
 
-Terraform for the workspace, layered on part 2 (read through `terraform_remote_state`, path in
+Terraform for the playground, layered on part 2 (read through `terraform_remote_state`, path in
 `var.part2_state_path`). Part 2 must be applied first; nothing here changes its resources.
 
 What it adds:
@@ -24,14 +24,17 @@ What it adds:
 
 Backend task role: MicroVM actions (`lambda:RunMicrovm`, `GetMicrovm`, `SuspendMicrovm`,
 `ResumeMicrovm`, `TerminateMicrovm`, `CreateMicrovmAuthToken`, `CreateMicrovmShellAuthToken`,
-`GetMicrovmImage`) scoped to the `my2cents-ws-sandbox` image ARN, which is the resource these
-actions authorize against; `lambda:ListMicrovms` on `*` (no resource type);
+`GetMicrovmImage`) scoped to the four sandbox image ARNs (`my2cents-ws-sandbox` and its `-1g`, `-4g` and `-8g`
+sizes, passed to the API as `IMAGE_ARNS_JSON`), which are the resources these actions authorize against; `lambda:ListMicrovms` on `*` (no resource type);
+`servicequotas:GetServiceQuota` on the MicroVM memory quota (`lambda/L-CD1C0CC4`);
 `lambda:PassNetworkConnector` on part 2's connector and the managed ingress connectors; the table;
 Live Tail and FilterLogEvents on the proxy and DNS log groups; resource-policy calls on the three
 part 2 secrets (never GetSecretValue); the change log table. When part 2 runs with `control_plane=true`
-(read from its outputs), also: get/put on the policy objects in its control bucket and get on `status.json`,
+(read from its outputs), also: get/put on the policy objects in its control bucket and get on `status.json` and
+`iron-proxy.default.yaml` (the factory reset's template),
 and create/put/delete/restore plus resource-policy calls on `my2cents-ip/user/*` secrets (again never
-GetSecretValue).
+GetSecretValue). The task also gets part 2's `control_poll_s` (how often its sidecar checks the bucket, 30 s by
+default) as `CONTROL_POLL_S`.
 
 Deploy and users:
 

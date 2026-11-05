@@ -1,9 +1,11 @@
 import { delay, http, HttpResponse } from 'msw';
 import { credentialMeta, currentAllowlist, IS_ADMIN, MOCK_EMAIL, policyHandlers } from './policy';
+import { paneOf } from './servers';
 import {
   GB_PER_SANDBOX,
   MAX_DURATION_S,
   QUOTA_GB,
+  SIZES,
   createSandbox,
   db,
   findSandbox,
@@ -12,7 +14,11 @@ import {
   usageFor,
   usedGb,
   type MSandbox,
+  type MSize,
 } from './db';
+
+const RESERVED = ['ANTHROPIC_API_KEY', 'GH_TOKEN', 'DEMO_TOKEN', 'TEST_KEY', 'SANDBOX_NAME', 'AWS_SDK_UA_APP_ID', 'NODE_EXTRA_CA_CERTS',
+  'SSL_CERT_FILE', 'REQUESTS_CA_BUNDLE', 'PATH', 'HOME', 'USER', 'SHELL', 'TERM', 'PWD', 'LANG', 'HOSTNAME', 'TZ', 'TMUX', 'IS_SANDBOX'];
 
 const latency = () => delay(90 + Math.random() * 260);
 
@@ -25,6 +31,15 @@ function view(sb: MSandbox) {
     started_at: sb.started_at,
     max_duration_s: sb.max_duration_s,
     idle_minutes: sb.idle_minutes,
+    size: sb.size,
+    size_label: SIZES[sb.size].label,
+    memory_gb: SIZES[sb.size].gb,
+    vcpu: SIZES[sb.size].vcpu,
+    usd_per_hour: SIZES[sb.size].usd,
+    egress: 'proxy',
+    auto_resume: sb.auto_resume,
+    suspended_duration_s: sb.suspended_duration_s ?? sb.max_duration_s,
+    env_names: sb.env_names,
     image_version: sb.image_version,
     expires_at: new Date(Date.parse(sb.started_at) + sb.max_duration_s * 1000).toISOString(),
     state_reason: sb.terminatedAt ? 'Success.' : null,
@@ -37,6 +52,9 @@ function view(sb: MSandbox) {
 function notFound() {
   return HttpResponse.json({ detail: 'Sandbox not found' }, { status: 404 });
 }
+
+/** What the mock's "AWS" says when RunMicrovm goes past the quota: AWS's wording, seen live on 2026-11-05. */
+const MOCK_AWS_QUOTA_MESSAGE = 'The base maximum allocated memory limit has been reached for this account';
 
 export const handlers = [
   http.get('/api/me', async () => {
@@ -62,6 +80,34 @@ export const handlers = [
       sandbox_cidrs: ['10.50.20.0/24', '10.50.21.0/24'],
       vm_memory_gb: GB_PER_SANDBOX,
       default_idle_minutes: 15,
+      sizes: (Object.keys(SIZES) as MSize[]).map((id) => ({
+        id,
+        label: SIZES[id].label,
+        memory_gb: SIZES[id].gb,
+        vcpu: SIZES[id].vcpu,
+        usd_per_hour: SIZES[id].usd,
+        available: true,
+        unavailable_reason: null,
+        note:
+          id === 'xlarge'
+            ? 'Needs all 8 GB of this account\'s MicroVM memory quota: AWS will refuse it if anything else is running or suspended.'
+            : null,
+        default: id === 'medium',
+      })),
+      default_size: 'medium',
+      burst_factor: 4,
+      lifetime: { min_minutes: 1, max_minutes: 480, default_minutes: 480 },
+      idle: { min_minutes: 1, max_minutes: 479, default_minutes: 15 },
+      suspended: { min_minutes: 0, max_minutes: 480, default: 'lifetime' },
+      env: {
+        name_pattern: '^[A-Za-z_][A-Za-z0-9_]*$',
+        max_vars: 32,
+        value_max: 2048,
+        forbidden_chars: '"$\\`',
+        reserved: [...RESERVED, 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION'].sort(),
+        reserved_prefixes: ['AWS_', 'LD_', 'BASH_FUNC_'],
+      },
+      run_payload: { limit: 4096, used_bytes: 1342 },
       secrets: credentialMeta().map((c) => c.name),
       feed_scope_note: 'iron-proxy sees every request as coming from the NLB, so the feed covers all sandboxes.',
     });
@@ -74,18 +120,43 @@ export const handlers = [
 
   http.post('/api/sandboxes', async ({ request }) => {
     await latency();
-    const body = (await request.json()) as { name?: string; idle_minutes?: number; max_hours?: number };
+    const body = (await request.json()) as {
+      name?: string;
+      size?: MSize;
+      idle_minutes?: number;
+      max_minutes?: number;
+      max_hours?: number;
+      suspended_minutes?: number | null;
+      auto_resume?: boolean;
+      env?: Record<string, string>;
+    };
     const name = (body.name ?? '').trim();
     if (!name) return HttpResponse.json({ detail: 'Name is required.' }, { status: 422 });
-    if (usedGb() + GB_PER_SANDBOX > QUOTA_GB) {
+    const size: MSize = body.size && body.size in SIZES ? body.size : 'medium';
+    const maxMinutes = body.max_minutes ?? Math.round((body.max_hours ?? 8) * 60);
+    const idle = body.idle_minutes ?? 15;
+    if (idle >= maxMinutes) return HttpResponse.json({ detail: 'the idle time before suspending must be shorter than the lifetime' }, { status: 422 });
+    const bad = Object.keys(body.env ?? {}).filter((k) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(k) || RESERVED.includes(k) || k.toUpperCase().startsWith('AWS_'));
+    if (bad.length) return HttpResponse.json({ detail: `environment variables: ${bad.join(', ')} is reserved or invalid` }, { status: 422 });
+    // No pre-check in the backend: it always calls RunMicrovm. The mock plays AWS refusing past the quota.
+    if (usedGb() + SIZES[size].gb > QUOTA_GB) {
+      const used = usedGb();
       return HttpResponse.json(
         {
-          detail: `The account's MicroVM memory quota is full (${usedGb()} of ${QUOTA_GB} GB; suspended sandboxes count). Terminate one to free 2 GB.`,
+          detail: `AWS refused ${SIZES[size].label} (${SIZES[size].gb} GB) with ServiceQuotaExceededException: “${MOCK_AWS_QUOTA_MESSAGE}”. Our estimate: ${used} of ${QUOTA_GB} GB of MicroVM memory in use in the account, ${Math.max(0, QUOTA_GB - used)} GB free; suspended sandboxes count. Pick a smaller size or terminate a sandbox.`,
         },
         { status: 409 },
       );
     }
-    const sb = createSandbox(name, body.idle_minutes ?? 15, body.max_hours ?? 8);
+    const sb = createSandbox({
+      name,
+      size,
+      idleMinutes: idle,
+      maxMinutes,
+      suspendedMinutes: body.suspended_minutes ?? null,
+      autoResume: body.auto_resume !== false,
+      envNames: Object.keys(body.env ?? {}),
+    });
     return HttpResponse.json(view(sb), { status: 201 });
   }),
 
@@ -130,8 +201,9 @@ export const handlers = [
       sampled_at: new Date().toISOString(),
       remaining_s: Math.max(0, Math.round(sb.max_duration_s - elapsed)),
       uptime_s: Math.round(elapsed),
-      idle_policy: { auto_resume: true, max_idle_s: sb.idle_minutes * 60, suspended_duration_s: sb.max_duration_s },
+      idle_policy: { auto_resume: sb.auto_resume, max_idle_s: sb.idle_minutes * 60, suspended_duration_s: sb.suspended_duration_s ?? sb.max_duration_s },
       stats: live && running ? stats(sb) : null,
+      pane: live && running ? paneOf(sb.id) : null,
       stats_error: !live ? null : running ? null : `The sandbox is ${sb.state}; live stats would wake it, so they are skipped.`,
     });
   }),
@@ -147,15 +219,20 @@ export const handlers = [
 
   http.get('/api/quota', async () => {
     await latency();
-    const mine = db.sandboxes.filter((s) => s.state !== 'TERMINATED').length;
+    const live = db.sandboxes.filter((s) => s.state !== 'TERMINATED');
     return HttpResponse.json({
       used_gb: usedGb(),
       quota_gb: QUOTA_GB,
+      free_gb: Math.max(0, QUOTA_GB - usedGb()),
       vm_memory_gb: GB_PER_SANDBOX,
-      user_microvms: mine,
-      user_gb: mine * GB_PER_SANDBOX,
-      account_microvms: mine,
+      user_microvms: live.length,
+      user_gb: usedGb(),
+      other_gb: 0,
+      other_unknown_size: 0,
+      account_microvms: live.length,
       scope: 'account',
+      segments: live.map((s) => ({ id: s.id, name: s.name, state: s.state, mine: true, gb: SIZES[s.size].gb })),
+      quota_source: { kind: 'service_quotas', service_code: 'lambda', quota_code: 'L-CD1C0CC4', name: 'Max allocated ARM_64 MicroVM memory', adjustable: true, unit: 'Gigabytes', fetched_at: new Date().toISOString(), error: null },
     });
   }),
 

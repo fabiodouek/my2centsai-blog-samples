@@ -763,13 +763,32 @@ select.input option {
   display: none;
 }
 
+/* The form scrolls inside the sidebar (or the drawer) when it's taller than the space left, and its footer (the quota
+   line and Create) stays pinned to the bottom of that scroll area, so Create is always reachable. */
 .new-form {
   display: grid;
+  flex: 0 1 auto;
   gap: 10px;
-  padding: 12px 14px 14px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* keyboard focus scrolls a field into view above the pinned footer */
+  scroll-padding-bottom: 96px;
+  padding: 12px 14px 0;
   border-bottom: 1px solid var(--line);
   background: var(--n2);
   animation: rise 180ms var(--ease);
+}
+.new-form-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  margin: 0 -14px;
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--line);
+  background: var(--n2);
 }
 .field label {
   display: block;
@@ -796,6 +815,126 @@ select.input option {
 .form-hint.is-warn {
   color: var(--deny);
 }
+/* New form: size picker (radio rows, the native radio covers the row), env rows, a number with a unit */
+.size-list {
+  display: grid;
+  gap: 4px;
+}
+.size-opt {
+  position: relative;
+  display: grid;
+  gap: 1px;
+  padding: 5px 9px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--n1);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.field .size-opt {
+  margin-bottom: 0;
+  font-weight: 400;
+}
+.size-opt:hover {
+  background: var(--n3);
+}
+.size-opt > input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.size-opt:has(> input:checked) {
+  border-color: var(--brass-line);
+  background: var(--brass-wash);
+  box-shadow: inset 0 0 0 1px var(--brass-line);
+}
+.size-opt:has(> input:focus-visible) {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+}
+.size-opt.is-off {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.size-opt.is-off:hover {
+  background: var(--n1);
+}
+.size-opt.is-off > input {
+  cursor: not-allowed;
+}
+/* Our estimate says it may not fit: still selectable (AWS decides), the meta line just turns to the warning colour */
+.size-opt.may-exceed .size-meta {
+  color: var(--deny);
+}
+.size-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.size-name {
+  color: var(--text-hi);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.size-price {
+  color: var(--text-2);
+  font-size: var(--fs-micro);
+}
+.size-meta {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.input-suffix {
+  position: relative;
+}
+.input-suffix .input {
+  padding-right: 34px;
+}
+.input-suffix .suffix {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.env-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 26px;
+  align-items: center;
+  gap: 4px;
+}
+.env-row .input {
+  height: 28px;
+  padding: 0 7px;
+  font-size: 11.5px;
+}
+.env-err {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+.env-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.env-foot .btn {
+  margin-left: -8px;
+}
+
 .form-actions {
   display: flex;
   gap: 8px;
@@ -935,15 +1074,19 @@ select.input option {
 .quota-value.is-full {
   color: var(--deny);
 }
+/* One cell per GB: 1px apart inside a sandbox, 3px between sandboxes (and free GB) */
 .quota-cells {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 3px;
+  gap: 1px;
   height: 8px;
 }
 .quota-cell {
   border-radius: 2px;
+}
+.quota-cell.is-start {
+  margin-left: 2px;
 }
 .cell-run {
   background: var(--run);
@@ -1997,6 +2140,11 @@ button.feed-status-chip {
 .fact-line .fact-sub {
   display: inline;
 }
+.env-names {
+  font-size: 11.5px;
+  word-spacing: 6px;
+  overflow-wrap: anywhere;
+}
 .facts-inline {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 16px;
@@ -2162,6 +2310,178 @@ button.feed-status-chip {
 }
 .apply-status.is-deny .apply-faint {
   color: inherit;
+}
+
+/* ---- proxy config (admins): the bucket's files against what the sidecar applied */
+
+.config-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+}
+.config-refresh {
+  margin-left: auto;
+}
+.config-code {
+  max-height: max(320px, calc(100vh - 290px));
+  margin: 0;
+  overflow: auto;
+  padding: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--n0);
+  color: var(--text-1);
+  font: 400 11.5px / 1.45 var(--font-mono);
+  tab-size: 2;
+}
+.config-code:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+}
+.config-code code {
+  display: block;
+  min-width: max-content;
+}
+.config-line {
+  display: block;
+  padding-right: 14px;
+  white-space: pre;
+}
+.config-line.is-redacted {
+  background: rgb(230 111 100 / 0.055);
+}
+.config-ln {
+  display: inline-block;
+  width: 5ch;
+  margin-right: 12px;
+  padding-right: 8px;
+  border-right: 1px solid var(--n3);
+  color: var(--text-faint);
+  text-align: right;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.config-sync {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.config-next {
+  color: var(--text-2);
+  font-size: var(--fs-small);
+}
+.config-detail {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+.config-detail.is-deny {
+  color: var(--deny);
+}
+.config-side .policy-h3 {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.config-file {
+  margin: 10px 0 6px;
+  color: var(--text-1);
+  font-size: 11.5px;
+}
+.config-facts {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 6px 12px;
+  font-size: var(--fs-small);
+}
+.config-facts dt {
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  line-height: 1.65;
+}
+.config-facts dd {
+  min-width: 0;
+  color: var(--text-1);
+  overflow-wrap: anywhere;
+}
+.config-facts dd.is-deny {
+  color: var(--deny);
+}
+.config-facts .fact-line {
+  margin-top: 2px;
+}
+.config-ago {
+  color: var(--text-muted);
+}
+.config-facts dd.is-deny .config-ago {
+  color: inherit;
+}
+.config-id {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.config-id .fact-line {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  white-space: normal;
+}
+.config-none {
+  color: var(--text-faint);
+}
+.config-reset {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.config-reset-text {
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+.reset-plan {
+  display: grid;
+  gap: 10px;
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+.reset-list {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px 12px;
+  font-size: var(--fs-small);
+}
+.reset-list dt {
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+}
+.reset-list dd {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.reset-line.is-warn {
+  color: var(--deny);
+}
+.reset-same,
+.reset-faint {
+  color: var(--text-muted);
+}
+.reset-creds {
+  display: grid;
+  gap: 2px;
+  font-size: 11.5px;
+}
+.reset-confirm {
+  color: var(--text-2);
+  font-size: var(--fs-small);
 }
 
 .policy-scroll {
@@ -3130,6 +3450,13 @@ fieldset.field legend {
   .policy-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* One column: the sync state first, the file under it */
+  .config-grid .config-side {
+    order: -1;
+  }
+  .config-code {
+    max-height: 70vh;
+  }
   .policy-side {
     position: static;
   }
@@ -3544,6 +3871,166 @@ fieldset.field legend {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--n0);
+}
+
+/* ---- AWS access: how much of a pick is effective (filled / half / empty ring, verdigris and ramp grey) */
+.tone-dot {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+.tone-dot.tone-all {
+  background: var(--run);
+  box-shadow: inset 0 0 0 1px var(--run);
+}
+.tone-dot.tone-partial {
+  background: linear-gradient(90deg, var(--run) 50%, transparent 50%);
+  box-shadow: inset 0 0 0 1px var(--run);
+}
+.tone-dot.tone-none {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--n6);
+}
+.tone-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 2px 0 4px;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+}
+.tone-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tone-legend > .tone-legend-note {
+  display: inline;
+  color: var(--text-faint);
+}
+.lvl.lvl-cov {
+  gap: 5px;
+}
+.aws-check.is-noeffect .aws-check-action {
+  color: var(--text-2);
+}
+.aws-chip-count {
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+}
+.aws-chip .tone-dot {
+  margin-right: 1px;
+}
+.aws-chip.is-none .mono {
+  color: var(--text-2);
+}
+.aws-chip.is-none .aws-chip-why {
+  color: var(--text-muted);
+}
+.aws-ptabs {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.tabs.aws-ptablist {
+  height: 32px;
+  padding: 0;
+}
+.aws-ptablist .tab:first-child {
+  padding-left: 0;
+}
+.aws-ptablist .tab:first-child[aria-selected='true']::after {
+  left: 0;
+}
+.aws-effective {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.aws-effective.is-busy {
+  opacity: 0.55;
+  transition: opacity var(--dur) var(--ease);
+}
+.aws-eff-title {
+  color: var(--text-1);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+.aws-eff-note {
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  line-height: 1.45;
+}
+.aws-eff-scroll {
+  max-height: 420px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+.aws-eff-scroll.is-tall {
+  max-height: 560px;
+}
+.aws-eff-table th[scope='row'] {
+  font-weight: 400;
+}
+.aws-eff-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.aws-eff-toggle:hover .aws-eff-name {
+  color: var(--text-hi);
+}
+.aws-eff-toggle:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.aws-eff-id {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.aws-eff-why {
+  display: block;
+  margin: 2px 0 0 15px;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  white-space: normal;
+}
+.aws-eff-row.is-none .aws-eff-name {
+  color: var(--text-2);
+}
+.aws-eff-of {
+  color: var(--text-faint);
+}
+.aws-eff-detail td {
+  padding-top: 2px;
+  background: var(--n2);
+}
+.aws-eff-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  padding: 4px 0 6px 15px;
+  font-size: 11px;
+}
+.aws-eff-names li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .aws-limited {

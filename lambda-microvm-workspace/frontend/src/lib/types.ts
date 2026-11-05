@@ -28,6 +28,58 @@ export interface Sandbox {
   lastActivityAt: number | null;
   /** When the backend saw it end (TERMINATING/TERMINATED only). */
   terminatedAt: number | null;
+  /** Chosen at create: small | medium | large | xlarge (one image per size). */
+  size: SizeId;
+  sizeLabel: string;
+  memoryGb: number;
+  vcpu: number;
+  /** USD per hour while running, at the size's baseline. */
+  usdPerHour: number | null;
+  /** "proxy": through part 2's iron-proxy (the only mode); anything else is reported as the API sees it. */
+  egress: string;
+  /** Off: the terminal and agent calls don't wake it when suspended; only Resume does. */
+  autoResume: boolean;
+  /** Terminated after this long suspended (0: as soon as it suspends; = maxDurationS: when the lifetime ends). */
+  suspendedDurationS: number | null;
+  /** Names of the extra environment variables set at create (values are never sent back). */
+  envNames: string[];
+}
+
+export type SizeId = 'small' | 'medium' | 'large' | 'xlarge';
+
+/** What the New form sends (POST /api/sandboxes). */
+export interface NewSandbox {
+  name: string;
+  size: SizeId;
+  idleMinutes: number;
+  maxMinutes: number;
+  /** null: terminate only when the lifetime ends. */
+  suspendedMinutes: number | null;
+  autoResume: boolean;
+  env: Record<string, string>;
+}
+
+export interface SizeOption {
+  id: SizeId;
+  label: string;
+  memoryGb: number;
+  vcpu: number;
+  usdPerHour: number;
+  /** Its image exists and has an active version. */
+  available: boolean;
+  unavailableReason: string | null;
+  /** A non-blocking hint, e.g. the size needs the whole quota as we read it (AWS decides). */
+  note: string | null;
+  isDefault: boolean;
+}
+
+export interface EnvRules {
+  namePattern: string;
+  maxVars: number;
+  valueMax: number;
+  forbiddenChars: string;
+  reserved: string[];
+  reservedPrefixes: string[];
 }
 
 export interface AppConfig {
@@ -43,6 +95,16 @@ export interface AppConfig {
   pricingAsOf: string | null;
   /** Part 2's sandbox subnets: a DNS query from one of these came from a sandbox. Empty = unknown. */
   sandboxCidrs: string[];
+  sizes: SizeOption[];
+  defaultSize: SizeId;
+  /** A MicroVM bursts to this multiple of its baseline vCPU; inside, nproc and free show it. */
+  burstFactor: number;
+  lifetime: { minMinutes: number; maxMinutes: number; defaultMinutes: number };
+  idle: { minMinutes: number; maxMinutes: number; defaultMinutes: number };
+  suspended: { minMinutes: number; maxMinutes: number };
+  env: EnvRules;
+  /** The run hook payload's limit and what it already takes (longest name, custom credentials). */
+  runPayload: { limit: number; usedBytes: number };
 }
 
 export interface Me {
@@ -53,13 +115,58 @@ export interface Me {
   isAdmin: boolean;
 }
 
+export interface QuotaSegment {
+  /** Null for someone else's MicroVM. */
+  id: string | null;
+  name: string | null;
+  state: string | null;
+  mine: boolean;
+  gb: number;
+}
+
+/** Where the MicroVM memory quota came from: Service Quotas (this account's applied value) or the QUOTA_GB fallback. */
+export interface QuotaSource {
+  kind: 'service_quotas' | 'fallback';
+  name: string | null;
+  quotaCode: string | null;
+  adjustable: boolean | null;
+  fetchedAt: number | null;
+  error: string | null;
+}
+
 export interface Quota {
-  /** Every live MicroVM in the account (the quota is per account). */
+  /** Every live MicroVM in the account (the quota is per account), summed from their sizes. */
   usedGb: number;
   quotaGb: number;
+  freeGb: number;
   /** This user's live sandboxes, when the backend reports it. */
   userGb: number | null;
+  otherGb: number;
+  /** Other MicroVMs whose size isn't known here (counted as 2 GB). */
+  otherUnknownSize: number;
   vmMemoryGb: number;
+  segments: QuotaSegment[];
+  quotaSource: QuotaSource | null;
+}
+
+/** GET /api/policy/reset: what a factory reset would change. */
+export interface ResetPlan {
+  configVersion: number;
+  nextConfigVersion: number;
+  allowlist: { remove: string[]; add: string[]; after: string[] };
+  credentials: {
+    reactivate: string[];
+    remove: { name: string; env: string | null; hosts: string[]; secretName: string; inConfig: boolean }[];
+    builtinChanged: string[];
+    builtin: string[];
+  };
+  aws: {
+    from: { role: string; sessionPolicy: boolean; actions: string[] };
+    to: { role: string; sessionPolicy: boolean; actions: string[] };
+    changes: boolean;
+  };
+  changes: number;
+  note: string;
 }
 
 export type CredentialStatus = 'active' | 'revoking' | 'revoked' | 'restoring' | 'unknown';
@@ -282,18 +389,60 @@ export interface AwsAction {
   service: string;
   name: string;
   level: AccessLevel;
-  /** The selected role allows it, it isn't blocked, and its service can be mapped to iron-proxy. */
+  /** Effective: the selected role allows it, it isn't blocked, and its service can be mapped to iron-proxy. */
   allowed: boolean;
+  /** Can go in a session policy: known, mapped, not blocked. Outside the role it's pickable with no effect. */
+  pickable: boolean;
   /** Allowed only on specific resources or under conditions (every matching Allow is scoped). */
+  limited: boolean;
+  /** Why it isn't effective (or can't be picked) */
+  reason: string | null;
+}
+
+/** How much of a pick is effective with the role: all, some or none of the actions it covers. */
+export type Tone = 'all' | 'partial' | 'none';
+
+export interface AwsWildcard {
+  /** <service>:* or <service>:Get* / List* / Describe* */
+  action: string;
+  label: string;
+  covers: number;
+  /** How many of the covered actions the role allows (blocked ones never count) */
+  effective: number;
+  tone: Tone;
+  pickable: boolean;
+  /** Every covered action is effective */
+  allowed: boolean;
   limited: boolean;
   reason: string | null;
 }
 
-export interface AwsWildcard {
+/** One pick in a preview: how many of the actions it covers are effective with the role, and why not the rest. */
+export interface AwsCoverage {
   action: string;
-  label: string;
+  kind: 'action' | 'wildcard';
   covers: number;
-  allowed: boolean;
+  effective: number;
+  limited: number;
+  tone: Tone;
+  reason: string | null;
+}
+
+/** One service of the effective access: role ∩ session policy (or the role alone with no session policy). */
+export interface AwsEffectiveRow {
+  service: string;
+  name: string;
+  /** Distinct actions the picks cover; null without a session policy */
+  asked: number | null;
+  effective: number;
+  roleAllows: number;
+  total: number;
+  limited: number;
+  /** The effective action names; null without a session policy (load the service to list them) */
+  actions: string[] | null;
+  limitedActions: string[] | null;
+  /** No picked action in it is effective: iron-proxy isn't told about it and answers a bare 403 */
+  noEffect: boolean;
   reason: string | null;
 }
 
@@ -306,6 +455,8 @@ export interface AwsServiceSummary {
   levels: Partial<Record<AccessLevel, number>>;
   /** false: no endpoint mapping, nothing in it can be applied */
   enabled: boolean;
+  /** Its actions can be picked (mapped, and not Secrets Manager) */
+  pickable: boolean;
   reason: string | null;
   signingNames: string[];
 }
@@ -390,6 +541,10 @@ export interface AwsPreview {
   chars: number;
   limit: number;
   fits: boolean;
+  /** The policy denies ssm:GetParameter* because a picked wildcard covers it */
+  denySsm: boolean;
+  coverage: AwsCoverage[];
+  effective: AwsEffectiveRow[];
 }
 
 export interface AwsScope {
@@ -403,13 +558,28 @@ export interface AwsScope {
   preview: AwsPreview | null;
 }
 
+/** Whether iron-proxy runs what's in the control bucket: in_sync, pending (until the sidecar's next check),
+ *  refused (the sidecar's guard, iron-proxy's validation or the role assumption said no), stale (no heartbeat). */
+export type SyncState = 'in_sync' | 'pending' | 'refused' | 'stale';
+
 export interface PolicyStatus {
   enabled: boolean;
   applied: boolean;
   pending: boolean;
   target: ApplyRef;
   latencyS: number | null;
-  config: { version: number | null; appliedAt: number | null };
+  /** Date.now() when this status arrived: the base for the next-check countdown. */
+  receivedAt: number;
+  sync: { state: SyncState | null; behind: string[] };
+  config: {
+    version: number | null;
+    appliedAt: number | null;
+    syncedVersion: number | null;
+    syncedAt: number | null;
+    etag: string | null;
+    rejectedVersion: number | null;
+    refusedReason: string | null;
+  };
   scope: {
     version: number | null;
     /** What the sidecar assumed: the role and whether a session policy narrowed it */
@@ -419,6 +589,7 @@ export interface PolicyStatus {
     sourceIdentity: string | null;
     expiration: number | null;
     assumedAt: number | null;
+    appliedAt: number | null;
     /** STS AssumeRole: share of the maximum session token size the token uses, and its size in bytes */
     sessionTokenUtilization: number | null;
     sessionTokenSize: number | null;
@@ -427,8 +598,61 @@ export interface PolicyStatus {
     error: string | null;
   };
   reload: { at: number | null; ok: boolean | null; httpStatus: number | null; error: string | null };
-  sidecar: { task: string | null; updatedAt: number | null; heartbeatAgeS: number | null; stale: boolean };
+  sidecar: {
+    task: string | null;
+    startedAt: number | null;
+    updatedAt: number | null;
+    heartbeatAgeS: number | null;
+    stale: boolean;
+    staleAfterS: number;
+    /** How often the sidecar checks the bucket (part 2's control_poll_s, 30 s by default). */
+    pollS: number | null;
+    nextPollAt: number | null;
+    /** Seconds from receivedAt until the sidecar's next check (0: due now). */
+    nextPollInS: number | null;
+  };
   error: string | null;
+}
+
+/** One object in the control bucket, as S3 describes it. */
+export interface ControlObject {
+  key: string;
+  version: number | null;
+  lastModified: number | null;
+  etag: string | null;
+  versionId: string | null;
+  size: number | null;
+  updatedAt: number | null;
+  updatedBy: string | null;
+}
+
+export interface Redaction {
+  line: number;
+  what: string;
+}
+
+/** GET /api/policy/config (admins): the desired state in the bucket against what the sidecar applied. */
+export interface ProxyConfigView {
+  receivedAt: number;
+  serverTime: number | null;
+  desired: {
+    config: ControlObject;
+    scope: (ControlObject & { role: string | null; sessionPolicy: boolean | null; seed: boolean }) | null;
+  };
+  applied: {
+    statusKey: string;
+    statusLastModified: number | null;
+    /** The same shapes as GET /api/policy/status */
+    config: PolicyStatus['config'];
+    scope: PolicyStatus['scope'] & { syncedVersion: number | null };
+    reload: PolicyStatus['reload'] & { pending: boolean | null };
+    sidecar: PolicyStatus['sidecar'];
+    latencyS: number | null;
+  };
+  sync: { state: SyncState; behind: string[]; detail: string; etagMatch: boolean | null };
+  error: string | null;
+  content: { config: string; scope: string };
+  redactions: { config: Redaction[]; scope: Redaction[] };
 }
 
 export type ChangeKind =
@@ -440,6 +664,7 @@ export type ChangeKind =
   | 'credential.revoke'
   | 'credential.restore'
   | 'aws.scope'
+  | 'policy.reset'
   | string;
 
 export interface PolicyChange {

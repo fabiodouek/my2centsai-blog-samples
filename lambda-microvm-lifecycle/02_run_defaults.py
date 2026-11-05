@@ -14,10 +14,14 @@ banner("run-microvm with only --image-identifier")
 with timed("run_microvm (API call)"):
     r = mvm.run_microvm(imageIdentifier=image_arn("sandbox"))
 vm = VM(r["microvmId"], r["endpoint"], 0)
-print("response:", redact({k: v for k, v in r.items() if k != "ResponseMetadata"}))
-vm.wait("RUNNING")
-show(vm.describe())
-vm.terminate()
+try:
+    print("response:", redact({k: v for k, v in r.items() if k != "ResponseMetadata"}))
+    vm.wait("RUNNING")
+    show(vm.describe())
+finally:
+    # This run has Lambda's defaults (8-hour cap, no idle policy) instead of common.run()'s safety
+    # nets, so terminate it even if the script fails here.
+    vm.terminate()
 
 banner(f"{N} sequential runs: time to RUNNING and to first 200")
 to_running, to_first = [], []

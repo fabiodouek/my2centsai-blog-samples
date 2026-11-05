@@ -1,4 +1,4 @@
-"""The proxy control plane: iron-proxy's policy in part 2's control bucket, edited by admins from the workspace.
+"""The proxy control plane: iron-proxy's policy in part 2's control bucket, edited by admins from the playground.
 
     s3://<bucket>/iron-proxy.yaml    iron-proxy's config. We change only the allowlist's domains, the secrets list
                                      and aws_auth.allowed_services; comments and everything else stay as they are.
@@ -18,6 +18,7 @@ import io
 import ipaddress
 import json
 import logging
+import math
 import re
 import secrets as pysecrets
 import threading
@@ -40,11 +41,15 @@ from . import aws_endpoints
 from .aws_reference import TTLCache, Unavailable, fetch_reference
 from .aws_roles import fetch_roles
 from .config import Settings
+from .redact import redact_json, redact_yaml
 
 log = logging.getLogger("policy")
 
 HEADER_RE = re.compile(r"^# my2cents control plane: config v(\d+)\b")
-SCOPE_NOTE = "Changes apply to every sandbox on this proxy, through a reload: no restart."
+HEADER_FULL_RE = re.compile(r"^# my2cents control plane: config v(\d+), ([^,]+), (.*)$")
+SCOPE_NOTE = ("Changes apply to every sandbox on this proxy at the proxy's next check (every 30 s), through a reload: "
+              "no restart.")
+# No sidecar heartbeat for this long: stale. The sidecar writes status.json every 30 s at the least.
 STALE_S = 90
 RECOVERY_DAYS = 7
 SECRET_TTL = "30s"
@@ -75,6 +80,10 @@ RESERVED_ENV = {
 RESERVED_ENV_PREFIXES = ("AWS_", "LD_", "BASH_", "LC_", "PYTHON", "CLAUDE_", "XDG_")
 HOP_HEADERS = {"host", "content-length", "transfer-encoding", "connection", "upgrade", "te", "trailer",
                "proxy-authorization", "proxy-authenticate", "keep-alive"}
+
+
+# Tag on every custom credential's secret: which credential it belongs to (a reset keeps the secret, a re-add finds it)
+CREDENTIAL_TAG = "my2cents:credential"
 
 
 # ---------------------------------------------------------------- errors
@@ -347,6 +356,22 @@ class ControlStore:
             raise
         return {"etag": r["ETag"], "metadata": r.get("Metadata") or {}}
 
+    def get_full(self, key: str) -> dict | None:
+        """The object and what S3 says about it: {body, etag, last_modified (ISO), version_id, size, metadata}."""
+        try:
+            r = self.s3.get_object(Bucket=self.bucket, Key=key)
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") in ("NoSuchKey", "404"):
+                return None
+            raise
+        body = r["Body"].read()
+        lm = r.get("LastModified")
+        if isinstance(lm, datetime):
+            lm = now_iso(lm.timestamp())
+        return {"body": body, "etag": r["ETag"], "last_modified": lm if isinstance(lm, str) else None,
+                "version_id": r.get("VersionId"), "size": r.get("ContentLength", len(body)),
+                "metadata": r.get("Metadata") or {}}
+
     def put(self, key: str, body: str, content_type: str, *, if_match: str | None = None, create: bool = False,
             metadata: dict | None = None) -> str:
         kw = {"Bucket": self.bucket, "Key": key, "Body": body.encode(), "ContentType": content_type}
@@ -468,7 +493,7 @@ class ProxyPolicy:
 
     @staticmethod
     def disabled_reason() -> str:
-        return ("The proxy control plane is off. Apply part 2 with control_plane=true, then redeploy the workspace, "
+        return ("The proxy control plane is off. Apply part 2 with control_plane=true, then redeploy the playground, "
                 "to edit iron-proxy's policy here.")
 
     def _load_config(self) -> tuple[ConfigDoc, str]:
@@ -654,15 +679,16 @@ class ProxyPolicy:
             raise Invalid("value: no line breaks (it goes into HTTP headers)")
         return value
 
-    def _put_new_secret(self, name: str, value: str, actor: str) -> tuple[str, bool]:
-        """Create my2cents-ip/user/<name>, or restore and overwrite one still in its recovery window.
-        Returns (arn, created)."""
+    def _put_new_secret(self, name: str, value: str, actor: str) -> tuple[str, str]:
+        """Create my2cents-ip/user/<name>; or restore and overwrite one still in its recovery window; or take back one
+        a factory reset left behind (out of the config and the index, its secret kept, tagged for this name) and
+        overwrite its value. Returns (arn, "created" | "restored" | "adopted")."""
         secret_name = self.s.user_secret_prefix + name
         try:
             r = self.sm.create_secret(Name=secret_name, SecretString=value,
-                                      Description=f"Injected by iron-proxy for workspace sandboxes; added by {_ascii(actor)}",
-                                      Tags=[{"Key": "my2cents:credential", "Value": name}])
-            return r["ARN"], True
+                                      Description=f"Injected by iron-proxy for playground sandboxes; added by {_ascii(actor)}",
+                                      Tags=[{"Key": CREDENTIAL_TAG, "Value": name}])
+            return r["ARN"], "created"
         except ClientError as e:
             code, msg = e.response.get("Error", {}).get("Code"), e.response.get("Error", {}).get("Message") or ""
             pending = code == "InvalidRequestException" and "deletion" in msg
@@ -670,12 +696,18 @@ class ProxyPolicy:
                 d = self.sm.describe_secret(SecretId=secret_name)
                 pending = bool(d.get("DeletedDate"))
                 if not pending:
-                    raise Conflict(f"a secret named {secret_name} already exists; pick another name") from e
+                    tags = {t.get("Key"): t.get("Value") for t in d.get("Tags") or []}
+                    if tags.get(CREDENTIAL_TAG) != name:
+                        raise Conflict(f"a secret named {secret_name} already exists and isn't this app's {name} "
+                                       "credential; pick another name") from e
+                    # The caller checked it isn't in the index: a factory reset took it out and kept the secret
+                    r = self.sm.put_secret_value(SecretId=secret_name, SecretString=value)
+                    return r["ARN"], "adopted"
             if not pending:
                 raise
         self.sm.restore_secret(SecretId=secret_name)
         r = self.sm.put_secret_value(SecretId=secret_name, SecretString=value)
-        return r["ARN"], False
+        return r["ARN"], "restored"
 
     def create_credential(self, user, body: dict) -> dict:
         self._need()
@@ -695,7 +727,7 @@ class ProxyPolicy:
             if size > 4096:
                 raise Conflict(f"a new sandbox's run hook payload would be {size:,} bytes (limit 4,096); "
                                "delete a custom credential first")
-            arn, created = self._put_new_secret(name, value, user.actor)
+            arn, how = self._put_new_secret(name, value, user.actor)
             value = None  # noqa: F841  (not kept past this point)
             try:
                 def mutate(doc: ConfigDoc):
@@ -707,10 +739,11 @@ class ProxyPolicy:
                 off_list, change, apply = self._edit(user, mutate, "credential.create",
                                                      f"Added credential {name} for {', '.join(spec['hosts'])}", detail)
             except Exception:
-                if created:
+                if how == "created":
                     self.sm.delete_secret(SecretId=arn, ForceDeleteWithoutRecovery=True)
-                else:
+                elif how == "restored":
                     self.sm.delete_secret(SecretId=arn, RecoveryWindowInDays=RECOVERY_DAYS)
+                # adopted: it stays where the reset left it (with the new value)
                 raise
             meta = {"env": spec["env"], "placeholder": placeholder, "secret_arn": arn,
                     "secret_name": self.s.user_secret_prefix + name, "created_at": change["at"],
@@ -843,7 +876,8 @@ class ProxyPolicy:
             raise Invalid(f"the session policy is {pv['chars']:,} characters; STS allows {cat.POLICY_CHARS:,}. "
                           "Pick fewer actions or a wildcard.")
         role, sp = pv["role"], pv["session_policy"]
-        stmts = cat.statements(pv["actions"]) if sp else []
+        # The Allow for the picks, plus the explicit Deny for SSM parameter reads when a pick covers them
+        stmts = (pv.get("statements") or cat.statements(pv["actions"], pv.get("deny_ssm", False))) if sp else []
         with self._lock:
             cur, etag = self._scope()
             cur_role, cur_sp = self._scope_flags(cur, self.aws_catalog.default_role)
@@ -890,7 +924,193 @@ class ProxyPolicy:
         log.info("scope seeded: %s, session policy %s", role, "on" if sp else "off")
         return True
 
+    # ---- factory reset
+    def _default_doc(self) -> ConfigDoc:
+        """Part 2's deploy-time config (iron-proxy.default.yaml: what Terraform would seed now, kept in step by every
+        part 2 apply)."""
+        key = self.keys.get("default_config")
+        got = self.store.get(key) if key else None
+        if not got:
+            raise PolicyError("the control bucket has no iron-proxy.default.yaml: apply part 2 (control_plane=true) to "
+                              "add it, then reset")
+        return ConfigDoc(got[0].decode())
+
+    def reset_plan(self, revoked: list[str]) -> dict:
+        """What a factory reset would change, for the confirmation dialog. `revoked`: credentials with a deny
+        statement now (credentials.py knows), which the reset makes active again."""
+        self._need()
+        default = self._default_doc()
+        cur, _ = self._load_config()
+        scope, _ = self._scope()
+        role, sp = self._scope_flags(scope, self.aws_catalog.default_role)
+        cur_hosts = [h for h in cur.hosts() if not is_aws_host(h)]
+        def_hosts = [h for h in default.hosts() if not is_aws_host(h)]
+        in_config = {c["name"]: c for c in self.list_credentials() if c["kind"] == "custom"}
+        index = self._index()[0]["credentials"]
+        custom = []
+        for name in sorted(set(in_config) | set(index)):
+            c, meta = in_config.get(name, {}), index.get(name, {})
+            custom.append({"name": name, "env": c.get("env") or meta.get("env"), "hosts": c.get("hosts") or [],
+                           "headers": c.get("headers") or [], "query": c.get("query", False), "body": c.get("body", False),
+                           "secret_name": self.s.user_secret_prefix + name, "in_config": name in in_config})
+        # Built-in secrets whose rules differ from the template's (hosts, headers, placeholder)
+        def_entries = {e["secret_id"]: e for e in default.secret_entries()}
+        builtin_changed = sorted(n for n, arn in self.builtin_arns.items()
+                                 if any(e["secret_id"] == arn and e != def_entries.get(arn) for e in cur.secret_entries()))
+        default_role = self.aws_catalog.default_role
+        aws_from = {"role": role, "session_policy": sp, "actions": [a for a in scope.get("actions") or [] if isinstance(a, str)]}
+        aws_to = {"role": default_role, "session_policy": False, "actions": []}
+        allow = {"remove": [h for h in cur_hosts if h not in def_hosts], "add": [h for h in def_hosts if h not in cur_hosts],
+                 "after": def_hosts}
+        n = (len(allow["remove"]) + len(allow["add"]) + len(custom) + len(revoked) + len(builtin_changed)
+             + (aws_from != aws_to))
+        return {"config_version": cur.version, "next_config_version": cur.version + 1,
+                "scope_version": int(scope.get("version") or 0), "next_scope_version": int(scope.get("version") or 0) + 1,
+                "allowlist": allow,
+                "credentials": {"reactivate": sorted(revoked), "remove": custom, "builtin_changed": builtin_changed,
+                                "builtin": sorted(self.builtin_arns)},
+                "aws": {"from": aws_from, "to": aws_to, "changes": aws_from != aws_to},
+                "changes": n,
+                "note": ("Applies to every sandbox on this proxy, running ones included, at the proxy's next check "
+                         f"(within about {self.poll_s():g} s). iron-proxy.yaml is regenerated from part 2's template.")}
+
+    def reset(self, user, revoked: list[str]) -> dict:
+        """Factory reset: part 2's template config with the default role's AWS lists, the default AWS scope (no
+        session policy, no actions), and no custom credentials (out of the config and the index; their secrets stay
+        in Secrets Manager so they can be added again). Deny statements are removed by the caller (credentials.py)
+        first; `revoked` names them. One new config version and one new scope version, one change entry."""
+        self._need()
+        plan = self.reset_plan(revoked)
+        default_role = self.aws_catalog.default_role
+        pv = self.aws_catalog.preview([], default_role, False)
+        with self._lock:
+            doc = self._default_doc()
+            doc.set_aws_hosts(pv["hosts"], self.s.region)
+            doc.set_allowed_services(pv["allowed_services"])
+            cur_scope, scope_etag = self._scope()
+            sv, at = int(cur_scope.get("version") or 0) + 1, now_iso()
+            scope = {"version": sv, "updated_at": at, "updated_by": user.actor, "role": default_role,
+                     "session_policy": False, "actions": [], "services": [], "statements": []}
+            self.store.put(self.keys["scope"], json.dumps(scope, indent=1), "application/json", if_match=scope_etag,
+                           create=scope_etag is None, metadata={"version": sv, "updated-at": at})
+            cur, etag = self._load_config()
+            version = cur.version + 1
+            self.store.put(self.keys["config"], doc.dump(version, at, user.actor), "application/yaml", if_match=etag,
+                           metadata={"version": version, "updated-at": at, "updated-by": user.actor})
+            removed = [c["name"] for c in plan["credentials"]["remove"]]
+            if removed:
+                self._write_index(lambda creds: [creds.pop(n, None) for n in removed])
+            parts = []
+            if plan["allowlist"]["remove"] or plan["allowlist"]["add"]:
+                parts.append(f"allowlist back to {len(plan['allowlist']['after'])} seeded hosts")
+            if removed:
+                parts.append(f"{len(removed)} custom credential(s) out of the config")
+            if revoked:
+                parts.append(f"{', '.join(sorted(revoked))} active again")
+            parts.append(f"AWS access {default_role}, no session policy")
+            change = self.changes.record(user.actor, "policy.reset", "Reset the proxy policy to its defaults: " + "; ".join(parts),
+                                         {"allowlist_removed": plan["allowlist"]["remove"], "allowlist_added": plan["allowlist"]["add"],
+                                          "credentials_removed": removed, "reactivated": sorted(revoked),
+                                          "aws_from": plan["aws"]["from"], "allowed_services": len(pv["allowed_services"])},
+                                         version, sv)
+            self._status_cache = None
+            self._index_cache = None
+        log.info("reset by %s: config v%s, scope v%s", user.actor, version, sv)
+        return {"plan": plan, "change": change,
+                "apply": {"config_version": version, "scope_version": sv, "requested_at": at}}
+
     # ---- status
+    def poll_s(self) -> float:
+        """How often the sidecar checks the bucket: what it last reported, else part 2's setting."""
+        sc = (self._status_cache[1] if self._status_cache else {}).get("sidecar") or {}
+        return float(sc.get("poll_s") or self.s.control_poll_s)
+
+    def _next_poll(self, sc: dict, now: float) -> tuple[float | None, float]:
+        """When the sidecar checks the bucket next, and its poll interval. Each round ends by writing status.json
+        (with the 30 s heartbeat no longer than the interval, every round does), with next_poll_at, then sleeps.
+        An older sidecar doesn't report next_poll_at: then it's about poll_s after updated_at. A round that is due
+        but hasn't reported counts as running for a few seconds; after that the estimate moves on by whole
+        intervals."""
+        poll = sc.get("poll_s")
+        poll = float(poll) if isinstance(poll, (int, float)) and poll > 0 else float(self.s.control_poll_s)
+        updated = parse_iso(sc.get("updated_at"))
+        nxt = parse_iso(sc.get("next_poll_at")) or (updated + poll if updated is not None else None)
+        if nxt is None:
+            return None, poll
+        grace = min(5.0, poll / 3)
+        if now - nxt > grace:
+            nxt += math.ceil((now - nxt - grace) / poll) * poll
+        return nxt, poll
+
+    def _evaluate(self, target: dict, sc: dict, now: float) -> dict:
+        """The sidecar's report (status.json) against the versions in the bucket (`target`)."""
+        c, s_, r = sc.get("config") or {}, sc.get("scope") or {}, sc.get("reload") or {}
+        updated = parse_iso(sc.get("updated_at"))
+        age = round(now - updated, 1) if updated else None
+        stale = age is None or age > STALE_S
+        applied = (bool(sc) and c.get("applied_version") == target["config_version"]
+                   and s_.get("applied_version") == target["scope_version"] and r.get("ok") is True)
+        error, refused = None, False
+        if c.get("refused_reason") and c.get("rejected_version") == target["config_version"]:
+            # part 2's sidecar checks the Secrets Manager guard itself and doesn't apply a config that breaks it
+            error = f"the control sidecar refused config v{c.get('rejected_version')}: {c['refused_reason']}"
+            refused = True
+        elif r.get("ok") is False and r.get("error"):
+            error = f"iron-proxy rejected config v{c.get('rejected_version') or c.get('synced_version')}: {r['error']}"
+            refused = True
+        elif s_.get("error") and s_.get("synced_version") != target["scope_version"]:
+            error = f"the sidecar couldn't assume the scoped role: {s_['error']}"
+            refused = True
+        elif not sc:
+            error = "the control sidecar hasn't reported yet"
+        latency = None
+        req = parse_iso(target.get("requested_at"))
+        done = [parse_iso(x) for x in (c.get("applied_at"), s_.get("applied_at")) if parse_iso(x)]
+        if applied and req and done:
+            latency = round(max(done) - req, 2)
+            if latency < 0 or latency > 3600:
+                latency = None
+        nxt, poll = self._next_poll(sc, now)
+        behind = [k for k, want, have in (("config", target["config_version"], c.get("applied_version")),
+                                          ("scope", target["scope_version"], s_.get("applied_version")))
+                  if have != want]
+        if stale:
+            state = "stale"
+        elif refused:
+            state = "refused"
+        elif applied:
+            state = "in_sync"
+        else:
+            state = "pending"
+        out = {"enabled": True, "applied": applied, "pending": not applied and not error, "target": target,
+               "latency_s": latency,
+               "config": {"version": c.get("applied_version"), "synced_version": c.get("synced_version"),
+                          "synced_at": c.get("synced_at"), "etag": c.get("etag"),
+                          "applied_at": c.get("applied_at"), "rejected_version": c.get("rejected_version"),
+                          "refused_reason": c.get("refused_reason")},
+               "scope": {"version": s_.get("applied_version"), "synced_version": s_.get("synced_version"),
+                         "role": s_.get("role"),
+                         "session_policy": s_.get("session_policy"), "session_name": s_.get("session_name"),
+                         "source_identity": s_.get("source_identity"), "expiration": s_.get("expiration"),
+                         "assumed_at": s_.get("assumed_at"), "applied_at": s_.get("applied_at"),
+                         # STS's AssumeRole answer: share of the maximum session token size, and its size in
+                         # bytes; packed_policy_size is the deprecated predecessor, kept for older answers
+                         "session_token_utilization": s_.get("session_token_utilization"),
+                         "session_token_size": s_.get("session_token_size"),
+                         "packed_policy_size": s_.get("packed_policy_size"), "error": s_.get("error")},
+               "reload": {"at": r.get("at"), "ok": r.get("ok"), "http_status": r.get("http_status"),
+                          "error": r.get("error"), "pending": r.get("pending")},
+               "sidecar": {"task": sc.get("task"), "started_at": sc.get("started_at"), "updated_at": sc.get("updated_at"),
+                           "heartbeat_age_s": age, "stale": stale, "stale_after_s": STALE_S, "poll_s": poll,
+                           "next_poll_at": now_iso(nxt) if nxt else None,
+                           "next_poll_in_s": round(max(0.0, nxt - now), 1) if nxt else None},
+               "sync": {"state": state, "behind": behind},
+               "error": error}
+        if stale and not error:
+            out["error"] = f"the control sidecar hasn't written its status for over {STALE_S} s"
+            out["pending"] = False
+        return out
+
     def status(self, max_age: float = 0.5) -> dict:
         """What the sidecar applied (status.json) against what's in the bucket now."""
         if not self.enabled:
@@ -908,51 +1128,86 @@ class ProxyPolicy:
         target = {"config_version": int(cfg_v or 0), "scope_version": int(scope.get("version") or 0)}
         times = [t for t in (cfg_at, scope.get("updated_at")) if parse_iso(t)]
         target["requested_at"] = max(times, key=parse_iso) if times else None
-        c, s_, r = sc.get("config") or {}, sc.get("scope") or {}, sc.get("reload") or {}
-        updated = parse_iso(sc.get("updated_at"))
-        age = round(time.time() - updated, 1) if updated else None
-        stale = age is None or age > STALE_S
-        applied = (bool(sc) and c.get("applied_version") == target["config_version"]
-                   and s_.get("applied_version") == target["scope_version"] and r.get("ok") is True)
-        error = None
-        if c.get("refused_reason") and c.get("rejected_version") == target["config_version"]:
-            # part 2's sidecar checks the Secrets Manager guard itself and doesn't apply a config that breaks it
-            error = f"the control sidecar refused config v{c.get('rejected_version')}: {c['refused_reason']}"
-        elif r.get("ok") is False and r.get("error"):
-            error = f"iron-proxy rejected config v{c.get('rejected_version') or c.get('synced_version')}: {r['error']}"
-        elif s_.get("error") and s_.get("synced_version") != target["scope_version"]:
-            error = f"the sidecar couldn't assume the scoped role: {s_['error']}"
-        elif not sc:
-            error = "the control sidecar hasn't reported yet"
-        latency = None
-        req = parse_iso(target["requested_at"])
-        done = [parse_iso(x) for x in (c.get("applied_at"), s_.get("applied_at")) if parse_iso(x)]
-        if applied and req and done:
-            latency = round(max(done) - req, 2)
-            if latency < 0 or latency > 3600:
-                latency = None
-        out = {"enabled": True, "applied": applied, "pending": not applied and not error, "target": target,
-               "latency_s": latency,
-               "config": {"version": c.get("applied_version"), "synced_version": c.get("synced_version"),
-                          "applied_at": c.get("applied_at"), "rejected_version": c.get("rejected_version")},
-               "scope": {"version": s_.get("applied_version"), "role": s_.get("role"),
-                         "session_policy": s_.get("session_policy"), "session_name": s_.get("session_name"),
-                         "source_identity": s_.get("source_identity"), "expiration": s_.get("expiration"),
-                         "assumed_at": s_.get("assumed_at"), "applied_at": s_.get("applied_at"),
-                         # STS's AssumeRole answer: share of the maximum session token size, and its size in
-                         # bytes; packed_policy_size is the deprecated predecessor, kept for older answers
-                         "session_token_utilization": s_.get("session_token_utilization"),
-                         "session_token_size": s_.get("session_token_size"),
-                         "packed_policy_size": s_.get("packed_policy_size"), "error": s_.get("error")},
-               "reload": {"at": r.get("at"), "ok": r.get("ok"), "http_status": r.get("http_status"), "error": r.get("error")},
-               "sidecar": {"task": sc.get("task"), "updated_at": sc.get("updated_at"), "heartbeat_age_s": age,
-                           "stale": stale},
-               "error": error}
-        if stale and not error:
-            out["error"] = "the control sidecar hasn't written its status for over 90 s"
-            out["pending"] = False
+        out = self._evaluate(target, sc, time.time())
         self._status_cache = (now, out)
         return out
+
+    def config_view(self) -> dict:
+        """For admins: iron-proxy.yaml and aws-scope.json as they are in the bucket (the desired state), what the
+        sidecar reports it applied (status.json), and whether the two match. Secret material, which neither file
+        should hold, is redacted here (app/redact.py)."""
+        self._need()
+        now = time.time()
+        cfg = self.store.get_full(self.keys["config"])
+        if not cfg:
+            raise PolicyError("the control bucket has no iron-proxy.yaml")
+        scope_obj = self.store.get_full(self.keys["scope"])
+        status_obj = self.store.get_full(self.keys["status"])
+        text = cfg["body"].decode("utf-8", "replace")
+        first = text.split("\n", 1)[0]
+        m = HEADER_FULL_RE.match(first.strip())
+        cfg_version = ConfigDoc(text).version if HEADER_RE.match(first) else 0
+        try:
+            scope = json.loads(scope_obj["body"]) if scope_obj else {}
+        except ValueError:
+            scope = {}
+        scope = scope if isinstance(scope, dict) else {}
+        try:
+            sc = json.loads(status_obj["body"]) if status_obj else {}
+        except ValueError:
+            sc = {}
+        sc = sc if isinstance(sc, dict) else {}
+        md = cfg["metadata"]
+        target = {"config_version": cfg_version, "scope_version": int(scope.get("version") or 0)}
+        times = [x for x in (md.get("updated-at") or (m.group(2) if m else None), scope.get("updated_at")) if parse_iso(x)]
+        target["requested_at"] = max(times, key=parse_iso) if times else None
+        ev = self._evaluate(target, sc, now)
+        placeholders = [str(c.get("placeholder") or "") for c in self.credential_catalog().values()]
+        cfg_text, cfg_found = redact_yaml(text, placeholders)
+        scope_text, scope_found = redact_json(scope, placeholders) if scope_obj else ("", [])
+        etag_match = (ev["config"]["etag"] == cfg["etag"]) if ev["config"]["etag"] else None
+        sync = dict(ev["sync"])
+        poll = ev["sidecar"]["poll_s"]
+        if sync["state"] == "in_sync":
+            sync["detail"] = (f"iron-proxy runs config v{cfg_version} and AWS scope v{target['scope_version']}, "
+                              "the versions in the bucket.")
+        elif sync["state"] == "pending":
+            parts = [f"config v{cfg_version}" if "config" in sync["behind"] else None,
+                     f"AWS scope v{target['scope_version']}" if "scope" in sync["behind"] else None]
+            what = " and ".join(p for p in parts if p) or f"config v{cfg_version}"
+            sync["detail"] = (f"The bucket has {what}; the sidecar applies it at its next check (every {poll:g} s).")
+        elif sync["state"] == "refused":
+            sync["detail"] = ev["error"] + ". iron-proxy keeps the last config it applied."
+        else:
+            sync["detail"] = ev["error"] or f"the control sidecar hasn't written its status for over {STALE_S} s"
+        sync["etag_match"] = etag_match
+        return {
+            "enabled": True,
+            "server_time": now_iso(now),
+            "bucket": self.s.control_bucket,
+            "desired": {
+                "config": {"key": self.keys["config"], "version": cfg_version, "last_modified": cfg["last_modified"],
+                           "etag": cfg["etag"], "version_id": cfg["version_id"], "size": cfg["size"],
+                           "updated_at": md.get("updated-at") or (m.group(2) if m else None),
+                           "updated_by": md.get("updated-by") or (m.group(3).strip() if m else None)},
+                "scope": ({"key": self.keys["scope"], "version": target["scope_version"],
+                           "last_modified": scope_obj["last_modified"], "etag": scope_obj["etag"],
+                           "version_id": scope_obj["version_id"], "size": scope_obj["size"],
+                           "updated_at": scope.get("updated_at"), "updated_by": scope.get("updated_by"),
+                           "role": scope.get("role"), "session_policy": scope.get("session_policy"),
+                           "seed": bool(scope.get("seed"))} if scope_obj else None),
+            },
+            "applied": {
+                "status_key": self.keys["status"],
+                "status_last_modified": status_obj["last_modified"] if status_obj else None,
+                "config": ev["config"], "scope": ev["scope"], "reload": ev["reload"], "sidecar": ev["sidecar"],
+                "latency_s": ev["latency_s"],
+            },
+            "sync": sync,
+            "error": ev["error"],
+            "content": {"config": cfg_text, "scope": scope_text},
+            "redactions": {"config": cfg_found, "scope": scope_found},
+        }
 
     def config_applied(self, version: int) -> bool:
         st = self.status(max_age=1.0)

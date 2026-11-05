@@ -1,5 +1,5 @@
 ---
-name: Lambda MicroVM Workspace
+name: My2cents.ai Lambda MicroVM Playground
 description: A night desk for sandboxes; the desk keeps the real keys and the clerk sees every one that leaves.
 colors:
   n0: "#0e0c09"
@@ -76,13 +76,13 @@ components:
   dialog: { backgroundColor: "{colors.n2}", textColor: "{colors.n9}", rounded: "{rounded.lg}", padding: "18px 20px 16px", width: "440px" }
 ---
 
-# Design System: Lambda MicroVM Workspace
+# Design System: My2cents.ai Lambda MicroVM Playground
 
 ## Overview
 
 **Creative North Star: "The Night Desk"**
 
-The workspace is a hotel night desk after hours. The desk (iron-proxy) holds the real keys, the rooms (sandboxes) hold only placeholders, and the clerk can see every key that leaves the board. The lobby is a warm charcoal ramp, lit by one brass lamp; everything else is quiet until a state changes.
+The playground is a hotel night desk after hours. The desk (iron-proxy) holds the real keys, the rooms (sandboxes) hold only placeholders, and the clerk can see every key that leaves the board. The lobby is a warm charcoal ramp, lit by one brass lamp; everything else is quiet until a state changes.
 
 It is dense but calm: a 28px row module, 11 to 14px type, hairline dividers, and no cards for metrics. The terminal owns the centre and is the darkest surface; sidebar and panel are one step lighter and serve as peripheral vision. Colour carries meaning only. It refuses the cool-slate cloud console with a neon cyan accent and a card grid of metrics.
 
@@ -131,7 +131,7 @@ A low-chroma warm charcoal lobby, one brass lamp, and state hues that only speak
 **Body Font:** system-ui (with -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial)
 **Mono Font:** ui-monospace (with SF Mono, Menlo, Consolas, Liberation Mono)
 
-**Character:** The platform's own UI sans, small and tight, so the workspace reads as a tool next to the terminal. Mono is reserved for what a machine would type.
+**Character:** The platform's own UI sans, small and tight, so the playground reads as a tool next to the terminal. Mono is reserved for what a machine would type.
 
 ### Hierarchy
 - **Title** (600, 14px): sandbox name in the toolbar, overlay titles. Dialog titles step to 15px and the sign-in title to 17px; nothing is larger.
@@ -206,7 +206,7 @@ Sandbox rows: 6px rows with name, state word, a 3px life bar and a micro meta li
 Terminal connection card: n2, 10px, overlay shadow, 34px round icon. Connecting, reconnecting, detached and shell-exited cards are neutral (n4 icon); suspended uses the indigo wash; connection errors use the oxide wash. The terminal dims to 28% beneath it. Dialogs: 440px, n2, 10px, focus lands on Cancel. Toasts: n3, 8px, a 7px leading dot (oxide for errors with an oxide border, verdigris for success).
 
 ### Quota meter
-Four 2 GB cells, 8px tall, 3px gaps: verdigris for running, indigo for suspended, a diagonal n6/n4 hatch for memory held elsewhere, an n5 inset outline for free.
+One cell per GB of the account's MicroVM memory quota (eight here; above 16 GB a cell stands for several GB), so a sandbox takes as many cells as its size. 8px tall, a 1px gap inside a sandbox and 3px between sandboxes: verdigris for running, indigo for suspended, a diagonal n6/n4 hatch for memory held elsewhere, an n5 inset outline for free.
 
 ## Do's and Don'ts
 

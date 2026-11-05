@@ -15,6 +15,7 @@ output "api_log_group" { value = aws_cloudwatch_log_group.api.name }
 output "ecs_cluster" { value = local.p2.ecs_cluster_arn }
 output "ecs_service" { value = aws_ecs_service.api.name }
 output "image_arn" { value = local.image_arn }
+output "image_arns" { value = local.image_arns }
 output "api_task_role_arn" { value = aws_iam_role.task.arn }
 output "origin_secret" {
   value     = random_password.origin_secret.result

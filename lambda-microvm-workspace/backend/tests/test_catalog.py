@@ -177,7 +177,9 @@ def test_open_lists_never_include_secrets_manager(catalog):
     for role in ("view-only", "read-only", "data-reader", "builder"):
         pv = catalog.preview(["s3:ListAllMyBuckets"], role, session_policy=False)
         assert pv["policy"] is None and pv["chars"] == 0 and pv["session_policy"] is False
-        assert "secretsmanager" not in pv["allowed_services"] and len(pv["allowed_services"]) > 10
+        # only services the role allows something in; data-reader: its demo bucket and table, and sts:GetCallerIdentity
+        assert "secretsmanager" not in pv["allowed_services"]
+        assert len(pv["allowed_services"]) > 10 if role != "data-reader" else pv["allowed_services"] == ["dynamodb", "s3", "sts"]
         assert pv["allowed_services"] != [] and "none" not in pv["allowed_services"]
         for ep in cat.secrets_endpoints("us-east-1"):
             assert not any(cat._glob(h, ep) for h in pv["hosts"]), ep
@@ -195,21 +197,30 @@ def test_guards():
 
 
 @pytest.mark.parametrize("role", ["view-only", "read-only", "data-reader", "builder"])
-def test_wildcards_are_allowed_only_when_everything_they_cover_is(catalog, role):
+def test_wildcards_report_how_much_is_effective(catalog, role):
     snap = catalog.snapshot(role)
     for sid, s in snap["services"].items():
+        names = [w["action"] for w in s["wildcards"]]
+        if sid == "secretsmanager":
+            assert f"{sid}:*" not in names and all(not w["pickable"] for w in s["wildcards"])
+        elif s["wildcards"]:
+            assert names[0] == f"{sid}:*" and s["wildcards"][0]["label"] == "Every action"
         for w in s["wildcards"]:
             verb = w["name"][:-1]
             covered = [a for a in s["actions"] if a["name"].startswith(verb)]
+            eff = sum(a["allowed"] for a in covered)
             assert w["covers"] == len(covered)
-            assert w["allowed"] == (s["enabled"] and all(a["allowed"] for a in covered)), w["action"]
+            assert w["pickable"] == (s["enabled"] and sid != "secretsmanager"), w["action"]
+            if w["pickable"]:
+                assert w["effective"] == eff and w["tone"] == cat.tone(eff, len(covered))
+                assert w["allowed"] == (eff == len(covered))
     if role != "read-only":
         return
     s3 = catalog.service("s3", role)
-    assert next(w for w in s3["wildcards"] if w["action"] == "s3:List*")["allowed"] is True
+    assert next(w for w in s3["wildcards"] if w["action"] == "s3:List*")["tone"] == "all"
     assert next(w for w in catalog.service("secretsmanager", role)["wildcards"] if w["action"].endswith("Get*"))["reason"] == cat.SECRETS_REASON
     ssm_get = next(w for w in catalog.service("ssm", role)["wildcards"] if w["action"] == "ssm:Get*")
-    assert ssm_get["allowed"] is False and "never enabled" in ssm_get["reason"]
+    assert ssm_get["pickable"] is True and ssm_get["tone"] == "partial" and "denied in the session policy" in ssm_get["reason"]
 
 
 # ---------------------------------------------------------------- search
@@ -261,9 +272,10 @@ def test_preview_maps_services_to_signing_names_and_hosts(catalog):
 
 
 @pytest.mark.parametrize("action,needle", [
-    ("s3:PutObject", "outside the read-only role"), ("secretsmanager:GetSecretValue", "secrets"),
+    ("secretsmanager:GetSecretValue", "secrets"),
     ("ssm:GetParameter", "SecureString"), ("cloudshell:DescribeEnvironments", "no endpoint mapping"),
-    ("s3:Describe*", "outside the read-only role"), ("nope:Nothing", "not in the Service Authorization Reference"),
+    ("secretsmanager:*", "not in the Service Authorization Reference"), ("secretsmanager:List*", "secrets"),
+    ("nope:Nothing", "not in the Service Authorization Reference"),
     ("s3:GetNothingHere", "not in the Service Authorization Reference")])
 def test_preview_refuses(catalog, action, needle):
     with pytest.raises(cat.CatalogError) as e:

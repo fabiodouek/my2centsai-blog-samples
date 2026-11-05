@@ -15,7 +15,19 @@ import { fmtAgo, fmtShortTime } from '../../lib/format';
 import { useNow, usePolling } from '../../lib/hooks';
 import { noteWrite, usePolicy } from '../../lib/policy';
 import { toast } from '../../lib/store';
-import type { AccessLevel, AwsAction, AwsCatalog, AwsPreview, AwsRole, AwsSearchResult, AwsServiceSummary, AwsWildcard } from '../../lib/types';
+import type {
+  AccessLevel,
+  AwsAction,
+  AwsCatalog,
+  AwsCoverage,
+  AwsEffectiveRow,
+  AwsPreview,
+  AwsRole,
+  AwsSearchResult,
+  AwsServiceSummary,
+  AwsWildcard,
+  Tone,
+} from '../../lib/types';
 import { Button, Empty, Note, Segmented, SkeletonRows } from '../ui/primitives';
 import { ApplyStatus } from './ApplyStatus';
 
@@ -46,6 +58,30 @@ function shortReason(reason: string | null): string | null {
   if (r.includes('mapping')) return 'no endpoint mapping';
   if (r.includes('secret')) return 'never here: reads secrets';
   return reason.length > 44 ? `${reason.slice(0, 42)}…` : reason;
+}
+
+const TONE_LABEL: Record<Tone, string> = { all: 'all effective', partial: 'partly effective', none: 'no effect' };
+
+/** How much of a pick is effective with the role: filled (all), half (some), empty ring (none). Colour plus shape. */
+function ToneDot({ tone, title }: { tone: Tone; title?: string }) {
+  return <span className={`tone-dot tone-${tone}`} role="img" aria-label={TONE_LABEL[tone]} title={title ?? TONE_LABEL[tone]} />;
+}
+
+function ToneLegend({ role }: { role: string | null }) {
+  return (
+    <p className="tone-legend">
+      <span>
+        <ToneDot tone="all" /> all effective
+      </span>
+      <span>
+        <ToneDot tone="partial" /> some
+      </span>
+      <span>
+        <ToneDot tone="none" /> none
+      </span>
+      <span className="tone-legend-note">with {role ? <span className="mono">{role}</span> : 'the role'}, computed from its policies</span>
+    </p>
+  );
 }
 
 export function AwsSection({ editable }: { editable: boolean }) {
@@ -260,6 +296,9 @@ export function AwsSection({ editable }: { editable: boolean }) {
   }
 
   const cat = catalog.data;
+  // A preview for the role on screen: after a role switch the old one stays up (dimmed) until the new one arrives,
+  // and its counts aren't shown against the new role
+  const fresh = preview !== null && (preview.role ?? shownRole) === shownRole && preview.sessionPolicy === spOn;
   const chosen = new Set(selected ?? []);
   const nSelected = chosen.size;
   const nServices = Object.keys(counts).length;
@@ -366,6 +405,7 @@ export function AwsSection({ editable }: { editable: boolean }) {
               {searching && !opened ? (
                 <SearchResults
                   query={query.trim()}
+                  role={shownRole}
                   level={lvl}
                   result={result}
                   error={searchError}
@@ -419,13 +459,20 @@ export function AwsSection({ editable }: { editable: boolean }) {
                 </span>
               </div>
               <SizeMeter preview={preview && preview.sessionPolicy ? preview : null} limit={cat.policyChars} busy={previewing} />
-              <SelectedChips actions={sorted(chosen)} role={shownRole} editable={editable} onRemove={(a) => toggle(a, false)} />
+              <SelectedChips
+                actions={sorted(chosen)}
+                role={shownRole}
+                coverage={fresh && preview && preview.sessionPolicy ? preview.coverage : null}
+                editable={editable}
+                onRemove={(a) => toggle(a, false)}
+              />
+              {nSelected ? <ToneLegend role={shownRole} /> : null}
               {previewError ? (
                 <p className="form-error" role="alert">
                   {previewError}
                 </p>
               ) : (
-                <PolicyJson preview={preview && preview.sessionPolicy ? preview : null} baseline={cat.baseline} />
+                <PreviewTabs preview={preview && preview.sessionPolicy ? preview : null} baseline={cat.baseline} role={shownRole} stale={!fresh || previewing} />
               )}
               {applyControls}
             </section>
@@ -439,6 +486,7 @@ export function AwsSection({ editable }: { editable: boolean }) {
           <p className="aws-open-text">Sandboxes get the role’s full permissions. iron-proxy still refuses Secrets Manager.</p>
           <OpenSummary preview={preview} busy={previewing} error={previewError} />
           {applyControls}
+          {preview && !preview.sessionPolicy ? <EffectiveTable preview={preview} role={shownRole} stale={!fresh || previewing} /> : null}
         </section>
       )}
     </div>
@@ -539,8 +587,9 @@ function OpenSummary({ preview, busy, error }: { preview: AwsPreview | null; bus
     <div className={`aws-open-summary${busy ? ' is-busy' : ''}`}>
       <p className="tabular">
         iron-proxy lets through <strong>{nSvc.toLocaleString()}</strong> {nSvc === 1 ? 'service' : 'services'} and{' '}
-        <strong>{nHosts.toLocaleString()}</strong> {nHosts === 1 ? 'host' : 'hosts'}: every AWS service the catalog can map,
-        except Secrets Manager.
+        <strong>{nHosts.toLocaleString()}</strong> {nHosts === 1 ? 'host' : 'hosts'}: every AWS service the catalog can map
+        and the role allows at least one action in, except Secrets Manager. Calls to any other service get iron-proxy’s
+        403 before they reach AWS.
       </p>
       <details className="aws-open-details">
         <summary>List them</summary>
@@ -666,7 +715,7 @@ function summaryItem(s: AwsServiceSummary, lvl: AccessLevel | null): ListItem {
     enabled: s.enabled,
     reason: s.reason,
     note: lvl ? String(n) : `${s.allowed}/${s.actions}`,
-    noteLabel: lvl ? `${n} ${lvl} actions` : `${s.allowed} of ${s.actions} actions can be picked`,
+    noteLabel: lvl ? `${n} ${lvl} actions` : `${s.allowed} of ${s.actions} actions effective with the role`,
   };
 }
 
@@ -748,13 +797,17 @@ function ServicePanel({
       (a) => (!level || a.level === level) && (!filterByQuery || a.action.toLowerCase().includes(q)),
     );
     const ok = rows.filter((a) => a.allowed);
+    // Outside the role: pickable, no effect with it. Blocked or unmapped: not pickable.
+    const noEffect = new Map<string, AwsAction[]>();
     const blocked = new Map<string, AwsAction[]>();
     for (const a of rows) {
       if (a.allowed) continue;
+      const into = a.pickable ? noEffect : blocked;
       const k = a.reason ?? 'not available here';
-      blocked.set(k, [...(blocked.get(k) ?? []), a]);
+      into.set(k, [...(into.get(k) ?? []), a]);
     }
-    return { ok, blocked: [...blocked.entries()], total: rows.length };
+    const nNoEffect = [...noEffect.values()].reduce((n, xs) => n + xs.length, 0);
+    return { ok, noEffect: [...noEffect.entries()], nNoEffect, blocked: [...blocked.entries()], total: rows.length };
   }, [data, level, filterByQuery, q]);
 
   const nChosen = [...chosen].filter((a) => prefixOf(a) === id).length;
@@ -798,25 +851,42 @@ function ServicePanel({
       ) : groups ? (
         <>
           {!level && !filterByQuery && data?.wildcards.length ? (
-            <ul className="aws-checks aws-wild" role="list" aria-label={`${name} wildcards`}>
-              {data.wildcards.map((w) => (
-                <WildcardRow key={w.action} w={w} checked={chosen.has(w.action)} editable={editable} onToggle={onToggle} />
-              ))}
-            </ul>
+            <>
+              <ul className="aws-checks aws-wild" role="list" aria-label={`${name} wildcards`}>
+                {data.wildcards.map((w) => (
+                  <WildcardRow key={w.action} w={w} checked={chosen.has(w.action)} editable={editable} onToggle={onToggle} />
+                ))}
+              </ul>
+              <ToneLegend role={role} />
+            </>
           ) : null}
           <p className="aws-group-head tabular">
-            {groups.ok.length.toLocaleString()} can be picked
-            {groups.total !== groups.ok.length ? ` · ${(groups.total - groups.ok.length).toLocaleString()} can’t` : ''}
+            {groups.ok.length.toLocaleString()} effective with {role ? <span className="mono">{role}</span> : 'the role'}
+            {groups.nNoEffect ? ` · ${groups.nNoEffect.toLocaleString()} no effect` : ''}
+            {groups.total - groups.ok.length - groups.nNoEffect ? ` · ${(groups.total - groups.ok.length - groups.nNoEffect).toLocaleString()} not available` : ''}
             {level ? ` · ${level} only` : ''}
             {filterByQuery ? ` · matching “${query}”` : ''}
           </p>
           {groups.ok.length ? (
-            <ul className="aws-checks" role="list" aria-label={`${name} actions you can pick`}>
+            <ul className="aws-checks" role="list" aria-label={`${name} actions effective with the role`}>
               {groups.ok.map((a) => (
-                <ActionRow key={a.action} a={a} label={a.name} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} />
+                <ActionRow key={a.action} a={a} role={role} label={a.name} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} />
               ))}
             </ul>
           ) : null}
+          {groups.noEffect.map(([reason, rows]) => (
+            <div key={reason} className="aws-noeffect">
+              <p className="aws-group-head is-blocked tabular" title={reason}>
+                {rows.length.toLocaleString()} no effect with {role ? <span className="mono">{role}</span> : 'the role'} ({shortReason(reason)}): can
+                still be picked
+              </p>
+              <ul className="aws-checks" role="list" aria-label={`${name}: no effect with the role`}>
+                {rows.map((a) => (
+                  <ActionRow key={a.action} a={a} role={role} label={a.name} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} />
+                ))}
+              </ul>
+            </div>
+          ))}
           {groups.blocked.map(([reason, rows]) => (
             <div key={reason} className="aws-blocked">
               <p className="aws-group-head is-blocked tabular">
@@ -824,7 +894,7 @@ function ServicePanel({
               </p>
               <ul className="aws-checks" role="list" aria-label={`${name}: ${reason}`}>
                 {rows.map((a) => (
-                  <ActionRow key={a.action} a={a} label={a.name} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} />
+                  <ActionRow key={a.action} a={a} role={role} label={a.name} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} />
                 ))}
               </ul>
             </div>
@@ -843,6 +913,7 @@ function ServicePanel({
 
 function SearchResults({
   query,
+  role,
   level,
   result,
   error,
@@ -851,6 +922,7 @@ function SearchResults({
   onToggle,
 }: {
   query: string;
+  role: string | null;
   level: AccessLevel | null;
   result: AwsSearchResult | null;
   error: string | null;
@@ -876,7 +948,7 @@ function SearchResults({
       {result.actions.length ? (
         <ul className="aws-checks" role="list" aria-label="Matching actions">
           {result.actions.map((a) => (
-            <ActionRow key={a.action} a={a} label={a.action} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} inline />
+            <ActionRow key={a.action} a={a} role={role} label={a.action} checked={chosen.has(a.action)} editable={editable} onToggle={onToggle} inline />
           ))}
         </ul>
       ) : (
@@ -890,6 +962,7 @@ function SearchResults({
 
 const ActionRow = memo(function ActionRow({
   a,
+  role,
   label,
   checked,
   editable,
@@ -897,6 +970,7 @@ const ActionRow = memo(function ActionRow({
   inline,
 }: {
   a: AwsAction;
+  role: string | null;
   label: string;
   checked: boolean;
   editable: boolean;
@@ -904,17 +978,22 @@ const ActionRow = memo(function ActionRow({
   /** Show the short reason on the row itself (search results have no group headings). */
   inline?: boolean;
 }) {
-  const off = !a.allowed;
+  // Not pickable (blocked, unmapped): disabled. Outside the role: pickable, marked "no effect".
+  const off = !a.pickable;
+  const noEffect = a.pickable && !a.allowed;
   const short = off && inline ? shortReason(a.reason) : null;
   return (
     <li>
-      <label className={`aws-check${checked ? ' is-on' : ''}${off ? ' is-off' : ''}`} title={off ? (a.reason ?? undefined) : undefined}>
+      <label
+        className={`aws-check${checked ? ' is-on' : ''}${off ? ' is-off' : ''}${noEffect ? ' is-noeffect' : ''}`}
+        title={off || noEffect ? (a.reason ?? undefined) : undefined}
+      >
         <input
           type="checkbox"
           checked={checked}
           // A chosen action the server no longer allows can still be unticked.
           disabled={!editable || (off && !checked)}
-          aria-label={`${a.action} (${a.level})${off ? `: ${a.reason ?? 'not available'}` : a.limited ? ', limited' : ''}`}
+          aria-label={`${a.action} (${a.level})${off ? `: ${a.reason ?? 'not available'}` : noEffect ? `: no effect with ${role ?? 'the role'}` : a.limited ? ', limited' : ''}`}
           onChange={(e) => onToggle(a.action, e.target.checked)}
         />
         <span className="aws-check-action mono" title={a.action}>
@@ -923,6 +1002,11 @@ const ActionRow = memo(function ActionRow({
         {short ? (
           <span className="aws-check-why" title={a.reason ?? undefined}>
             {short}
+          </span>
+        ) : null}
+        {noEffect ? (
+          <span className="aws-check-why" title={a.reason ?? undefined}>
+            no effect with {role ?? 'the role'}
           </span>
         ) : null}
         {a.limited && !off ? (
@@ -947,25 +1031,34 @@ function WildcardRow({
   editable: boolean;
   onToggle: (action: string, on: boolean) => void;
 }) {
-  const off = !w.allowed;
+  const off = !w.pickable;
+  const count = `${w.effective} of ${w.covers} effective`;
   return (
     <li>
-      <label className={`aws-check aws-wild-row${checked ? ' is-on' : ''}${off ? ' is-off' : ''}`}>
+      <label className={`aws-check aws-wild-row${checked ? ' is-on' : ''}${off ? ' is-off' : ''}`} title={w.reason ?? undefined}>
         <input
           type="checkbox"
           checked={checked}
           disabled={!editable || (off && !checked)}
-          aria-label={`${w.action} (wildcard, ${w.covers} actions)${off ? `: ${w.reason ?? 'not available'}` : ''}`}
+          aria-label={`${w.action} (wildcard, ${w.covers} actions)${off ? `: ${w.reason ?? 'not available'}` : `: ${count}`}`}
           onChange={(e) => onToggle(w.action, e.target.checked)}
         />
         <span className="aws-wild-text">
           <span className="aws-check-label">{w.label}</span>
-          {off && w.reason ? <span className="aws-wild-why">{w.reason}</span> : null}
+          {/* The action names stay in the tooltip; the row keeps the counts */}
+          {w.reason ? <span className="aws-wild-why">{w.reason.replace(/ \([^)]*\)/g, '')}</span> : null}
         </span>
         <span className="aws-check-action mono" title={w.action}>
           {w.action}
         </span>
-        <span className="lvl tabular">covers {w.covers}</span>
+        {off ? (
+          <span className="lvl tabular">covers {w.covers}</span>
+        ) : (
+          <span className="lvl lvl-cov tabular" title={w.reason ?? `${count}${w.limited ? ', some limited' : ''}`}>
+            <ToneDot tone={w.tone} title={w.reason ?? count} />
+            {w.effective}/{w.covers}
+          </span>
+        )}
       </label>
     </li>
   );
@@ -974,14 +1067,18 @@ function WildcardRow({
 function SelectedChips({
   actions,
   role,
+  coverage,
   editable,
   onRemove,
 }: {
   actions: string[];
   role: string | null;
+  /** The preview's coverage per pick (null while it loads, or with no session policy) */
+  coverage: AwsCoverage[] | null;
   editable: boolean;
   onRemove: (a: string) => void;
 }) {
+  const byAction = new Map((coverage ?? []).map((c) => [c.action, c]));
   if (!actions.length) {
     return <p className="aws-chips-empty">Nothing selected: iron-proxy will refuse every AWS call.</p>;
   }
@@ -991,10 +1088,16 @@ function SelectedChips({
       <ul className="aws-chips" role="list" aria-label="Selected actions">
         {actions.map((a) => {
           const k = knownAction(a, role);
-          const bad = k !== null && !k.allowed;
+          // Can't be picked any more (blocked, unmapped): red. Otherwise the tone of its coverage.
+          const bad = k !== null && !k.pickable;
+          const c = byAction.get(a);
+          const title = bad ? (k?.reason ?? undefined) : (c?.reason ?? (c ? `${c.effective} of ${c.covers} effective` : undefined));
           return (
-            <li key={a} className={`aws-chip${bad ? ' is-bad' : ''}`} title={bad ? (k?.reason ?? undefined) : undefined}>
+            <li key={a} className={`aws-chip${bad ? ' is-bad' : ''}${c && c.tone === 'none' ? ' is-none' : ''}`} title={title}>
+              {c && !bad ? <ToneDot tone={c.tone} title={title} /> : null}
               <span className="mono">{a}</span>
+              {c && !bad && c.kind === 'wildcard' ? <span className="aws-chip-count tabular">{c.effective}/{c.covers}</span> : null}
+              {c && !bad && c.kind === 'action' && c.tone === 'none' ? <span className="aws-chip-why">no effect</span> : null}
               {bad ? <span className="aws-chip-why">{shortReason(k?.reason ?? null)}</span> : null}
               {editable ? (
                 <button type="button" aria-label={`Remove ${a}`} onClick={() => onRemove(a)}>
@@ -1007,6 +1110,187 @@ function SelectedChips({
       </ul>
     </div>
   );
+}
+
+// ---------------------------------------------------------------- session policy / effective access
+
+type PreviewTab = 'policy' | 'effective';
+
+function PreviewTabs({
+  preview,
+  baseline,
+  role,
+  stale,
+}: {
+  preview: AwsPreview | null;
+  baseline: Record<string, unknown> | null;
+  role: string | null;
+  stale: boolean;
+}) {
+  const [tab, setTab] = useState<PreviewTab>('policy');
+  const tabs: { id: PreviewTab; label: string }[] = [
+    { id: 'policy', label: 'Session policy' },
+    { id: 'effective', label: 'Effective access' },
+  ];
+  function onKey(e: React.KeyboardEvent) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next: PreviewTab = tab === 'policy' ? 'effective' : 'policy';
+    setTab(next);
+    document.getElementById(`aws-ptab-${next}`)?.focus();
+  }
+  return (
+    <div className="aws-ptabs">
+      <div className="tabs aws-ptablist" role="tablist" aria-label="Session policy or effective access" onKeyDown={onKey}>
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            id={`aws-ptab-${t.id}`}
+            type="button"
+            role="tab"
+            className="tab"
+            aria-selected={tab === t.id}
+            aria-controls={`aws-ppanel-${t.id}`}
+            tabIndex={tab === t.id ? 0 : -1}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" id={`aws-ppanel-${tab}`} aria-labelledby={`aws-ptab-${tab}`}>
+        {tab === 'policy' ? (
+          <PolicyJson preview={preview} baseline={baseline} />
+        ) : preview ? (
+          <EffectiveTable preview={preview} role={role} stale={stale} />
+        ) : (
+          <SkeletonRows rows={4} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Effective access per service: the role's own permissions intersected with the session policy (or the role alone,
+ * with no session policy). Computed by the backend from the role's policies; a row opens to the action names.
+ */
+function EffectiveTable({ preview, role, stale }: { preview: AwsPreview; role: string | null; stale: boolean }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const rows = preview.effective;
+  const sp = preview.sessionPolicy;
+  const nEff = rows.reduce((n, r) => n + r.effective, 0);
+  const nLive = rows.filter((r) => r.effective > 0).length;
+  // The table is for the preview's role; while a switched role's preview loads, say so and dim it
+  const shown = preview.role ?? role;
+  const roleEl = shown ? <span className="mono">{shown}</span> : 'the role';
+  return (
+    <div className={`aws-effective${stale ? ' is-busy' : ''}`} aria-busy={stale || undefined}>
+      <h3 className="aws-eff-title">
+        {sp ? (
+          <>
+            Role {roleEl} ∩ session policy = effective
+          </>
+        ) : (
+          <>Role {roleEl}, no session policy: everything it allows</>
+        )}
+      </h3>
+      <p className="aws-eff-note tabular">
+        {stale && role && shown !== role ? `Evaluating for ${role}… ` : ''}
+        {nEff.toLocaleString()} {nEff === 1 ? 'action' : 'actions'} in {nLive} {nLive === 1 ? 'service' : 'services'}. Computed
+        here from the role’s policies: an action counts when an Allow matches it and no unconditional Deny does; “limited”
+        when every matching Allow is tied to a resource or a condition. AWS has the last word.
+      </p>
+      {rows.length ? (
+        <div className={`table-scroll aws-eff-scroll${sp ? '' : ' is-tall'}`}>
+          <table className="table aws-eff-table">
+            <thead>
+              <tr>
+                <th scope="col">Service</th>
+                <th scope="col" className="num">
+                  Effective
+                </th>
+                <th scope="col" className="num">
+                  Asked
+                </th>
+                <th scope="col" className="num">
+                  Role allows
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <EffectiveRow key={r.service} r={r} role={role} open={open === r.service} onToggle={() => setOpen(open === r.service ? null : r.service)} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="aws-empty">Nothing picked: no AWS service gets through.</p>
+      )}
+    </div>
+  );
+}
+
+function EffectiveRow({ r, role, open, onToggle }: { r: AwsEffectiveRow; role: string | null; open: boolean; onToggle: () => void }) {
+  const tone: Tone = r.asked === null ? 'all' : r.effective === 0 ? 'none' : r.effective === r.asked ? 'all' : 'partial';
+  return (
+    <>
+      <tr className={`aws-eff-row${r.noEffect ? ' is-none' : ''}`}>
+        <th scope="row">
+          <button type="button" className="aws-eff-toggle" aria-expanded={open} onClick={onToggle} title={r.reason ?? undefined}>
+            <ToneDot tone={tone} title={r.reason ?? undefined} />
+            <span className="aws-eff-name">{r.name}</span> <span className="mono aws-eff-id">{r.service}</span>
+            {r.limited ? <span className="aws-limited">{r.limited} limited</span> : null}
+          </button>
+          {r.noEffect ? (
+            <span className="aws-eff-why" title={r.reason ?? undefined}>
+              no effect with {role ?? 'the role'}: iron-proxy answers its calls with a bare 403
+            </span>
+          ) : null}
+        </th>
+        <td className="num tabular">{r.effective.toLocaleString()}</td>
+        <td className="num tabular">{r.asked === null ? '–' : r.asked.toLocaleString()}</td>
+        <td className="num tabular">
+          {r.roleAllows.toLocaleString()}
+          <span className="aws-eff-of"> / {r.total.toLocaleString()}</span>
+        </td>
+      </tr>
+      {open ? (
+        <tr className="aws-eff-detail">
+          <td colSpan={4}>{r.actions ? <ActionNames names={r.actions} limited={r.limitedActions ?? []} /> : <RoleActions id={r.service} role={role} />}</td>
+        </tr>
+      ) : null}
+    </>
+  );
+}
+
+function ActionNames({ names, limited }: { names: string[]; limited: string[] }) {
+  if (!names.length) return <p className="aws-empty">None of the picked actions is allowed by the role.</p>;
+  const lim = new Set(limited);
+  return (
+    <ul className="aws-eff-names" role="list">
+      {names.map((n) => (
+        <li key={n}>
+          <span className="mono">{n}</span>
+          {lim.has(n) ? (
+            <span className="aws-limited" title="allowed only on specific resources or conditions">
+              limited
+            </span>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** With no session policy: the role's own allowed actions in one service, from the service's detail. */
+function RoleActions({ id, role }: { id: string; role: string | null }) {
+  const { data, error } = useServiceDetail(id, role);
+  if (error) return <p className="form-error">{error}</p>;
+  if (!data) return <SkeletonRows rows={3} />;
+  const ok = data.actions.filter((a) => a.allowed);
+  return <ActionNames names={ok.map((a) => a.action)} limited={ok.filter((a) => a.limited).map((a) => a.action)} />;
 }
 
 function HostList({ hosts }: { hosts: string[] }) {

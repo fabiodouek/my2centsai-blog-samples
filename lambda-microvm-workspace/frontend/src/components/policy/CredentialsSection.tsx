@@ -3,7 +3,7 @@ import { KeyRound, Plus, RefreshCw, RotateCcw, ShieldOff, Trash2 } from 'lucide-
 import { api } from '../../lib/api';
 import { fmtAgo } from '../../lib/format';
 import { useNow, usePolling } from '../../lib/hooks';
-import { noteWrite, usePolicy } from '../../lib/policy';
+import { noteWrite, usePolicy, usePollS } from '../../lib/policy';
 import { toast } from '../../lib/store';
 import type { PolicyCredential } from '../../lib/types';
 import { Button, ConfirmDialog, Empty, KeyFob, SkeletonRows } from '../ui/primitives';
@@ -47,11 +47,18 @@ function looksIn(c: PolicyCredential): string {
 
 export function CredentialsSection({ editable }: { editable: boolean }) {
   const tick = usePolicy((s) => s.tick);
+  const pollS = usePollS();
+  // A revoke or restore settles at the sidecar's next check (up to ~30 s): poll every 5 s meanwhile, and at once
+  // when the sidecar reports a new config applied
+  const appliedVersion = usePolicy((s) => s.status?.config.version ?? null);
   const [fast, setFast] = useState(false);
-  const creds = usePolling(api.policyCredentials, fast ? 2_000 : 20_000, true, 'policy-credentials');
+  const creds = usePolling(api.policyCredentials, fast ? 5_000 : 20_000, true, 'policy-credentials');
   const pending = creds.data?.some((c) => c.status === 'revoking' || c.status === 'restoring') ?? false;
   useEffect(() => setFast(pending), [pending]);
   const refresh = creds.refresh;
+  useEffect(() => {
+    if (appliedVersion !== null && pending) void refresh();
+  }, [appliedVersion]);
   useEffect(() => {
     if (tick) void refresh();
   }, [tick, refresh]);
@@ -90,10 +97,10 @@ export function CredentialsSection({ editable }: { editable: boolean }) {
         toast('success', `Deleted ${cred.name}`, 'Out of the proxy config; the secret is scheduled for deletion in 7 days.');
       } else if (action === 'revoke') {
         noteWrite(await api.revokeCredential(cred.name));
-        toast('success', `Revoking ${cred.name}`, 'iron-proxy reloads without it in a few seconds, for every sandbox.');
+        toast('success', `Revoking ${cred.name}`, `iron-proxy reloads without it at its next check (within about ${pollS} s), for every sandbox. Until then the key still works.`);
       } else {
         noteWrite(await api.restoreCredential(cred.name));
-        toast('success', `Restoring ${cred.name}`, 'iron-proxy reloads and fetches it again in a few seconds.');
+        toast('success', `Restoring ${cred.name}`, `iron-proxy reloads and fetches it again at its next check (within about ${pollS} s).`);
       }
       setDialog(null);
       setRotateError(null);
@@ -210,8 +217,9 @@ export function CredentialsSection({ editable }: { editable: boolean }) {
         ) : d?.action === 'revoke' ? (
           <>
             <p>
-              iron-proxy is denied the <strong>{d.cred.name}</strong> secret and reloads its config, which drops its
-              cached copy. It takes a few seconds, with no restart.
+              iron-proxy is denied the <strong>{d.cred.name}</strong> secret and reloads its config at its next check
+              for changes, which drops its cached copy. It takes up to about {pollS} s, with no restart; until then the
+              key is still swapped in.
             </p>
             <p>
               It affects every sandbox on this proxy, including ones you don’t own. Their placeholder goes out unswapped
@@ -225,7 +233,7 @@ export function CredentialsSection({ editable }: { editable: boolean }) {
               iron-proxy gets read access to the <strong>{d.cred.name}</strong> secret again and reloads, for every
               sandbox on this proxy.
             </p>
-            <p className="dialog-faint">It takes a few seconds.</p>
+            <p className="dialog-faint">It takes up to about {pollS} s: the proxy checks for changes every {pollS} s.</p>
           </>
         ) : null}
       </ConfirmDialog>

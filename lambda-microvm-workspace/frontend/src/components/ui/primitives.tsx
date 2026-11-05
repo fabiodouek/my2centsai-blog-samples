@@ -164,6 +164,7 @@ export function ConfirmDialog({
   confirmLabel,
   tone = 'danger',
   busy,
+  confirmDisabled,
   onConfirm,
   onClose,
 }: {
@@ -173,6 +174,8 @@ export function ConfirmDialog({
   confirmLabel: string;
   tone?: 'danger' | 'primary';
   busy?: boolean;
+  /** e.g. until a confirmation word is typed */
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -208,7 +211,13 @@ export function ConfirmDialog({
           <Button ref={cancelRef} variant="ghost" onClick={onClose} disabled={busy}>
             Cancel
           </Button>
-          <Button variant={tone === 'danger' ? 'danger' : 'primary'} className="btn-solid" loading={busy} onClick={onConfirm}>
+          <Button
+            variant={tone === 'danger' ? 'danger' : 'primary'}
+            className="btn-solid"
+            loading={busy}
+            disabled={confirmDisabled}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </Button>
         </div>

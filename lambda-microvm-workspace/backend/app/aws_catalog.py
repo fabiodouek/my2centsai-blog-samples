@@ -3,13 +3,17 @@ the scoped role's ceiling (ReadOnlyAccess) and mapped to what iron-proxy needs, 
 from a selection.
 
 - Access level from the action's annotations (aws_reference.access_level).
-- `allowed`: inside the current ReadOnlyAccess, and not blocked here. Anything else is listed but can't be applied.
+- `allowed` (effective): the selected role allows it (RoleEvaluator, from the role's own policies) and it isn't
+  blocked here. `pickable`: it can go in a session policy: known, its service mapped, not blocked. An action outside
+  the role is pickable but has no effect with that role, so a policy can be built before switching role.
+- Wildcards: `<service>:*` (every action) and `Get*`, `List*`, `Describe*`, always pickable in a mapped service except
+  Secrets Manager; each reports how many of the actions it covers are effective with the role.
 - Mapping: IAM prefix -> boto3 clients (from the reference's own Operations[].SDK entries) -> SigV4 signing
   names and us-east-1 hosts (aws_endpoints, generated from botocore). No client, no mapping: the service is
   listed with enabled=false.
 - Blocked whatever the ceiling says: every secretsmanager action (iron-proxy fetches its own secrets with the
   same session, so allowing the service would hand sandboxes the real keys), and ssm:GetParameter* (reads
-  SecureString parameters decrypted with the AWS-managed key, such as the workspace's own origin secret)."""
+  SecureString parameters decrypted with the AWS-managed key, such as the playground's own origin secret)."""
 
 from __future__ import annotations
 
@@ -27,14 +31,23 @@ POLICY_CHARS = 2048          # STS: a session policy's plaintext can't exceed 2,
 NO_SERVICE = "none"          # iron-proxy 0.55.0 treats an empty allowed_services list as "every service"
 WILDCARD_VERBS = ("List", "Describe", "Get")
 
-CEILING_REASON = "outside this workspace's read-only ceiling (ReadOnlyAccess)"   # (before the role picker)
 UNMAPPED_REASON = "can't be enabled here (no endpoint mapping)"
 OUTSIDE_REASON = ("can't be enabled here (no endpoint mapping under amazonaws.com: its endpoint is under api.aws, "
                   "which iron-proxy doesn't re-sign here)")
 SECRETS_REASON = "never enabled here: iron-proxy fetches its own secrets with the same session"
-SSM_REASON = ("never enabled here: reads SecureString parameters, such as this workspace's own origin secret")
+SSM_REASON = ("never enabled here: reads SecureString parameters, such as this playground's own origin secret")
 BLOCKED = [(re.compile(r"^secretsmanager:", re.I), SECRETS_REASON),
            (re.compile(r"^ssm:GetParameter", re.I), SSM_REASON)]
+# When a pick covers a blocked SSM action (ssm:*, ssm:Get*), the session policy denies these explicitly: a wildcard
+# must never grant them. Secrets Manager isn't denied there: the baseline Allow is the proxy's own secret read, and
+# iron-proxy never lets sandbox calls reach the service.
+SSM_DENY = ["ssm:GetParameter*"]
+SSM_DENY_SID = "NoParameterValues"
+# AWS requires no permission for these, and no policy can deny them (sts:GetCallerIdentity): always effective
+ALWAYS_EFFECTIVE = {"sts:getcalleridentity"}
+NO_EFFECT = "no effect with {role}"
+NO_EFFECT_PROXY = ("no effect with {role}: no picked action in it is allowed, so iron-proxy refuses its calls "
+                   "(a bare 403) before they reach AWS")
 
 # Hosts SDKs and the CLI use besides the client's default us-east-1 endpoint
 EXTRA_HOSTS = {"s3": ["*.s3.{region}.amazonaws.com"], "sts": ["sts.amazonaws.com"]}
@@ -44,14 +57,20 @@ class CatalogError(ValueError):
     pass
 
 
-def statements(actions: list[str]) -> list[dict]:
-    """The scope's own statements; the sidecar puts the proxy's baseline statement in front."""
-    return [{"Sid": "Scope", "Effect": "Allow", "Action": list(actions), "Resource": "*"}] if actions else []
+def statements(actions: list[str], deny_ssm: bool = False) -> list[dict]:
+    """The scope's own statements; the sidecar puts the proxy's baseline statement in front. `deny_ssm` adds the
+    explicit Deny for the SSM parameter reads a picked wildcard covers."""
+    if not actions:
+        return []
+    out = [{"Sid": "Scope", "Effect": "Allow", "Action": list(actions), "Resource": "*"}]
+    if deny_ssm:
+        out.append({"Sid": SSM_DENY_SID, "Effect": "Deny", "Action": list(SSM_DENY), "Resource": "*"})
+    return out
 
 
-def session_policy_doc(actions: list[str], baseline: dict) -> dict:
+def session_policy_doc(actions: list[str], baseline: dict, deny_ssm: bool = False) -> dict:
     """Exactly what the sidecar sends to STS (jq -c of the same structure)."""
-    return {"Version": "2012-10-17", "Statement": [baseline, *statements(actions)]}
+    return {"Version": "2012-10-17", "Statement": [baseline, *statements(actions, deny_ssm)]}
 
 
 def minified(policy: dict) -> str:
@@ -99,6 +118,30 @@ def guard_hosts(hosts, region: str) -> list[str]:
         if h not in out:
             out.append(h)
     return out
+
+
+def tone(effective: int, covers: int) -> str:
+    return "all" if covers and effective == covers else ("none" if effective == 0 else "partial")
+
+
+def coverage_of(covered: list[dict], role: str) -> dict:
+    """How many of the actions a pick covers are effective with the role, and why the rest aren't."""
+    eff = [a for a in covered if a["allowed"]]
+    blk = [a for a in covered if a.get("blocked")]
+    outside = len(covered) - len(eff) - len(blk)
+    parts = []
+    if outside:
+        parts.append(f"{outside} outside the {role} role" if len(covered) > 1 else
+                     f"{NO_EFFECT.format(role=role)}: {next((a['reason'] for a in covered if not a['allowed']), '')}")
+    if blk:
+        names = sorted({a["action"] for a in blk})
+        parts.append(f"{len(blk)} never enabled here ({', '.join(names[:2])}{', ...' if len(names) > 2 else ''}), "
+                     "denied in the session policy")
+    reason = None
+    if parts:
+        reason = (f"{len(eff)} of {len(covered)} effective: " if len(covered) > 1 else "") + "; ".join(parts)
+    return {"covers": len(covered), "effective": len(eff), "limited": sum(1 for a in eff if a["limited"]),
+            "blocked": len(blk), "tone": tone(len(eff), len(covered)), "reason": reason}
 
 
 class Catalog:
@@ -186,35 +229,43 @@ class Catalog:
                 reason, limited = blocked(full), False
                 if not reason and not enabled:
                     reason = unmapped
-                if not reason:
-                    ok, limited, why = ev.verdict(full)
+                pickable = reason is None
+                if pickable:
+                    if full.lower() in ALWAYS_EFFECTIVE:
+                        ok, limited, why = True, False, None
+                    else:
+                        ok, limited, why = ev.verdict(full)
                     reason = None if ok else why
                 rec = {"action": full, "service": sid, "name": name, "level": level, "allowed": reason is None,
-                       "limited": bool(limited and reason is None), "reason": reason}
+                       "pickable": pickable, "limited": bool(limited and reason is None), "reason": reason,
+                       "blocked": bool(blocked(full))}
                 acts.append(rec)
                 levels[level] += 1
                 n_allowed += reason is None
                 index[full.lower()] = rec
                 flat.append((name.lower(), full.lower(), rec))
             wildcards = []
-            for verb in WILDCARD_VERBS:
+            for verb in ("", *WILDCARD_VERBS):
+                if not verb and sid in SECRETS_SERVICES:
+                    continue            # never offer secretsmanager:*
                 covered = [a for a in acts if a["name"].startswith(verb)]
                 if not covered:
                     continue
-                bad = [a for a in covered if not a["allowed"]]
                 if not enabled:
-                    reason = unmapped
-                elif bad and any(blocked(a["action"]) for a in bad):
-                    reason = blocked(bad[0]["action"]) if all(blocked(a["action"]) for a in bad) else \
-                        f"covers actions that are never enabled here ({bad[0]['action']})"
-                elif bad:
-                    reason = (f"{len(bad)} of the {len(covered)} {verb} actions are outside the {ev.role} role; "
-                              "pick them one by one")
+                    pickable, reason = False, unmapped
+                elif sid in SECRETS_SERVICES:
+                    pickable, reason = False, SECRETS_REASON
                 else:
-                    reason = None
-                w = {"action": f"{sid}:{verb}*", "service": sid, "name": f"{verb}*", "label": f"Every {verb} action",
-                     "level": "Wildcard", "covers": len(covered), "allowed": reason is None,
-                     "limited": reason is None and any(a["limited"] for a in covered), "reason": reason}
+                    pickable, reason = True, None
+                cov = coverage_of(covered, ev.role)
+                if pickable and cov["effective"] < cov["covers"]:
+                    reason = cov["reason"]
+                w = {"action": f"{sid}:{verb}*", "service": sid, "name": f"{verb}*",
+                     "label": f"Every {verb} action" if verb else "Every action", "level": "Wildcard",
+                     "covers": cov["covers"], "effective": cov["effective"] if pickable else 0,
+                     "tone": cov["tone"] if pickable else "none", "pickable": pickable,
+                     "allowed": pickable and cov["effective"] == cov["covers"],
+                     "limited": pickable and cov["limited"] > 0, "reason": reason, "_covered": covered}
                 wildcards.append(w)
                 index[w["action"].lower()] = w
             for h in hosts:
@@ -223,9 +274,9 @@ class Catalog:
                              "reason": unmapped, "signing_names": signing, "hosts": hosts,
                              "actions": acts, "wildcards": wildcards, "levels": {lv: levels.get(lv, 0) for lv in LEVELS},
                              "allowed": n_allowed}
-        # Session policy off: what iron-proxy lets through is every service the mapping can enable, explicitly
-        # (an empty allowed_services would mean every service), never Secrets Manager
-        enabled = [s for s in services.values() if s["enabled"]]
+        # Session policy off: what iron-proxy lets through is every mapped service the role allows at least one
+        # action in, explicitly (an empty allowed_services would mean every service), never Secrets Manager
+        enabled = [s for s in services.values() if s["enabled"] and s["allowed"] > 0]
         open_services = guard_services({n for s in enabled for n in s["signing_names"]})
         open_hosts = guard_hosts([h for s in enabled if s["id"] not in SECRETS_SERVICES for h in s["hosts"]], self.region)
         return {"services": services, "index": index, "flat": flat, "host_owner": host_owner, "role": ev.role,
@@ -249,6 +300,7 @@ class Catalog:
             "levels": list(LEVELS),
             "services": [{"id": s["id"], "name": s["name"], "actions": len(s["actions"]), "allowed": s["allowed"],
                           "levels": s["levels"], "enabled": s["enabled"], "reason": s["reason"],
+                          "pickable": s["enabled"] and s["id"] not in SECRETS_SERVICES,
                           "signing_names": s["signing_names"]} for s in snap["services"].values()],
             "baseline": self.baseline,
             "limits": {"policy_chars": POLICY_CHARS},
@@ -259,8 +311,10 @@ class Catalog:
         if not s:
             return None
         return {k: s[k] for k in ("id", "name", "enabled", "reason", "signing_names", "hosts")} | {
-            "actions": [{k: a[k] for k in ("action", "name", "level", "allowed", "limited", "reason")} for a in s["actions"]],
-            "wildcards": [{k: w[k] for k in ("action", "label", "covers", "allowed", "limited", "reason")} for w in s["wildcards"]],
+            "actions": [{k: a[k] for k in ("action", "name", "level", "allowed", "pickable", "limited", "reason")}
+                        for a in s["actions"]],
+            "wildcards": [{k: w[k] for k in ("action", "label", "covers", "effective", "tone", "allowed", "pickable",
+                                              "limited", "reason")} for w in s["wildcards"]],
             "role": self.role(role)}
 
     def search(self, q: str = "", level: str | None = None, limit: int = 100, role: str | None = None) -> dict:
@@ -290,9 +344,10 @@ class Catalog:
                 continue
             ranked.append((rank, full, rec))
             per_service[rec["service"]] += 1
-        # Within a rank, actions that can be applied come first
-        ranked.sort(key=lambda t: (t[0], not t[2]["allowed"], t[1]))
-        out = [{k: r[k] for k in ("action", "service", "name", "level", "allowed", "limited", "reason")} for _, _, r in ranked[:limit]]
+        # Within a rank, effective actions come first, then the rest that can be picked
+        ranked.sort(key=lambda t: (t[0], not t[2]["allowed"], not t[2]["pickable"], t[1]))
+        out = [{k: r[k] for k in ("action", "service", "name", "level", "allowed", "pickable", "limited", "reason")}
+               for _, _, r in ranked[:limit]]
         sids = sorted(svc_hit | set(per_service), key=lambda sid: (sid not in svc_hit, -per_service[sid], sid))
         services = [{"id": sid, "name": snap["services"][sid]["name"], "enabled": snap["services"][sid]["enabled"],
                      "matches": per_service[sid]} for sid in sids]
@@ -307,7 +362,9 @@ class Catalog:
 
     # ---- a selection -> session policy, allowed_services, hosts
     def normalize(self, actions: list[str], role: str | None = None) -> list[str]:
-        """Canonical names, deduped and sorted. Refuses unknown, blocked, unmapped and outside-the-role actions."""
+        """Canonical names, deduped and sorted. Refuses unknown actions, anything in Secrets Manager, ssm:GetParameter*
+        on its own and services with no endpoint mapping. Actions outside the role are kept: they have no effect
+        with it (preview says so), and a selection survives a role switch."""
         index = self.snapshot(role)["index"]
         out, unknown, refused = [], [], []
         for a in actions:
@@ -317,7 +374,7 @@ class Catalog:
             rec = index.get(a.lower())
             if not rec:
                 unknown.append(a)
-            elif not rec["allowed"]:
+            elif not rec["pickable"]:
                 refused.append(f"{rec['action']} ({rec['reason']})")
             elif rec["action"] not in out:
                 out.append(rec["action"])
@@ -337,23 +394,59 @@ class Catalog:
         index = self.snapshot(None)["index"]
         return sorted({index[str(a).strip().lower()]["action"] for a in actions if str(a).strip().lower() in index})
 
+    def _covered(self, rec: dict) -> list[dict]:
+        return rec["_covered"] if "_covered" in rec else [rec]
+
     def preview(self, actions: list[str], role: str | None = None, session_policy: bool = True) -> dict:
+        """The session policy for a selection, what iron-proxy is told (allowed_services, hosts: services with at least
+        one effective action), `coverage` per pick (how many of the actions it covers are effective with the role)
+        and `effective` per service (role ∩ session policy). Effective = allowed by the role's own policies as
+        RoleEvaluator reads them (unconditional Denies; Allows tied to resources or conditions are `limited`)."""
         role = self.role(role)
         snap = self.snapshot(role)
+        services = snap["services"]
         if not session_policy:
             # The role's full permissions: no Policy to STS. iron-proxy still needs explicit lists.
+            rows = [{"service": s["id"], "name": s["name"], "asked": None, "effective": s["allowed"],
+                     "role_allows": s["allowed"], "total": len(s["actions"]),
+                     "limited": sum(1 for a in s["actions"] if a["allowed"] and a["limited"]),
+                     "actions": None, "limited_actions": None, "no_effect": False, "reason": None}
+                    for s in services.values() if s["enabled"] and s["allowed"] > 0 and s["id"] not in SECRETS_SERVICES]
             return {"role": role, "session_policy": False, "actions": self.known(actions), "services": [],
                     "allowed_services": snap["open"]["allowed_services"], "hosts": snap["open"]["hosts"],
-                    "policy": None, "policy_json": None, "chars": 0, "limit": POLICY_CHARS, "fits": True}
+                    "policy": None, "policy_json": None, "chars": 0, "limit": POLICY_CHARS, "fits": True,
+                    "statements": [], "deny_ssm": False, "coverage": [], "effective": rows}
         acts = self.normalize(actions, role)
-        services = sorted({a.split(":", 1)[0] for a in acts})
-        signing = guard_services({n for sid in services for n in snap["services"][sid]["signing_names"]})
+        index = snap["index"]
+        coverage, asked, deny = [], {}, False
+        for a in acts:
+            rec = index[a.lower()]
+            covered = self._covered(rec)
+            cov = coverage_of(covered, role)
+            deny = deny or cov["blocked"] > 0
+            coverage.append({"action": rec["action"], "kind": "wildcard" if "_covered" in rec else "action",
+                             **{k: cov[k] for k in ("covers", "effective", "limited", "tone", "reason")}})
+            bucket = asked.setdefault(rec["service"], {})
+            for c in covered:
+                bucket[c["action"]] = c
+        rows = []
+        for sid in sorted(asked):
+            s, covered = services[sid], list(asked[sid].values())
+            eff = sorted(c["action"] for c in covered if c["allowed"])
+            lim = sorted(c["action"] for c in covered if c["allowed"] and c["limited"])
+            rows.append({"service": sid, "name": s["name"], "asked": len(covered), "effective": len(eff),
+                         "role_allows": s["allowed"], "total": len(s["actions"]), "limited": len(lim),
+                         "actions": eff, "limited_actions": lim, "no_effect": not eff,
+                         "reason": NO_EFFECT_PROXY.format(role=role) if not eff else None})
+        live = [r["service"] for r in rows if r["effective"] > 0]
+        signing = guard_services({n for sid in live for n in services[sid]["signing_names"]})
         hosts: list[str] = []
-        for sid in services:
-            hosts += [h for h in snap["services"][sid]["hosts"] if h not in hosts]
+        for sid in live:
+            hosts += [h for h in services[sid]["hosts"] if h not in hosts]
         hosts = guard_hosts(hosts, self.region)
-        policy = session_policy_doc(acts, self.baseline)
+        policy = session_policy_doc(acts, self.baseline, deny)
         text = minified(policy)
-        return {"role": role, "session_policy": True, "actions": acts, "services": services,
+        return {"role": role, "session_policy": True, "actions": acts, "services": sorted(asked),
                 "allowed_services": signing, "hosts": hosts, "policy": policy, "policy_json": text, "chars": len(text),
-                "limit": POLICY_CHARS, "fits": len(text) <= POLICY_CHARS}
+                "limit": POLICY_CHARS, "fits": len(text) <= POLICY_CHARS,
+                "statements": statements(acts, deny), "deny_ssm": deny, "coverage": coverage, "effective": rows}

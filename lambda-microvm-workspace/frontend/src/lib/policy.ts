@@ -4,7 +4,9 @@ import type { ApplyRef, PolicyOverview, PolicyStatus } from './types';
 
 // Shared state for the proxy policy page: the overview (enabled, editable, versions), the sidecar's apply
 // status, and the last write this page made. Every write returns `apply` (the config/scope versions the
-// sidecar must reach); the status poll runs every second until it reports them, then every 10 s.
+// sidecar must reach). The sidecar checks the bucket every 30 s (part 2's control_poll_s), so a change goes
+// live at its next check: while one is pending the status poll waits for that check (at most 5 s at a time,
+// then every second once it's due) instead of asking every second for half a minute; otherwise every 10 s.
 
 interface PolicyState {
   overview: PolicyOverview | null;
@@ -35,6 +37,12 @@ export function usePolicy<T>(selector: (s: PolicyState) => T): T {
   );
 }
 
+/** How often the proxy's control sidecar checks for changes: what it last reported, else part 2's default. */
+export const DEFAULT_POLL_S = 30;
+export function usePollS(): number {
+  return usePolicy((s) => s.status?.sidecar.pollS ?? DEFAULT_POLL_S);
+}
+
 export function getPolicyState(): PolicyState {
   return state;
 }
@@ -62,7 +70,22 @@ export function ensureOverview() {
 // ---------- apply status ----------
 
 const FAST_MS = 1000;
+const PENDING_MAX_MS = 5000;
+/** The sidecar writes its status right after the reload; give it this long past the check. */
+const AFTER_CHECK_MS = 1500;
 const SLOW_MS = 10_000;
+
+/** Seconds until the sidecar's next check of the bucket, counted down from when the status arrived (0: due now). */
+export function nextCheckIn(st: PolicyStatus | null, now: number): number | null {
+  if (!st || st.sidecar.nextPollInS === null) return null;
+  return Math.max(0, st.sidecar.nextPollInS - (now - st.receivedAt) / 1000);
+}
+
+function pendingDelay(st: PolicyStatus | null): number {
+  const left = nextCheckIn(st, Date.now());
+  if (left === null) return 2000;
+  return Math.min(PENDING_MAX_MS, Math.max(FAST_MS, left * 1000 + AFTER_CHECK_MS));
+}
 
 /** True while the last change (ours or anyone's, per the backend) hasn't been applied by the sidecar yet. */
 export function isPending(st: PolicyStatus | null, target: ApplyRef | null): boolean {
@@ -99,7 +122,7 @@ function schedule(delay?: number) {
   if (timer !== null) window.clearTimeout(timer);
   timer = null;
   if (holders === 0) return;
-  const wait = delay ?? (isPending(state.status, state.target) ? FAST_MS : SLOW_MS);
+  const wait = delay ?? (isPending(state.status, state.target) ? pendingDelay(state.status) : SLOW_MS);
   timer = window.setTimeout(async () => {
     timer = null;
     if (!document.hidden || isPending(state.status, state.target)) await pollOnce();

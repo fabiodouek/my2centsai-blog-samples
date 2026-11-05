@@ -10,6 +10,11 @@ export interface MSandbox {
   started_at: string;
   max_duration_s: number;
   idle_minutes: number;
+  size: MSize;
+  auto_resume: boolean;
+  /** null: until the lifetime ends */
+  suspended_duration_s: number | null;
+  env_names: string[];
   image_version: string;
   lastActivity: number;
   attached: number;
@@ -61,6 +66,15 @@ export const QUOTA_GB = 8;
 export const GB_PER_SANDBOX = 2;
 export const MAX_DURATION_S = 8 * 3600;
 
+export type MSize = 'small' | 'medium' | 'large' | 'xlarge';
+/** Same sizes and prices as the backend (app/sizes.py, app/pricing.py). */
+export const SIZES: Record<MSize, { label: string; gb: number; vcpu: number; usd: number }> = {
+  small: { label: 'Small', gb: 1, vcpu: 0.5, usd: 0.0631 },
+  medium: { label: 'Medium', gb: 2, vcpu: 1, usd: 0.1261 },
+  large: { label: 'Large', gb: 4, vcpu: 2, usd: 0.2522 },
+  xlarge: { label: 'X-Large', gb: 8, vcpu: 4, usd: 0.5044 },
+};
+
 // Pricing per million tokens, used only by the mock to fake est_cost_usd.
 const PRICES: Record<string, { in: number; out: number; cr: number; cw: number }> = {
   'claude-sonnet-4-5': { in: 3, out: 15, cr: 0.3, cw: 3.75 },
@@ -70,7 +84,7 @@ const PRICES: Record<string, { in: number; out: number; cr: number; cw: number }
 
 function seedSandboxes(): MSandbox[] {
   if (scenario === 'empty') return [];
-  const mk = (name: string, state: MState, ageMin: number, idleMin: number, idleUsedMin: number): MSandbox => ({
+  const mk = (name: string, state: MState, ageMin: number, idleMin: number, idleUsedMin: number, size: MSize = 'medium'): MSandbox => ({
     id: `mvm-${rid()}${rid()}`.slice(0, 20),
     name,
     state,
@@ -78,18 +92,23 @@ function seedSandboxes(): MSandbox[] {
     started_at: iso(now - ageMin * 60_000),
     max_duration_s: MAX_DURATION_S,
     idle_minutes: idleMin,
+    size,
+    auto_resume: name !== 'docs-site',
+    suspended_duration_s: name === 'docs-site' ? 3600 : null,
+    env_names: name === 'refactor-auth' ? ['NODE_ENV', 'APP_REGION'] : [],
     image_version: 'v2.3',
     lastActivity: now - idleUsedMin * 60_000,
     attached: 0,
     cpu: 4 + Math.random() * 6,
     mem: 620 + Math.random() * 200,
   });
+  const full = scenario === 'full';
   const list = [
-    mk('refactor-auth', 'RUNNING', 72, 15, 0),
-    mk('docs-site', 'SUSPENDED', 341, 15, 0),
-    mk('flaky-tests', 'RUNNING', 452, 10, 9.4),
+    mk('refactor-auth', 'RUNNING', 72, 15, 0, 'medium'),
+    mk('docs-site', 'SUSPENDED', 341, 15, 0, 'small'),
+    mk('flaky-tests', 'RUNNING', 452, 10, 9.4, full ? 'small' : 'medium'),
   ];
-  if (scenario === 'full') list.push(mk('perf-bench', 'RUNNING', 20, 30, 2));
+  if (full) list.push(mk('perf-bench', 'RUNNING', 20, 30, 2, 'large'));
   return list;
 }
 
@@ -160,19 +179,33 @@ export function findSandbox(id: string) {
 }
 
 export function usedGb(): number {
-  return db.sandboxes.filter((s) => s.state !== 'TERMINATED').length * GB_PER_SANDBOX;
+  return db.sandboxes.filter((s) => s.state !== 'TERMINATED').reduce((n, s) => n + SIZES[s.size].gb, 0);
 }
 
-export function createSandbox(name: string, idleMinutes: number, maxHours: number): MSandbox {
+export interface MNew {
+  name: string;
+  size: MSize;
+  idleMinutes: number;
+  maxMinutes: number;
+  suspendedMinutes: number | null;
+  autoResume: boolean;
+  envNames: string[];
+}
+
+export function createSandbox(o: MNew): MSandbox {
   const t = Date.now();
   const sb: MSandbox = {
     id: `mvm-${rid()}${rid()}`.slice(0, 20),
-    name,
+    name: o.name,
     state: 'PENDING',
     created_at: iso(t),
     started_at: iso(t),
-    max_duration_s: Math.min(MAX_DURATION_S, Math.round(maxHours * 3600)),
-    idle_minutes: idleMinutes,
+    max_duration_s: Math.min(MAX_DURATION_S, o.maxMinutes * 60),
+    idle_minutes: o.idleMinutes,
+    size: o.size,
+    auto_resume: o.autoResume,
+    suspended_duration_s: o.suspendedMinutes === null ? null : o.suspendedMinutes * 60,
+    env_names: o.envNames,
     image_version: 'v2.3',
     lastActivity: t,
     attached: 0,

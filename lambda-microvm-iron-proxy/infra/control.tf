@@ -4,6 +4,8 @@
 #   s3://<control bucket>/aws-scope.json    the AWS access for sandbox calls: role, session policy on/off, actions
 #   s3://<control bucket>/status.json       what the sidecar applied, and when (written by the sidecar)
 #   s3://<control bucket>/credentials.json  part 3's metadata for the credentials admins add (no values)
+#   s3://<control bucket>/iron-proxy.default.yaml  the template config as this apply renders it, kept in step on
+#                                           every apply: part 3's factory reset goes back to it. The sidecar ignores it.
 #
 # The `control` sidecar in the iron-proxy task (proxy.tf, control.sh) polls the bucket, writes the config and a
 # credential_process file for the chosen sandbox role (roles.tf) to a task volume, and calls iron-proxy's
@@ -12,10 +14,11 @@
 
 locals {
   control_keys = {
-    config      = "iron-proxy.yaml"
-    scope       = "aws-scope.json"
-    status      = "status.json"
-    credentials = "credentials.json"
+    config         = "iron-proxy.yaml"
+    scope          = "aws-scope.json"
+    status         = "status.json"
+    credentials    = "credentials.json"
+    default_config = "iron-proxy.default.yaml"
   }
 
   seed_config = "# my2cents control plane: config v1, seeded by Terraform from iron-proxy.yaml.tftpl\n${local.iron_config_cp}"
@@ -110,6 +113,22 @@ resource "aws_s3_object" "config" {
     precondition {
       condition     = local.seed_guard_ok
       error_message = "The seed config must not reach Secrets Manager through aws_auth (see control.tf)."
+    }
+  }
+  depends_on = [aws_s3_bucket_versioning.control]
+}
+
+# The deploy-time default, for part 3's factory reset. Unlike the seed above, Terraform keeps it equal to the template.
+resource "aws_s3_object" "config_default" {
+  count        = var.control_plane ? 1 : 0
+  bucket       = aws_s3_bucket.control[0].id
+  key          = local.control_keys.default_config
+  content      = local.seed_config
+  content_type = "application/yaml"
+  lifecycle {
+    precondition {
+      condition     = local.seed_guard_ok
+      error_message = "The default config must not reach Secrets Manager through aws_auth (see control.tf)."
     }
   }
   depends_on = [aws_s3_bucket_versioning.control]

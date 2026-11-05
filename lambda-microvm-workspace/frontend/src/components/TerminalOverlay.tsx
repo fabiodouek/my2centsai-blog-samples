@@ -99,7 +99,7 @@ function describe(
         title: secs ? `Reconnecting in ${secs} s` : 'Reconnecting',
         body: (
           <>
-            {status.detail || (byServer ? 'The workspace lost the sandbox’s shell and is retrying.' : 'Lost the connection to the workspace.')}
+            {status.detail || (byServer ? 'The playground lost the sandbox’s shell and is retrying.' : 'Lost the connection to the playground.')}
             {byServer && givesUp ? ` It keeps trying for another ${givesUp} s.` : ''}
             {status.attempt ? <span className="overlay-faint"> Attempt {status.attempt}.</span> : null}
           </>
@@ -115,11 +115,14 @@ function describe(
       return {
         tone: 'sleep',
         icon: <Moon size={18} />,
-        title: 'Sandbox suspended',
+        title: sb.autoResume ? 'Sandbox suspended' : 'Suspended: press Resume',
         body: (
           <>
-            Nothing is lost. Resume takes about a second and brings back the same screen, with tmux and anything
-            running in it (Claude Code too) where it stopped.
+            {sb.autoResume
+              ? 'Nothing is lost. '
+              : 'Auto-resume is off for this sandbox, so the terminal won’t wake it. Nothing is lost: '}
+            Resume takes about a second and brings back the same screen, with tmux and anything running in it (Claude
+            Code too) where it stopped.
             <span className="overlay-faint"> Memory and disk are kept while suspended.</span>
           </>
         ),

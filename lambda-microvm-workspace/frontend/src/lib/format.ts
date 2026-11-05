@@ -85,3 +85,12 @@ export function endReason(reason: string | null | undefined): string | null {
   if (/^not found$/i.test(r)) return 'No longer exists in Lambda';
   return r;
 }
+
+/** A lifetime or a wait in seconds, the way the forms show it: 45 min, 1 h 30 min, 8 h. */
+export function fmtLifetime(s: number): string {
+  if (!Number.isFinite(s) || s <= 0) return '–';
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  return m % 60 ? `${h} h ${m % 60} min` : `${h} h`;
+}
