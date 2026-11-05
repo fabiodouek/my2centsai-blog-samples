@@ -1,0 +1,13 @@
+[project]
+name = "lambda-microvm-iron-proxy"
+version = "0.2.0"
+description = "Companion code for the my2cents.ai Lambda MicroVM credentials tutorial: iron-proxy in its own VPC, sandboxes in another, transparent interception through a DNS Firewall override"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3==1.43.123",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
+
+[tool.setuptools]
+py-modules = ["common"]

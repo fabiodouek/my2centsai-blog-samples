@@ -1,0 +1,110 @@
+# my2cents control plane: config v1, seeded by Terraform from iron-proxy.yaml.tftpl
+dns:
+  # iron-proxy's DNS server stays off in both modes: a MicroVM can't be pointed at it
+  # (/etc/resolv.conf is read-only). In dns mode Route 53 private zones send intercepted
+  # names to the NLB, so the proxy must resolve upstream hosts somewhere else.
+  enabled: false
+  # Resolve upstream hosts outside the VPC, so the Route 53 interception zones (dns mode)
+  # don't send the proxy's own lookups back to itself.
+  upstream_resolver: "1.1.1.1:53"
+
+proxy:
+  http_listen: ":80"
+  https_listen: ":443"
+  tunnel_listen: ":8080"
+  upstream_response_header_timeout: "5m"
+  # The defaults cover IMDS and loopback but not the ECS task credentials endpoint
+  # (169.254.170.2) or the VPC. Setting the list replaces the defaults.
+  upstream_deny_cidrs:
+    - "169.254.169.254/32"
+    - "169.254.170.2/32"
+    - "fd00:ec2::254/128"
+    - "127.0.0.0/8"
+    - "::1/128"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+
+tls:
+  mode: "mitm"
+  ca_cert: "/etc/iron-proxy/ca.crt"
+  ca_key: "/etc/iron-proxy/ca.key"
+
+metrics:
+  listen: ":9090"
+
+# Part 3's control sidecar calls POST /v1/reload here after it syncs a new config or new credentials.
+# Loopback only, so it is never reachable through the NLB.
+management:
+  listen: "127.0.0.1:9092"
+  api_key_env: "IRON_MANAGEMENT_API_KEY"
+
+transforms:
+  - name: allowlist
+    config:
+      domains:
+        - "api.anthropic.com"
+        - "statsig.anthropic.com"
+        - "github.com"
+        - "api.github.com"
+        - "codeload.github.com"
+        - "*.githubusercontent.com"
+        - "httpbin.org"
+        - "sts.amazonaws.com"
+        - "sts.us-east-1.amazonaws.com"
+        - "s3.amazonaws.com"
+        - "*.s3.amazonaws.com"
+        - "s3.us-east-1.amazonaws.com"
+        - "*.s3.us-east-1.amazonaws.com"
+        - "ecs.us-east-1.amazonaws.com"
+        - "iam.amazonaws.com"
+        - "ec2.us-west-2.amazonaws.com"
+
+  - name: secrets
+    config:
+      secrets:
+        - source:
+            type: aws_sm
+            secret_id: "arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/anthropic-TEST-AbCdEf"
+            ttl: "30s"
+          replace:
+            proxy_value: "sk-ant-api03-proxy-placeholder-0000000000000000000000000000000000000000000000000000000000000000-AAAAAAAA"
+            match_headers: ["X-Api-Key", "Authorization"]
+          rules:
+            - host: "api.anthropic.com"
+        - source:
+            type: aws_sm
+            secret_id: "arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/github-TEST-AbCdEf"
+            ttl: "30s"
+          replace:
+            proxy_value: "ghp_proxyplaceholder000000000000000000000"
+            match_headers: ["Authorization"]
+          rules:
+            - host: "api.github.com"
+            - host: "github.com"
+        - source:
+            type: aws_sm
+            secret_id: "arn:aws:secretsmanager:us-east-1:111122223333:secret:my2cents-ip/demo-TEST-AbCdEf"
+            ttl: "30s"
+          replace:
+            proxy_value: "demo-placeholder-token"
+            match_headers: []
+            match_query: true
+            match_body: true
+          rules:
+            - host: "httpbin.org"
+
+  - name: aws_auth
+    config:
+      credentials_provider:
+        type: workload_identity
+        region: "us-east-1"
+      allowed_services: ["sts", "s3", "ecs"]
+      allowed_regions: ["us-east-1", "us-east-1"]
+      rules:
+        - host: "*.amazonaws.com"
+
+log:
+  level: "info"
+
+

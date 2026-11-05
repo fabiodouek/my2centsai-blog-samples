@@ -1,0 +1,76 @@
+/*
+ * Night-desk palette: an eleven-step warm charcoal ramp is the only neutral set; brass is the one
+ * accent (primary action, focus, selection, key fobs). State hues carry meaning only.
+ * The app is dark-first by design (long sessions next to a terminal), so there is no light theme.
+ */
+:root {
+  color-scheme: dark;
+
+  /* ramp: oklch(L 0.006–0.012 70–85) */
+  --n0: #0e0c09;
+  --n1: #14110e;
+  --n2: #1a1713;
+  --n3: #211d1a;
+  --n4: #2d2925;
+  --n5: #3f3b36;
+  --n6: #5f5a54;
+  --n7: #969189;
+  --n8: #b8b3ac;
+  --n9: #e4e1da;
+  --n10: #f7f5f1;
+
+  --bg-term: var(--n0);
+  --bg-app: var(--n1);
+  --bg-raised: var(--n2);
+  --bg-hover: var(--n3);
+  --line: var(--n4);
+  --line-strong: var(--n5);
+  --text-faint: var(--n6);
+  --text-muted: var(--n7);
+  --text-2: var(--n8);
+  --text-1: var(--n9);
+  --text-hi: var(--n10);
+
+  --brass: #e1b761;
+  --brass-hi: #ecc77a;
+  --brass-ink: #1c1407;
+  --brass-wash: rgb(225 183 97 / 0.1);
+  --brass-wash-2: rgb(225 183 97 / 0.18);
+  --brass-line: rgb(225 183 97 / 0.42);
+
+  /* states */
+  --run: #69c898;
+  --run-wash: rgb(105 200 152 / 0.12);
+  --sleep: #92a2db;
+  --sleep-wash: rgb(146 162 219 / 0.12);
+  --deny: #e66f64;
+  --deny-wash: rgb(230 111 100 / 0.12);
+  --deny-line: rgb(230 111 100 / 0.4);
+
+  /* data series (validated on #1a1713: dataviz validator, dark mode, all checks pass) */
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-other: #5f5a54;
+
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --fs-micro: 0.6875rem; /* 11 */
+  --fs-small: 0.75rem; /* 12 */
+  --fs-body: 0.8125rem; /* 13 */
+  --fs-title: 0.875rem; /* 14 */
+  --fs-num: 1.0625rem; /* 17 */
+
+  --row: 28px;
+  --bar: 40px;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-lg: 10px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 160ms;
+
+  --shadow-overlay: 0 12px 32px -8px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.4);
+}

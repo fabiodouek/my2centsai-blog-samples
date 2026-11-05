@@ -1,0 +1,125 @@
+dns:
+  # iron-proxy's own DNS server stays off: a MicroVM can't be pointed at it (/etc/resolv.conf is read-only),
+  # and it isn't needed. DNS Firewall in the sandbox VPC answers every name with a CNAME to the NLB.
+  # `enabled` defaults to true (which then needs proxy_ip), so it's set explicitly.
+  enabled: false
+  # No upstream_resolver: the proxy VPC has normal Route 53 DNS, so iron-proxy resolves upstream hosts
+  # through its VPC resolver like any other task. Only the sandbox VPC has the override.
+
+proxy:
+  # Transparent interception: sandboxes connect to 80/443 believing they're talking to the real host
+  http_listen: ":80"
+  https_listen: ":443"
+  # Explicit mode (HTTPS_PROXY / CONNECT), kept only for the comparisons in 11_path_rules.py and 14_latency.py
+  tunnel_listen: ":8080"
+  upstream_response_header_timeout: "5m"
+  # Setting the list replaces iron-proxy's defaults (IMDS and loopback), so they're repeated here, plus the
+  # ECS task credentials endpoint (169.254.170.2), both VPCs and the rest of RFC 1918.
+  upstream_deny_cidrs:
+    - "169.254.169.254/32"
+    - "169.254.170.2/32"
+    - "fd00:ec2::254/128"
+    - "127.0.0.0/8"
+    - "::1/128"
+    - "${proxy_cidr}"
+    - "${sandbox_cidr}"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+
+tls:
+  mode: "mitm"
+  ca_cert: "/etc/iron-proxy/ca.crt"
+  ca_key: "/etc/iron-proxy/ca.key"
+
+metrics:
+  listen: ":9090"
+%{ if control_plane ~}
+
+# control_plane=true: the control sidecar calls POST /v1/reload here after it syncs a new config or new
+# credentials. Loopback only, so it is never reachable through the NLB.
+management:
+  listen: "127.0.0.1:9092"
+  api_key_env: "IRON_MANAGEMENT_API_KEY"
+%{ endif ~}
+
+transforms:
+  - name: allowlist
+    config:
+      domains:
+        - "api.anthropic.com"
+        - "statsig.anthropic.com"
+%{ if !strict ~}
+        - "github.com"
+        - "api.github.com"
+%{ endif ~}
+        - "codeload.github.com"
+        - "*.githubusercontent.com"
+        - "httpbin.org"
+        - "sts.amazonaws.com"
+        - "sts.${region}.amazonaws.com"
+        - "s3.amazonaws.com"
+        - "*.s3.amazonaws.com"
+        - "s3.${region}.amazonaws.com"
+        - "*.s3.${region}.amazonaws.com"
+        - "ecs.${region}.amazonaws.com"
+        - "iam.amazonaws.com"
+        - "ec2.us-west-2.amazonaws.com"
+%{ if strict ~}
+      rules:
+        # One repo only: REST, git smart HTTP, plus the endpoints gh needs
+        - host: "api.github.com"
+          paths: ["/repos/${github_repo}", "/repos/${github_repo}/*", "/user", "/graphql"]
+        - host: "github.com"
+          paths: ["/${github_repo}.git/*", "/${github_repo}/*"]
+%{ endif ~}
+
+  - name: secrets
+    config:
+      secrets:
+        - source:
+            type: aws_sm
+            secret_id: "${secret_arns.anthropic}"
+            ttl: "30s"
+          replace:
+            proxy_value: "${placeholders.anthropic}"
+            match_headers: ["X-Api-Key", "Authorization"]
+          rules:
+            - host: "api.anthropic.com"
+        - source:
+            type: aws_sm
+            secret_id: "${secret_arns.github}"
+            ttl: "30s"
+          replace:
+            proxy_value: "${placeholders.github}"
+            match_headers: ["Authorization"]
+%{ if strict ~}
+            require: true
+%{ endif ~}
+          rules:
+            - host: "api.github.com"
+            - host: "github.com"
+        - source:
+            type: aws_sm
+            secret_id: "${secret_arns.demo}"
+            ttl: "30s"
+          replace:
+            proxy_value: "${placeholders.demo}"
+            match_headers: []
+            match_query: true
+            match_body: true
+          rules:
+            - host: "httpbin.org"
+
+  - name: aws_auth
+    config:
+      credentials_provider:
+        type: workload_identity
+        region: "${region}"
+      allowed_services: ["sts", "s3", "ecs"]
+      allowed_regions: ["${region}", "us-east-1"]
+      rules:
+        - host: "*.amazonaws.com"
+
+log:
+  level: "info"

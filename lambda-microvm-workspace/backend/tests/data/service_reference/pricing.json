@@ -1,0 +1,1 @@
+{"Name":"pricing","ServiceName":"Price List","Actions":[{"Name":"DescribeServices"},{"Name":"GetAttributeValues"},{"Name":"GetPriceListFileUrl"},{"Name":"GetProducts"},{"Name":"ListPriceLists"}],"Operations":[{"Name":"DescribeServices","AuthorizedActions":[{"Name":"DescribeServices","Service":"pricing"}],"SDK":[{"Name":"pricing","Package":"Boto3"}]}]}

@@ -1,0 +1,14 @@
+[project]
+name = "lambda-microvm-lifecycle"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai AWS Lambda MicroVMs lifecycle tutorial"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3==1.43.123",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "websockets==15.0.1",
+]
+
+[tool.setuptools]
+py-modules = ["common"]

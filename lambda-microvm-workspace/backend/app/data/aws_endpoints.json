@@ -1,0 +1,2617 @@
+{
+"botocore": "1.43.123",
+"clients": {
+"accessanalyzer": {
+"endpoint_prefix": "access-analyzer",
+"full_name": "Access Analyzer",
+"host": "access-analyzer.us-east-1.amazonaws.com",
+"signing_name": "access-analyzer"
+},
+"account": {
+"endpoint_prefix": "account",
+"full_name": "AWS Account",
+"host": "account.us-east-1.amazonaws.com",
+"signing_name": "account"
+},
+"account-access": {
+"endpoint_prefix": "account-access",
+"full_name": "Account Access",
+"host": "account-access.us-east-1.amazonaws.com",
+"signing_name": "account-access"
+},
+"acm": {
+"endpoint_prefix": "acm",
+"full_name": "AWS Certificate Manager",
+"host": "acm.us-east-1.amazonaws.com",
+"signing_name": "acm"
+},
+"acm-pca": {
+"endpoint_prefix": "acm-pca",
+"full_name": "AWS Certificate Manager Private Certificate Authority",
+"host": "acm-pca.us-east-1.amazonaws.com",
+"signing_name": "acm-pca"
+},
+"agent-registry": {
+"endpoint_prefix": "agent-registry",
+"full_name": "Agent Registry",
+"host": "agent-registry.us-east-1.amazonaws.com",
+"signing_name": "agent-registry"
+},
+"agent-registry-control": {
+"endpoint_prefix": "agent-registry-control",
+"full_name": "Agent Registry Control",
+"host": "agent-registry-control.us-east-1.amazonaws.com",
+"signing_name": "agent-registry"
+},
+"aiops": {
+"endpoint_prefix": "aiops",
+"full_name": "AWS AI Ops",
+"host": "aiops.us-east-1.amazonaws.com",
+"signing_name": "aiops"
+},
+"amp": {
+"endpoint_prefix": "aps",
+"full_name": "Amazon Prometheus Service",
+"host": "aps.us-east-1.amazonaws.com",
+"signing_name": "aps"
+},
+"amplify": {
+"endpoint_prefix": "amplify",
+"full_name": "AWS Amplify",
+"host": "amplify.us-east-1.amazonaws.com",
+"signing_name": "amplify"
+},
+"amplifybackend": {
+"endpoint_prefix": "amplifybackend",
+"full_name": "AmplifyBackend",
+"host": "amplifybackend.us-east-1.amazonaws.com",
+"signing_name": "amplifybackend"
+},
+"amplifyuibuilder": {
+"endpoint_prefix": "amplifyuibuilder",
+"full_name": "AWS Amplify UI Builder",
+"host": "amplifyuibuilder.us-east-1.amazonaws.com",
+"signing_name": "amplifyuibuilder"
+},
+"apigateway": {
+"endpoint_prefix": "apigateway",
+"full_name": "Amazon API Gateway",
+"host": "apigateway.us-east-1.amazonaws.com",
+"signing_name": "apigateway"
+},
+"apigatewaymanagementapi": {
+"endpoint_prefix": "execute-api",
+"full_name": "AmazonApiGatewayManagementApi",
+"host": "execute-api.us-east-1.amazonaws.com",
+"signing_name": "execute-api"
+},
+"apigatewayv2": {
+"endpoint_prefix": "apigateway",
+"full_name": "AmazonApiGatewayV2",
+"host": "apigateway.us-east-1.amazonaws.com",
+"signing_name": "apigateway"
+},
+"appconfig": {
+"endpoint_prefix": "appconfig",
+"full_name": "Amazon AppConfig",
+"host": "appconfig.us-east-1.amazonaws.com",
+"signing_name": "appconfig"
+},
+"appconfigdata": {
+"endpoint_prefix": "appconfigdata",
+"full_name": "AWS AppConfig Data",
+"host": "appconfigdata.us-east-1.amazonaws.com",
+"signing_name": "appconfig"
+},
+"appfabric": {
+"endpoint_prefix": "appfabric",
+"full_name": "AppFabric",
+"host": "appfabric.us-east-1.amazonaws.com",
+"signing_name": "appfabric"
+},
+"appflow": {
+"endpoint_prefix": "appflow",
+"full_name": "Amazon Appflow",
+"host": "appflow.us-east-1.amazonaws.com",
+"signing_name": "appflow"
+},
+"appintegrations": {
+"endpoint_prefix": "app-integrations",
+"full_name": "Amazon AppIntegrations Service",
+"host": "app-integrations.us-east-1.amazonaws.com",
+"signing_name": "app-integrations"
+},
+"application-autoscaling": {
+"endpoint_prefix": "application-autoscaling",
+"full_name": "Application Auto Scaling",
+"host": "application-autoscaling.us-east-1.amazonaws.com",
+"signing_name": "application-autoscaling"
+},
+"application-insights": {
+"endpoint_prefix": "applicationinsights",
+"full_name": "Amazon CloudWatch Application Insights",
+"host": "applicationinsights.us-east-1.amazonaws.com",
+"signing_name": "applicationinsights"
+},
+"application-signals": {
+"endpoint_prefix": "application-signals",
+"full_name": "Amazon CloudWatch Application Signals",
+"host": "application-signals.us-east-1.amazonaws.com",
+"signing_name": "application-signals"
+},
+"applicationcostprofiler": {
+"endpoint_prefix": "application-cost-profiler",
+"full_name": "AWS Application Cost Profiler",
+"host": "application-cost-profiler.us-east-1.amazonaws.com",
+"signing_name": "application-cost-profiler"
+},
+"appmesh": {
+"endpoint_prefix": "appmesh",
+"full_name": "AWS App Mesh",
+"host": "appmesh.us-east-1.amazonaws.com",
+"signing_name": "appmesh"
+},
+"apprunner": {
+"endpoint_prefix": "apprunner",
+"full_name": "AWS App Runner",
+"host": "apprunner.us-east-1.amazonaws.com",
+"signing_name": "apprunner"
+},
+"appstream": {
+"endpoint_prefix": "appstream2",
+"full_name": "Amazon AppStream",
+"host": "appstream2.us-east-1.amazonaws.com",
+"signing_name": "appstream"
+},
+"appsync": {
+"endpoint_prefix": "appsync",
+"full_name": "AWS AppSync",
+"host": "appsync.us-east-1.amazonaws.com",
+"signing_name": "appsync"
+},
+"arc-region-switch": {
+"endpoint_prefix": "arc-region-switch",
+"full_name": "ARC - Region switch",
+"host": "arc-region-switch.us-east-1.amazonaws.com",
+"signing_name": "arc-region-switch"
+},
+"arc-zonal-shift": {
+"endpoint_prefix": "arc-zonal-shift",
+"full_name": "AWS ARC - Zonal Shift",
+"host": "arc-zonal-shift.us-east-1.amazonaws.com",
+"signing_name": "arc-zonal-shift"
+},
+"artifact": {
+"endpoint_prefix": "artifact",
+"full_name": "AWS Artifact",
+"host": "artifact.us-east-1.amazonaws.com",
+"signing_name": "artifact"
+},
+"athena": {
+"endpoint_prefix": "athena",
+"full_name": "Amazon Athena",
+"host": "athena.us-east-1.amazonaws.com",
+"signing_name": "athena"
+},
+"auditmanager": {
+"endpoint_prefix": "auditmanager",
+"full_name": "AWS Audit Manager",
+"host": "auditmanager.us-east-1.amazonaws.com",
+"signing_name": "auditmanager"
+},
+"autoscaling": {
+"endpoint_prefix": "autoscaling",
+"full_name": "Auto Scaling",
+"host": "autoscaling.us-east-1.amazonaws.com",
+"signing_name": "autoscaling"
+},
+"autoscaling-plans": {
+"endpoint_prefix": "autoscaling-plans",
+"full_name": "AWS Auto Scaling Plans",
+"host": "autoscaling-plans.us-east-1.amazonaws.com",
+"signing_name": "autoscaling-plans"
+},
+"b2bi": {
+"endpoint_prefix": "b2bi",
+"full_name": "AWS B2B Data Interchange",
+"host": "b2bi.us-east-1.amazonaws.com",
+"signing_name": "b2bi"
+},
+"backup": {
+"endpoint_prefix": "backup",
+"full_name": "AWS Backup",
+"host": "backup.us-east-1.amazonaws.com",
+"signing_name": "backup"
+},
+"backup-gateway": {
+"endpoint_prefix": "backup-gateway",
+"full_name": "AWS Backup Gateway",
+"host": "backup-gateway.us-east-1.amazonaws.com",
+"signing_name": "backup-gateway"
+},
+"backupsearch": {
+"endpoint_prefix": "backup-search",
+"full_name": "AWS Backup Search",
+"host": "backup-search.us-east-1.amazonaws.com",
+"signing_name": "backup-search"
+},
+"batch": {
+"endpoint_prefix": "batch",
+"full_name": "AWS Batch",
+"host": "batch.us-east-1.amazonaws.com",
+"signing_name": "batch"
+},
+"bcm-dashboards": {
+"endpoint_prefix": "bcm-dashboards",
+"full_name": "AWS Billing and Cost Management Dashboards",
+"host": "bcm-dashboards.us-east-1.amazonaws.com",
+"signing_name": "bcm-dashboards"
+},
+"bcm-data-exports": {
+"endpoint_prefix": "bcm-data-exports",
+"full_name": "AWS Billing and Cost Management Data Exports",
+"host": "bcm-data-exports.us-east-1.amazonaws.com",
+"signing_name": "bcm-data-exports"
+},
+"bcm-pricing-calculator": {
+"endpoint_prefix": "bcm-pricing-calculator",
+"full_name": "AWS Billing and Cost Management Pricing Calculator",
+"host": "bcm-pricing-calculator.us-east-1.amazonaws.com",
+"signing_name": "bcm-pricing-calculator"
+},
+"bcm-recommended-actions": {
+"endpoint_prefix": "bcm-recommended-actions",
+"full_name": "AWS Billing and Cost Management Recommended Actions",
+"host": "bcm-recommended-actions.us-east-1.amazonaws.com",
+"signing_name": "bcm-recommended-actions"
+},
+"bedrock": {
+"endpoint_prefix": "bedrock",
+"full_name": "Amazon Bedrock",
+"host": "bedrock.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"bedrock-agent": {
+"endpoint_prefix": "bedrock-agent",
+"full_name": "Agents for Amazon Bedrock",
+"host": "bedrock-agent.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"bedrock-agent-runtime": {
+"endpoint_prefix": "bedrock-agent-runtime",
+"full_name": "Agents for Amazon Bedrock Runtime",
+"host": "bedrock-agent-runtime.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"bedrock-agentcore": {
+"endpoint_prefix": "bedrock-agentcore",
+"full_name": "Amazon Bedrock AgentCore",
+"host": "bedrock-agentcore.us-east-1.amazonaws.com",
+"signing_name": "bedrock-agentcore"
+},
+"bedrock-agentcore-control": {
+"endpoint_prefix": "bedrock-agentcore-control",
+"full_name": "Amazon Bedrock AgentCore Control",
+"host": "bedrock-agentcore-control.us-east-1.amazonaws.com",
+"signing_name": "bedrock-agentcore"
+},
+"bedrock-data-automation": {
+"endpoint_prefix": "bedrock-data-automation",
+"full_name": "Data Automation for Amazon Bedrock",
+"host": "bedrock-data-automation.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"bedrock-data-automation-runtime": {
+"endpoint_prefix": "bedrock-data-automation-runtime",
+"full_name": "Runtime for Amazon Bedrock Data Automation",
+"host": "bedrock-data-automation-runtime.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"bedrock-runtime": {
+"endpoint_prefix": "bedrock-runtime",
+"full_name": "Amazon Bedrock Runtime",
+"host": "bedrock-runtime.us-east-1.amazonaws.com",
+"signing_name": "bedrock"
+},
+"billing": {
+"endpoint_prefix": "billing",
+"full_name": "AWS Billing",
+"host": "billing.us-east-1.amazonaws.com",
+"signing_name": "billing"
+},
+"billingconductor": {
+"endpoint_prefix": "billingconductor",
+"full_name": "AWSBillingConductor",
+"host": "billingconductor.us-east-1.amazonaws.com",
+"signing_name": "billingconductor"
+},
+"braket": {
+"endpoint_prefix": "braket",
+"full_name": "Braket",
+"host": "braket.us-east-1.amazonaws.com",
+"signing_name": "braket"
+},
+"budgets": {
+"endpoint_prefix": "budgets",
+"full_name": "AWS Budgets",
+"host": "budgets.amazonaws.com",
+"signing_name": "budgets"
+},
+"ce": {
+"endpoint_prefix": "ce",
+"full_name": "AWS Cost Explorer Service",
+"host": "ce.us-east-1.amazonaws.com",
+"signing_name": "ce"
+},
+"chatbot": {
+"endpoint_prefix": "chatbot",
+"full_name": "AWS Chatbot",
+"host": "chatbot.us-east-1.amazonaws.com",
+"signing_name": "chatbot"
+},
+"chime": {
+"endpoint_prefix": "chime",
+"full_name": "Amazon Chime",
+"host": "chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"chime-sdk-identity": {
+"endpoint_prefix": "identity-chime",
+"full_name": "Amazon Chime SDK Identity",
+"host": "identity-chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"chime-sdk-media-pipelines": {
+"endpoint_prefix": "media-pipelines-chime",
+"full_name": "Amazon Chime SDK Media Pipelines",
+"host": "media-pipelines-chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"chime-sdk-meetings": {
+"endpoint_prefix": "meetings-chime",
+"full_name": "Amazon Chime SDK Meetings",
+"host": "meetings-chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"chime-sdk-messaging": {
+"endpoint_prefix": "messaging-chime",
+"full_name": "Amazon Chime SDK Messaging",
+"host": "messaging-chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"chime-sdk-voice": {
+"endpoint_prefix": "voice-chime",
+"full_name": "Amazon Chime SDK Voice",
+"host": "voice-chime.us-east-1.amazonaws.com",
+"signing_name": "chime"
+},
+"cleanrooms": {
+"endpoint_prefix": "cleanrooms",
+"full_name": "AWS Clean Rooms Service",
+"host": "cleanrooms.us-east-1.amazonaws.com",
+"signing_name": "cleanrooms"
+},
+"cleanroomsml": {
+"endpoint_prefix": "cleanrooms-ml",
+"full_name": "AWS Clean Rooms ML",
+"host": "cleanrooms-ml.us-east-1.amazonaws.com",
+"signing_name": "cleanrooms-ml"
+},
+"cloud9": {
+"endpoint_prefix": "cloud9",
+"full_name": "AWS Cloud9",
+"host": "cloud9.us-east-1.amazonaws.com",
+"signing_name": "cloud9"
+},
+"cloudcontrol": {
+"endpoint_prefix": "cloudcontrolapi",
+"full_name": "AWS Cloud Control API",
+"host": "cloudcontrolapi.us-east-1.amazonaws.com",
+"signing_name": "cloudcontrolapi"
+},
+"clouddirectory": {
+"endpoint_prefix": "clouddirectory",
+"full_name": "Amazon CloudDirectory",
+"host": "clouddirectory.us-east-1.amazonaws.com",
+"signing_name": "clouddirectory"
+},
+"cloudformation": {
+"endpoint_prefix": "cloudformation",
+"full_name": "AWS CloudFormation",
+"host": "cloudformation.us-east-1.amazonaws.com",
+"signing_name": "cloudformation"
+},
+"cloudfront": {
+"endpoint_prefix": "cloudfront",
+"full_name": "Amazon CloudFront",
+"host": "cloudfront.amazonaws.com",
+"signing_name": "cloudfront"
+},
+"cloudfront-keyvaluestore": {
+"endpoint_prefix": "cloudfront-keyvaluestore",
+"full_name": "Amazon CloudFront KeyValueStore",
+"host": "cloudfront-keyvaluestore.us-east-1.amazonaws.com",
+"signing_name": "cloudfront-keyvaluestore"
+},
+"cloudhsm": {
+"endpoint_prefix": "cloudhsm",
+"full_name": "Amazon CloudHSM",
+"host": "cloudhsm.us-east-1.amazonaws.com",
+"signing_name": "cloudhsm"
+},
+"cloudhsmv2": {
+"endpoint_prefix": "cloudhsmv2",
+"full_name": "AWS CloudHSM V2",
+"host": "cloudhsmv2.us-east-1.amazonaws.com",
+"signing_name": "cloudhsm"
+},
+"cloudsearch": {
+"endpoint_prefix": "cloudsearch",
+"full_name": "Amazon CloudSearch",
+"host": "cloudsearch.us-east-1.amazonaws.com",
+"signing_name": "cloudsearch"
+},
+"cloudsearchdomain": {
+"endpoint_prefix": "cloudsearchdomain",
+"full_name": "Amazon CloudSearch Domain",
+"host": "cloudsearchdomain.us-east-1.amazonaws.com",
+"signing_name": "cloudsearch"
+},
+"cloudtrail": {
+"endpoint_prefix": "cloudtrail",
+"full_name": "AWS CloudTrail",
+"host": "cloudtrail.us-east-1.amazonaws.com",
+"signing_name": "cloudtrail"
+},
+"cloudtrail-data": {
+"endpoint_prefix": "cloudtrail-data",
+"full_name": "AWS CloudTrail Data Service",
+"host": "cloudtrail-data.us-east-1.amazonaws.com",
+"signing_name": "cloudtrail-data"
+},
+"cloudwatch": {
+"endpoint_prefix": "monitoring",
+"full_name": "Amazon CloudWatch",
+"host": "monitoring.us-east-1.amazonaws.com",
+"signing_name": "monitoring"
+},
+"cloudwatchomni": {
+"endpoint_prefix": "cloudwatch-omni",
+"full_name": "CloudWatch Omni",
+"host": "cloudwatch-omni.us-east-1.amazonaws.com",
+"signing_name": "cloudwatch"
+},
+"codeartifact": {
+"endpoint_prefix": "codeartifact",
+"full_name": "CodeArtifact",
+"host": "codeartifact.us-east-1.amazonaws.com",
+"signing_name": "codeartifact"
+},
+"codebuild": {
+"endpoint_prefix": "codebuild",
+"full_name": "AWS CodeBuild",
+"host": "codebuild.us-east-1.amazonaws.com",
+"signing_name": "codebuild"
+},
+"codecatalyst": {
+"endpoint_prefix": "codecatalyst",
+"full_name": "Amazon CodeCatalyst",
+"host": "codecatalyst.global.api.aws",
+"signing_name": "codecatalyst"
+},
+"codecommit": {
+"endpoint_prefix": "codecommit",
+"full_name": "AWS CodeCommit",
+"host": "codecommit.us-east-1.amazonaws.com",
+"signing_name": "codecommit"
+},
+"codeconnections": {
+"endpoint_prefix": "codeconnections",
+"full_name": "AWS CodeConnections",
+"host": "codeconnections.us-east-1.amazonaws.com",
+"signing_name": "codeconnections"
+},
+"codedeploy": {
+"endpoint_prefix": "codedeploy",
+"full_name": "AWS CodeDeploy",
+"host": "codedeploy.us-east-1.amazonaws.com",
+"signing_name": "codedeploy"
+},
+"codeguru-reviewer": {
+"endpoint_prefix": "codeguru-reviewer",
+"full_name": "Amazon CodeGuru Reviewer",
+"host": "codeguru-reviewer.us-east-1.amazonaws.com",
+"signing_name": "codeguru-reviewer"
+},
+"codeguru-security": {
+"endpoint_prefix": "codeguru-security",
+"full_name": "Amazon CodeGuru Security",
+"host": "codeguru-security.us-east-1.amazonaws.com",
+"signing_name": "codeguru-security"
+},
+"codeguruprofiler": {
+"endpoint_prefix": "codeguru-profiler",
+"full_name": "Amazon CodeGuru Profiler",
+"host": "codeguru-profiler.us-east-1.amazonaws.com",
+"signing_name": "codeguru-profiler"
+},
+"codepipeline": {
+"endpoint_prefix": "codepipeline",
+"full_name": "AWS CodePipeline",
+"host": "codepipeline.us-east-1.amazonaws.com",
+"signing_name": "codepipeline"
+},
+"codestar-connections": {
+"endpoint_prefix": "codestar-connections",
+"full_name": "AWS CodeStar connections",
+"host": "codestar-connections.us-east-1.amazonaws.com",
+"signing_name": "codestar-connections"
+},
+"codestar-notifications": {
+"endpoint_prefix": "codestar-notifications",
+"full_name": "AWS CodeStar Notifications",
+"host": "codestar-notifications.us-east-1.amazonaws.com",
+"signing_name": "codestar-notifications"
+},
+"cognito-identity": {
+"endpoint_prefix": "cognito-identity",
+"full_name": "Amazon Cognito Identity",
+"host": "cognito-identity.us-east-1.amazonaws.com",
+"signing_name": "cognito-identity"
+},
+"cognito-idp": {
+"endpoint_prefix": "cognito-idp",
+"full_name": "Amazon Cognito Identity Provider",
+"host": "cognito-idp.us-east-1.amazonaws.com",
+"signing_name": "cognito-idp"
+},
+"cognito-sync": {
+"endpoint_prefix": "cognito-sync",
+"full_name": "Amazon Cognito Sync",
+"host": "cognito-sync.us-east-1.amazonaws.com",
+"signing_name": "cognito-sync"
+},
+"comprehend": {
+"endpoint_prefix": "comprehend",
+"full_name": "Amazon Comprehend",
+"host": "comprehend.us-east-1.amazonaws.com",
+"signing_name": "comprehend"
+},
+"comprehendmedical": {
+"endpoint_prefix": "comprehendmedical",
+"full_name": "AWS Comprehend Medical",
+"host": "comprehendmedical.us-east-1.amazonaws.com",
+"signing_name": "comprehendmedical"
+},
+"compute-optimizer": {
+"endpoint_prefix": "compute-optimizer",
+"full_name": "AWS Compute Optimizer",
+"host": "compute-optimizer.us-east-1.amazonaws.com",
+"signing_name": "compute-optimizer"
+},
+"compute-optimizer-automation": {
+"endpoint_prefix": "aco-automation",
+"full_name": "Compute Optimizer Automation",
+"host": "aco-automation.us-east-1.amazonaws.com",
+"signing_name": "aco-automation"
+},
+"config": {
+"endpoint_prefix": "config",
+"full_name": "AWS Config",
+"host": "config.us-east-1.amazonaws.com",
+"signing_name": "config"
+},
+"connect": {
+"endpoint_prefix": "connect",
+"full_name": "Amazon Connect Service",
+"host": "connect.us-east-1.amazonaws.com",
+"signing_name": "connect"
+},
+"connect-contact-lens": {
+"endpoint_prefix": "contact-lens",
+"full_name": "Amazon Connect Contact Lens",
+"host": "contact-lens.us-east-1.amazonaws.com",
+"signing_name": "connect"
+},
+"connectcampaigns": {
+"endpoint_prefix": "connect-campaigns",
+"full_name": "AmazonConnectCampaignService",
+"host": "connect-campaigns.us-east-1.amazonaws.com",
+"signing_name": "connect-campaigns"
+},
+"connectcampaignsv2": {
+"endpoint_prefix": "connect-campaigns",
+"full_name": "AmazonConnectCampaignServiceV2",
+"host": "connect-campaigns.us-east-1.amazonaws.com",
+"signing_name": "connect-campaigns"
+},
+"connectcases": {
+"endpoint_prefix": "cases",
+"full_name": "Amazon Connect Cases",
+"host": "cases.us-east-1.amazonaws.com",
+"signing_name": "cases"
+},
+"connecthealth": {
+"endpoint_prefix": "health-agent",
+"full_name": "Connect Health",
+"host": "health-agent.us-east-1.amazonaws.com",
+"signing_name": "health-agent"
+},
+"connectparticipant": {
+"endpoint_prefix": "participant.connect",
+"full_name": "Amazon Connect Participant Service",
+"host": "participant.connect.us-east-1.amazonaws.com",
+"signing_name": "execute-api"
+},
+"continuum": {
+"endpoint_prefix": "continuum",
+"full_name": "AWS Continuum",
+"host": "continuum.us-east-1.amazonaws.com",
+"signing_name": "continuum"
+},
+"controlcatalog": {
+"endpoint_prefix": "controlcatalog",
+"full_name": "AWS Control Catalog",
+"host": "controlcatalog.us-east-1.amazonaws.com",
+"signing_name": "controlcatalog"
+},
+"controltower": {
+"endpoint_prefix": "controltower",
+"full_name": "AWS Control Tower",
+"host": "controltower.us-east-1.amazonaws.com",
+"signing_name": "controltower"
+},
+"cost-optimization-hub": {
+"endpoint_prefix": "cost-optimization-hub",
+"full_name": "Cost Optimization Hub",
+"host": "cost-optimization-hub.us-east-1.amazonaws.com",
+"signing_name": "cost-optimization-hub"
+},
+"cur": {
+"endpoint_prefix": "cur",
+"full_name": "AWS Cost and Usage Report Service",
+"host": "cur.us-east-1.amazonaws.com",
+"signing_name": "cur"
+},
+"customer-profiles": {
+"endpoint_prefix": "profile",
+"full_name": "Amazon Connect Customer Profiles",
+"host": "profile.us-east-1.amazonaws.com",
+"signing_name": "profile"
+},
+"databrew": {
+"endpoint_prefix": "databrew",
+"full_name": "AWS Glue DataBrew",
+"host": "databrew.us-east-1.amazonaws.com",
+"signing_name": "databrew"
+},
+"dataexchange": {
+"endpoint_prefix": "dataexchange",
+"full_name": "AWS Data Exchange",
+"host": "dataexchange.us-east-1.amazonaws.com",
+"signing_name": "dataexchange"
+},
+"datapipeline": {
+"endpoint_prefix": "datapipeline",
+"full_name": "AWS Data Pipeline",
+"host": "datapipeline.us-east-1.amazonaws.com",
+"signing_name": "datapipeline"
+},
+"datasync": {
+"endpoint_prefix": "datasync",
+"full_name": "AWS DataSync",
+"host": "datasync.us-east-1.amazonaws.com",
+"signing_name": "datasync"
+},
+"datazone": {
+"endpoint_prefix": "datazone",
+"full_name": "Amazon DataZone",
+"host": "datazone.us-east-1.api.aws",
+"signing_name": "datazone"
+},
+"dax": {
+"endpoint_prefix": "dax",
+"full_name": "Amazon DynamoDB Accelerator (DAX)",
+"host": "dax.us-east-1.amazonaws.com",
+"signing_name": "dax"
+},
+"deadline": {
+"endpoint_prefix": "deadline",
+"full_name": "AWSDeadlineCloud",
+"host": "deadline.us-east-1.amazonaws.com",
+"signing_name": "deadline"
+},
+"detective": {
+"endpoint_prefix": "api.detective",
+"full_name": "Amazon Detective",
+"host": "api.detective.us-east-1.amazonaws.com",
+"signing_name": "detective"
+},
+"devicefarm": {
+"endpoint_prefix": "devicefarm",
+"full_name": "AWS Device Farm",
+"host": "devicefarm.us-east-1.amazonaws.com",
+"signing_name": "devicefarm"
+},
+"devops-agent": {
+"endpoint_prefix": "aidevops",
+"full_name": "AWS DevOps Agent Service",
+"host": "aidevops.us-east-1.amazonaws.com",
+"signing_name": "aidevops"
+},
+"devops-guru": {
+"endpoint_prefix": "devops-guru",
+"full_name": "Amazon DevOps Guru",
+"host": "devops-guru.us-east-1.amazonaws.com",
+"signing_name": "devops-guru"
+},
+"directconnect": {
+"endpoint_prefix": "directconnect",
+"full_name": "AWS Direct Connect",
+"host": "directconnect.us-east-1.amazonaws.com",
+"signing_name": "directconnect"
+},
+"discovery": {
+"endpoint_prefix": "discovery",
+"full_name": "AWS Application Discovery Service",
+"host": "discovery.us-east-1.amazonaws.com",
+"signing_name": "discovery"
+},
+"dlm": {
+"endpoint_prefix": "dlm",
+"full_name": "Amazon Data Lifecycle Manager",
+"host": "dlm.us-east-1.amazonaws.com",
+"signing_name": "dlm"
+},
+"dms": {
+"endpoint_prefix": "dms",
+"full_name": "AWS Database Migration Service",
+"host": "dms.us-east-1.amazonaws.com",
+"signing_name": "dms"
+},
+"docdb": {
+"endpoint_prefix": "rds",
+"full_name": "Amazon DocumentDB with MongoDB compatibility",
+"host": "rds.us-east-1.amazonaws.com",
+"signing_name": "rds"
+},
+"docdb-elastic": {
+"endpoint_prefix": "docdb-elastic",
+"full_name": "Amazon DocumentDB Elastic Clusters",
+"host": "docdb-elastic.us-east-1.amazonaws.com",
+"signing_name": "docdb-elastic"
+},
+"drs": {
+"endpoint_prefix": "drs",
+"full_name": "Elastic Disaster Recovery Service",
+"host": "drs.us-east-1.amazonaws.com",
+"signing_name": "drs"
+},
+"ds": {
+"endpoint_prefix": "ds",
+"full_name": "AWS Directory Service",
+"host": "ds.us-east-1.amazonaws.com",
+"signing_name": "ds"
+},
+"ds-data": {
+"endpoint_prefix": "ds-data",
+"full_name": "AWS Directory Service Data",
+"host": "ds-data.us-east-1.amazonaws.com",
+"signing_name": "ds-data"
+},
+"dsql": {
+"endpoint_prefix": "dsql",
+"full_name": "Amazon Aurora DSQL",
+"host": "dsql.us-east-1.amazonaws.com",
+"signing_name": "dsql"
+},
+"dynamodb": {
+"endpoint_prefix": "dynamodb",
+"full_name": "Amazon DynamoDB",
+"host": "dynamodb.us-east-1.amazonaws.com",
+"signing_name": "dynamodb"
+},
+"dynamodbstreams": {
+"endpoint_prefix": "streams.dynamodb",
+"full_name": "Amazon DynamoDB Streams",
+"host": "streams.dynamodb.us-east-1.amazonaws.com",
+"signing_name": "dynamodb"
+},
+"ebs": {
+"endpoint_prefix": "ebs",
+"full_name": "Amazon Elastic Block Store",
+"host": "ebs.us-east-1.amazonaws.com",
+"signing_name": "ebs"
+},
+"ec2": {
+"endpoint_prefix": "ec2",
+"full_name": "Amazon Elastic Compute Cloud",
+"host": "ec2.us-east-1.amazonaws.com",
+"signing_name": "ec2"
+},
+"ec2-instance-connect": {
+"endpoint_prefix": "ec2-instance-connect",
+"full_name": "AWS EC2 Instance Connect",
+"host": "ec2-instance-connect.us-east-1.amazonaws.com",
+"signing_name": "ec2-instance-connect"
+},
+"ecr": {
+"endpoint_prefix": "api.ecr",
+"full_name": "Amazon Elastic Container Registry",
+"host": "api.ecr.us-east-1.amazonaws.com",
+"signing_name": "ecr"
+},
+"ecr-public": {
+"endpoint_prefix": "api.ecr-public",
+"full_name": "Amazon Elastic Container Registry Public",
+"host": "api.ecr-public.us-east-1.amazonaws.com",
+"signing_name": "ecr-public"
+},
+"ecs": {
+"endpoint_prefix": "ecs",
+"full_name": "Amazon EC2 Container Service",
+"host": "ecs.us-east-1.amazonaws.com",
+"signing_name": "ecs"
+},
+"efs": {
+"endpoint_prefix": "elasticfilesystem",
+"full_name": "Amazon Elastic File System",
+"host": "elasticfilesystem.us-east-1.amazonaws.com",
+"signing_name": "elasticfilesystem"
+},
+"eks": {
+"endpoint_prefix": "eks",
+"full_name": "Amazon Elastic Kubernetes Service",
+"host": "eks.us-east-1.amazonaws.com",
+"signing_name": "eks"
+},
+"eks-auth": {
+"endpoint_prefix": "eks-auth",
+"full_name": "Amazon EKS Auth",
+"host": "eks-auth.us-east-1.api.aws",
+"signing_name": "eks-auth"
+},
+"elasticache": {
+"endpoint_prefix": "elasticache",
+"full_name": "Amazon ElastiCache",
+"host": "elasticache.us-east-1.amazonaws.com",
+"signing_name": "elasticache"
+},
+"elasticbeanstalk": {
+"endpoint_prefix": "elasticbeanstalk",
+"full_name": "AWS Elastic Beanstalk",
+"host": "elasticbeanstalk.us-east-1.amazonaws.com",
+"signing_name": "elasticbeanstalk"
+},
+"elb": {
+"endpoint_prefix": "elasticloadbalancing",
+"full_name": "Elastic Load Balancing",
+"host": "elasticloadbalancing.us-east-1.amazonaws.com",
+"signing_name": "elasticloadbalancing"
+},
+"elbv2": {
+"endpoint_prefix": "elasticloadbalancing",
+"full_name": "Elastic Load Balancing",
+"host": "elasticloadbalancing.us-east-1.amazonaws.com",
+"signing_name": "elasticloadbalancing"
+},
+"elementalinference": {
+"endpoint_prefix": "elemental-inference",
+"full_name": "AWS Elemental Inference",
+"host": "elemental-inference.us-east-1.amazonaws.com",
+"signing_name": "elemental-inference"
+},
+"emr": {
+"endpoint_prefix": "elasticmapreduce",
+"full_name": "Amazon EMR",
+"host": "elasticmapreduce.us-east-1.amazonaws.com",
+"signing_name": "elasticmapreduce"
+},
+"emr-containers": {
+"endpoint_prefix": "emr-containers",
+"full_name": "Amazon EMR Containers",
+"host": "emr-containers.us-east-1.amazonaws.com",
+"signing_name": "emr-containers"
+},
+"emr-serverless": {
+"endpoint_prefix": "emr-serverless",
+"full_name": "EMR Serverless",
+"host": "emr-serverless.us-east-1.amazonaws.com",
+"signing_name": "emr-serverless"
+},
+"endusermessaging": {
+"endpoint_prefix": "end-user-messaging",
+"full_name": "AWS End User Messaging",
+"host": "end-user-messaging.us-east-1.amazonaws.com",
+"signing_name": "end-user-messaging"
+},
+"entityresolution": {
+"endpoint_prefix": "entityresolution",
+"full_name": "AWS EntityResolution",
+"host": "entityresolution.us-east-1.amazonaws.com",
+"signing_name": "entityresolution"
+},
+"es": {
+"endpoint_prefix": "es",
+"full_name": "Amazon Elasticsearch Service",
+"host": "es.us-east-1.amazonaws.com",
+"signing_name": "es"
+},
+"eventbridgev2": {
+"endpoint_prefix": "eventsv2",
+"full_name": "Amazon EventBridgeV2",
+"host": "eventsv2.us-east-1.amazonaws.com",
+"signing_name": "events"
+},
+"events": {
+"endpoint_prefix": "events",
+"full_name": "Amazon EventBridge",
+"host": "events.us-east-1.amazonaws.com",
+"signing_name": "events"
+},
+"evs": {
+"endpoint_prefix": "evs",
+"full_name": "Amazon Elastic VMware Service",
+"host": "evs.us-east-1.amazonaws.com",
+"signing_name": "evs"
+},
+"firehose": {
+"endpoint_prefix": "firehose",
+"full_name": "Amazon Kinesis Firehose",
+"host": "firehose.us-east-1.amazonaws.com",
+"signing_name": "firehose"
+},
+"fis": {
+"endpoint_prefix": "fis",
+"full_name": "AWS Fault Injection Simulator",
+"host": "fis.us-east-1.amazonaws.com",
+"signing_name": "fis"
+},
+"fms": {
+"endpoint_prefix": "fms",
+"full_name": "Firewall Management Service",
+"host": "fms.us-east-1.amazonaws.com",
+"signing_name": "fms"
+},
+"forecast": {
+"endpoint_prefix": "forecast",
+"full_name": "Amazon Forecast Service",
+"host": "forecast.us-east-1.amazonaws.com",
+"signing_name": "forecast"
+},
+"forecastquery": {
+"endpoint_prefix": "forecastquery",
+"full_name": "Amazon Forecast Query Service",
+"host": "forecastquery.us-east-1.amazonaws.com",
+"signing_name": "forecast"
+},
+"frauddetector": {
+"endpoint_prefix": "frauddetector",
+"full_name": "Amazon Fraud Detector",
+"host": "frauddetector.us-east-1.amazonaws.com",
+"signing_name": "frauddetector"
+},
+"freetier": {
+"endpoint_prefix": "freetier",
+"full_name": "AWS Free Tier",
+"host": "freetier.us-east-1.amazonaws.com",
+"signing_name": "freetier"
+},
+"fsx": {
+"endpoint_prefix": "fsx",
+"full_name": "Amazon FSx",
+"host": "fsx.us-east-1.amazonaws.com",
+"signing_name": "fsx"
+},
+"gamelift": {
+"endpoint_prefix": "gamelift",
+"full_name": "Amazon GameLift",
+"host": "gamelift.us-east-1.amazonaws.com",
+"signing_name": "gamelift"
+},
+"gameliftstreams": {
+"endpoint_prefix": "gameliftstreams",
+"full_name": "Amazon GameLift Streams",
+"host": "gameliftstreams.us-east-1.api.aws",
+"signing_name": "gameliftstreams"
+},
+"geo-maps": {
+"endpoint_prefix": "geo-maps",
+"full_name": "Amazon Location Service Maps V2",
+"host": "geo-maps.us-east-1.amazonaws.com",
+"signing_name": "geo-maps"
+},
+"geo-places": {
+"endpoint_prefix": "geo-places",
+"full_name": "Amazon Location Service Places V2",
+"host": "geo-places.us-east-1.amazonaws.com",
+"signing_name": "geo-places"
+},
+"geo-routes": {
+"endpoint_prefix": "geo-routes",
+"full_name": "Amazon Location Service Routes V2",
+"host": "geo-routes.us-east-1.amazonaws.com",
+"signing_name": "geo-routes"
+},
+"glacier": {
+"endpoint_prefix": "glacier",
+"full_name": "Amazon Glacier",
+"host": "glacier.us-east-1.amazonaws.com",
+"signing_name": "glacier"
+},
+"globalaccelerator": {
+"endpoint_prefix": "globalaccelerator",
+"full_name": "AWS Global Accelerator",
+"host": "globalaccelerator.us-east-1.amazonaws.com",
+"signing_name": "globalaccelerator"
+},
+"glue": {
+"endpoint_prefix": "glue",
+"full_name": "AWS Glue",
+"host": "glue.us-east-1.amazonaws.com",
+"signing_name": "glue"
+},
+"grafana": {
+"endpoint_prefix": "grafana",
+"full_name": "Amazon Managed Grafana",
+"host": "grafana.us-east-1.amazonaws.com",
+"signing_name": "grafana"
+},
+"greengrass": {
+"endpoint_prefix": "greengrass",
+"full_name": "AWS Greengrass",
+"host": "greengrass.us-east-1.amazonaws.com",
+"signing_name": "greengrass"
+},
+"greengrassv2": {
+"endpoint_prefix": "greengrass",
+"full_name": "AWS IoT Greengrass V2",
+"host": "greengrass.us-east-1.amazonaws.com",
+"signing_name": "greengrass"
+},
+"groundstation": {
+"endpoint_prefix": "groundstation",
+"full_name": "AWS Ground Station",
+"host": "groundstation.us-east-1.amazonaws.com",
+"signing_name": "groundstation"
+},
+"guardduty": {
+"endpoint_prefix": "guardduty",
+"full_name": "Amazon GuardDuty",
+"host": "guardduty.us-east-1.amazonaws.com",
+"signing_name": "guardduty"
+},
+"health": {
+"endpoint_prefix": "health",
+"full_name": "AWS Health APIs and Notifications",
+"host": "global.health.amazonaws.com",
+"signing_name": "health"
+},
+"healthlake": {
+"endpoint_prefix": "healthlake",
+"full_name": "Amazon HealthLake",
+"host": "healthlake.us-east-1.amazonaws.com",
+"signing_name": "healthlake"
+},
+"iam": {
+"endpoint_prefix": "iam",
+"full_name": "AWS Identity and Access Management",
+"host": "iam.amazonaws.com",
+"signing_name": "iam"
+},
+"iam-toolbox": {
+"endpoint_prefix": "iam-toolbox",
+"full_name": "IAM Toolbox (Preview)",
+"host": "iam-toolbox.us-east-1.amazonaws.com",
+"signing_name": "iam"
+},
+"identitystore": {
+"endpoint_prefix": "identitystore",
+"full_name": "AWS SSO Identity Store",
+"host": "identitystore.us-east-1.amazonaws.com",
+"signing_name": "identitystore"
+},
+"imagebuilder": {
+"endpoint_prefix": "imagebuilder",
+"full_name": "EC2 Image Builder",
+"host": "imagebuilder.us-east-1.amazonaws.com",
+"signing_name": "imagebuilder"
+},
+"importexport": {
+"endpoint_prefix": "importexport",
+"full_name": "AWS Import/Export",
+"host": "importexport.amazonaws.com",
+"signing_name": "importexport"
+},
+"inspector": {
+"endpoint_prefix": "inspector",
+"full_name": "Amazon Inspector",
+"host": "inspector.us-east-1.amazonaws.com",
+"signing_name": "inspector"
+},
+"inspector-scan": {
+"endpoint_prefix": "inspector-scan",
+"full_name": "Inspector Scan",
+"host": "inspector-scan.us-east-1.amazonaws.com",
+"signing_name": "inspector-scan"
+},
+"inspector2": {
+"endpoint_prefix": "inspector2",
+"full_name": "Inspector2",
+"host": "inspector2.us-east-1.amazonaws.com",
+"signing_name": "inspector2"
+},
+"interconnect": {
+"endpoint_prefix": "interconnect",
+"full_name": "Interconnect",
+"host": "interconnect.us-east-1.amazonaws.com",
+"signing_name": "interconnect"
+},
+"internetmonitor": {
+"endpoint_prefix": "internetmonitor",
+"full_name": "Amazon CloudWatch Internet Monitor",
+"host": "internetmonitor.us-east-1.api.aws",
+"signing_name": "internetmonitor"
+},
+"invoicing": {
+"endpoint_prefix": "invoicing",
+"full_name": "AWS Invoicing",
+"host": "invoicing.us-east-1.amazonaws.com",
+"signing_name": "invoicing"
+},
+"iot": {
+"endpoint_prefix": "iot",
+"full_name": "AWS IoT",
+"host": "iot.us-east-1.amazonaws.com",
+"signing_name": "iot"
+},
+"iot-data": {
+"endpoint_prefix": "data-ats.iot",
+"full_name": "AWS IoT Data Plane",
+"host": "data-ats.iot.us-east-1.amazonaws.com",
+"signing_name": "iotdata"
+},
+"iot-jobs-data": {
+"endpoint_prefix": "data.jobs.iot",
+"full_name": "AWS IoT Jobs Data Plane",
+"host": "data.jobs.iot.us-east-1.amazonaws.com",
+"signing_name": "iot-jobs-data"
+},
+"iot-managed-integrations": {
+"endpoint_prefix": "api.iotmanagedintegrations",
+"full_name": "Managed integrations for AWS IoT Device Management",
+"host": "api.iotmanagedintegrations.us-east-1.amazonaws.com",
+"signing_name": "iotmanagedintegrations"
+},
+"iotdeviceadvisor": {
+"endpoint_prefix": "api.iotdeviceadvisor",
+"full_name": "AWS IoT Core Device Advisor",
+"host": "api.iotdeviceadvisor.us-east-1.amazonaws.com",
+"signing_name": "iotdeviceadvisor"
+},
+"iotfleetwise": {
+"endpoint_prefix": "iotfleetwise",
+"full_name": "AWS IoT FleetWise",
+"host": "iotfleetwise.us-east-1.amazonaws.com",
+"signing_name": "iotfleetwise"
+},
+"iotsecuretunneling": {
+"endpoint_prefix": "api.tunneling.iot",
+"full_name": "AWS IoT Secure Tunneling",
+"host": "api.tunneling.iot.us-east-1.amazonaws.com",
+"signing_name": "IoTSecuredTunneling"
+},
+"iotsitewise": {
+"endpoint_prefix": "iotsitewise",
+"full_name": "AWS IoT SiteWise",
+"host": "iotsitewise.us-east-1.amazonaws.com",
+"signing_name": "iotsitewise"
+},
+"iotthingsgraph": {
+"endpoint_prefix": "iotthingsgraph",
+"full_name": "AWS IoT Things Graph",
+"host": "iotthingsgraph.us-east-1.amazonaws.com",
+"signing_name": "iotthingsgraph"
+},
+"iottwinmaker": {
+"endpoint_prefix": "iottwinmaker",
+"full_name": "AWS IoT TwinMaker",
+"host": "iottwinmaker.us-east-1.amazonaws.com",
+"signing_name": "iottwinmaker"
+},
+"iotwireless": {
+"endpoint_prefix": "api.iotwireless",
+"full_name": "AWS IoT Wireless",
+"host": "api.iotwireless.us-east-1.amazonaws.com",
+"signing_name": "iotwireless"
+},
+"ivs": {
+"endpoint_prefix": "ivs",
+"full_name": "Amazon Interactive Video Service",
+"host": "ivs.us-east-1.amazonaws.com",
+"signing_name": "ivs"
+},
+"ivs-realtime": {
+"endpoint_prefix": "ivsrealtime",
+"full_name": "Amazon Interactive Video Service RealTime",
+"host": "ivsrealtime.us-east-1.amazonaws.com",
+"signing_name": "ivs"
+},
+"ivschat": {
+"endpoint_prefix": "ivschat",
+"full_name": "Amazon Interactive Video Service Chat",
+"host": "ivschat.us-east-1.amazonaws.com",
+"signing_name": "ivschat"
+},
+"kafka": {
+"endpoint_prefix": "kafka",
+"full_name": "Managed Streaming for Kafka",
+"host": "kafka.us-east-1.amazonaws.com",
+"signing_name": "kafka"
+},
+"kafkaconnect": {
+"endpoint_prefix": "kafkaconnect",
+"full_name": "Managed Streaming for Kafka Connect",
+"host": "kafkaconnect.us-east-1.amazonaws.com",
+"signing_name": "kafkaconnect"
+},
+"kendra": {
+"endpoint_prefix": "kendra",
+"full_name": "AWSKendraFrontendService",
+"host": "kendra.us-east-1.amazonaws.com",
+"signing_name": "kendra"
+},
+"kendra-ranking": {
+"endpoint_prefix": "kendra-ranking",
+"full_name": "Amazon Kendra Intelligent Ranking",
+"host": "kendra-ranking.us-east-1.api.aws",
+"signing_name": "kendra-ranking"
+},
+"keyspaces": {
+"endpoint_prefix": "cassandra",
+"full_name": "Amazon Keyspaces",
+"host": "cassandra.us-east-1.amazonaws.com",
+"signing_name": "cassandra"
+},
+"keyspacesstreams": {
+"endpoint_prefix": "cassandra-streams",
+"full_name": "Amazon Keyspaces Streams",
+"host": "cassandra-streams.us-east-1.amazonaws.com",
+"signing_name": "cassandra"
+},
+"kinesis": {
+"endpoint_prefix": "kinesis",
+"full_name": "Amazon Kinesis",
+"host": "kinesis.us-east-1.amazonaws.com",
+"signing_name": "kinesis"
+},
+"kinesis-video-archived-media": {
+"endpoint_prefix": "kinesisvideo",
+"full_name": "Amazon Kinesis Video Streams Archived Media",
+"host": "kinesisvideo.us-east-1.amazonaws.com",
+"signing_name": "kinesisvideo"
+},
+"kinesis-video-media": {
+"endpoint_prefix": "kinesisvideo",
+"full_name": "Amazon Kinesis Video Streams Media",
+"host": "kinesisvideo.us-east-1.amazonaws.com",
+"signing_name": "kinesisvideo"
+},
+"kinesis-video-signaling": {
+"endpoint_prefix": "kinesisvideo",
+"full_name": "Amazon Kinesis Video Signaling Channels",
+"host": "kinesisvideo.us-east-1.amazonaws.com",
+"signing_name": "kinesisvideo"
+},
+"kinesis-video-webrtc-storage": {
+"endpoint_prefix": "kinesisvideo",
+"full_name": "Amazon Kinesis Video WebRTC Storage",
+"host": "kinesisvideo.us-east-1.amazonaws.com",
+"signing_name": "kinesisvideo"
+},
+"kinesisanalytics": {
+"endpoint_prefix": "kinesisanalytics",
+"full_name": "Amazon Kinesis Analytics",
+"host": "kinesisanalytics.us-east-1.amazonaws.com",
+"signing_name": "kinesisanalytics"
+},
+"kinesisanalyticsv2": {
+"endpoint_prefix": "kinesisanalytics",
+"full_name": "Amazon Kinesis Analytics",
+"host": "kinesisanalytics.us-east-1.amazonaws.com",
+"signing_name": "kinesisanalytics"
+},
+"kinesisvideo": {
+"endpoint_prefix": "kinesisvideo",
+"full_name": "Amazon Kinesis Video Streams",
+"host": "kinesisvideo.us-east-1.amazonaws.com",
+"signing_name": "kinesisvideo"
+},
+"kms": {
+"endpoint_prefix": "kms",
+"full_name": "AWS Key Management Service",
+"host": "kms.us-east-1.amazonaws.com",
+"signing_name": "kms"
+},
+"lakeformation": {
+"endpoint_prefix": "lakeformation",
+"full_name": "AWS Lake Formation",
+"host": "lakeformation.us-east-1.amazonaws.com",
+"signing_name": "lakeformation"
+},
+"lambda": {
+"endpoint_prefix": "lambda",
+"full_name": "AWS Lambda",
+"host": "lambda.us-east-1.amazonaws.com",
+"signing_name": "lambda"
+},
+"lambda-core": {
+"endpoint_prefix": "lambda",
+"full_name": "AWS Lambda Core",
+"host": "lambda.us-east-1.amazonaws.com",
+"signing_name": "lambda"
+},
+"lambda-microvms": {
+"endpoint_prefix": "lambda",
+"full_name": "Lambda MicroVMs",
+"host": "lambda.us-east-1.amazonaws.com",
+"signing_name": "lambda"
+},
+"lambda-web": {
+"endpoint_prefix": "lambda",
+"full_name": "Lambda Web",
+"host": "lambda.us-east-1.amazonaws.com",
+"signing_name": "lambda"
+},
+"launch-wizard": {
+"endpoint_prefix": "launchwizard",
+"full_name": "AWS Launch Wizard",
+"host": "launchwizard.us-east-1.amazonaws.com",
+"signing_name": "launchwizard"
+},
+"lex-models": {
+"endpoint_prefix": "models.lex",
+"full_name": "Amazon Lex Model Building Service",
+"host": "models.lex.us-east-1.amazonaws.com",
+"signing_name": "lex"
+},
+"lex-runtime": {
+"endpoint_prefix": "runtime.lex",
+"full_name": "Amazon Lex Runtime Service",
+"host": "runtime.lex.us-east-1.amazonaws.com",
+"signing_name": "lex"
+},
+"lexv2-models": {
+"endpoint_prefix": "models-v2-lex",
+"full_name": "Amazon Lex Model Building V2",
+"host": "models-v2-lex.us-east-1.amazonaws.com",
+"signing_name": "lex"
+},
+"lexv2-runtime": {
+"endpoint_prefix": "runtime-v2-lex",
+"full_name": "Amazon Lex Runtime V2",
+"host": "runtime-v2-lex.us-east-1.amazonaws.com",
+"signing_name": "lex"
+},
+"license-manager": {
+"endpoint_prefix": "license-manager",
+"full_name": "AWS License Manager",
+"host": "license-manager.us-east-1.amazonaws.com",
+"signing_name": "license-manager"
+},
+"license-manager-linux-subscriptions": {
+"endpoint_prefix": "license-manager-linux-subscriptions",
+"full_name": "AWS License Manager Linux Subscriptions",
+"host": "license-manager-linux-subscriptions.us-east-1.amazonaws.com",
+"signing_name": "license-manager-linux-subscriptions"
+},
+"license-manager-user-subscriptions": {
+"endpoint_prefix": "license-manager-user-subscriptions",
+"full_name": "AWS License Manager User Subscriptions",
+"host": "license-manager-user-subscriptions.us-east-1.amazonaws.com",
+"signing_name": "license-manager-user-subscriptions"
+},
+"lightsail": {
+"endpoint_prefix": "lightsail",
+"full_name": "Amazon Lightsail",
+"host": "lightsail.us-east-1.amazonaws.com",
+"signing_name": "lightsail"
+},
+"location": {
+"endpoint_prefix": "geo",
+"full_name": "Amazon Location Service",
+"host": "geo.us-east-1.amazonaws.com",
+"signing_name": "geo"
+},
+"logs": {
+"endpoint_prefix": "logs",
+"full_name": "Amazon CloudWatch Logs",
+"host": "logs.us-east-1.amazonaws.com",
+"signing_name": "logs"
+},
+"lookoutequipment": {
+"endpoint_prefix": "lookoutequipment",
+"full_name": "Amazon Lookout for Equipment",
+"host": "lookoutequipment.us-east-1.amazonaws.com",
+"signing_name": "lookoutequipment"
+},
+"m2": {
+"endpoint_prefix": "m2",
+"full_name": "AWSMainframeModernization",
+"host": "m2.us-east-1.amazonaws.com",
+"signing_name": "m2"
+},
+"machinelearning": {
+"endpoint_prefix": "machinelearning",
+"full_name": "Amazon Machine Learning",
+"host": "machinelearning.us-east-1.amazonaws.com",
+"signing_name": "machinelearning"
+},
+"macie2": {
+"endpoint_prefix": "macie2",
+"full_name": "Amazon Macie 2",
+"host": "macie2.us-east-1.amazonaws.com",
+"signing_name": "macie2"
+},
+"mailmanager": {
+"endpoint_prefix": "mail-manager",
+"full_name": "MailManager",
+"host": "mail-manager.us-east-1.amazonaws.com",
+"signing_name": "ses"
+},
+"managedblockchain": {
+"endpoint_prefix": "managedblockchain",
+"full_name": "Amazon Managed Blockchain",
+"host": "managedblockchain.us-east-1.amazonaws.com",
+"signing_name": "managedblockchain"
+},
+"managedblockchain-query": {
+"endpoint_prefix": "managedblockchain-query",
+"full_name": "Amazon Managed Blockchain Query",
+"host": "managedblockchain-query.us-east-1.amazonaws.com",
+"signing_name": "managedblockchain-query"
+},
+"marketplace-agreement": {
+"endpoint_prefix": "agreement-marketplace",
+"full_name": "AWS Marketplace Agreement Service",
+"host": "agreement-marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplace-catalog": {
+"endpoint_prefix": "catalog.marketplace",
+"full_name": "AWS Marketplace Catalog Service",
+"host": "catalog.marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplace-deployment": {
+"endpoint_prefix": "deployment-marketplace",
+"full_name": "AWS Marketplace Deployment Service",
+"host": "deployment-marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplace-discovery": {
+"endpoint_prefix": "discovery-marketplace",
+"full_name": "AWS Marketplace Discovery",
+"host": "discovery-marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplace-entitlement": {
+"endpoint_prefix": "entitlement.marketplace",
+"full_name": "AWS Marketplace Entitlement Service",
+"host": "entitlement.marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplace-reporting": {
+"endpoint_prefix": "reporting-marketplace",
+"full_name": "AWS Marketplace Reporting Service",
+"host": "reporting-marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"marketplacecommerceanalytics": {
+"endpoint_prefix": "marketplacecommerceanalytics",
+"full_name": "AWS Marketplace Commerce Analytics",
+"host": "marketplacecommerceanalytics.us-east-1.amazonaws.com",
+"signing_name": "marketplacecommerceanalytics"
+},
+"mediaconnect": {
+"endpoint_prefix": "mediaconnect",
+"full_name": "AWS MediaConnect",
+"host": "mediaconnect.us-east-1.amazonaws.com",
+"signing_name": "mediaconnect"
+},
+"mediaconvert": {
+"endpoint_prefix": "mediaconvert",
+"full_name": "AWS Elemental MediaConvert",
+"host": "mediaconvert.us-east-1.amazonaws.com",
+"signing_name": "mediaconvert"
+},
+"medialive": {
+"endpoint_prefix": "medialive",
+"full_name": "AWS Elemental MediaLive",
+"host": "medialive.us-east-1.amazonaws.com",
+"signing_name": "medialive"
+},
+"mediapackage": {
+"endpoint_prefix": "mediapackage",
+"full_name": "AWS Elemental MediaPackage",
+"host": "mediapackage.us-east-1.amazonaws.com",
+"signing_name": "mediapackage"
+},
+"mediapackage-vod": {
+"endpoint_prefix": "mediapackage-vod",
+"full_name": "AWS Elemental MediaPackage VOD",
+"host": "mediapackage-vod.us-east-1.amazonaws.com",
+"signing_name": "mediapackage-vod"
+},
+"mediapackagev2": {
+"endpoint_prefix": "mediapackagev2",
+"full_name": "AWS Elemental MediaPackage v2",
+"host": "mediapackagev2.us-east-1.amazonaws.com",
+"signing_name": "mediapackagev2"
+},
+"mediastore": {
+"endpoint_prefix": "mediastore",
+"full_name": "AWS Elemental MediaStore",
+"host": "mediastore.us-east-1.amazonaws.com",
+"signing_name": "mediastore"
+},
+"mediastore-data": {
+"endpoint_prefix": "data.mediastore",
+"full_name": "AWS Elemental MediaStore Data Plane",
+"host": "data.mediastore.us-east-1.amazonaws.com",
+"signing_name": "mediastore"
+},
+"mediatailor": {
+"endpoint_prefix": "api.mediatailor",
+"full_name": "AWS MediaTailor",
+"host": "api.mediatailor.us-east-1.amazonaws.com",
+"signing_name": "mediatailor"
+},
+"medical-imaging": {
+"endpoint_prefix": "medical-imaging",
+"full_name": "AWS Health Imaging",
+"host": "medical-imaging.us-east-1.amazonaws.com",
+"signing_name": "medical-imaging"
+},
+"memorydb": {
+"endpoint_prefix": "memory-db",
+"full_name": "Amazon MemoryDB",
+"host": "memory-db.us-east-1.amazonaws.com",
+"signing_name": "memorydb"
+},
+"meteringmarketplace": {
+"endpoint_prefix": "metering.marketplace",
+"full_name": "AWSMarketplace Metering",
+"host": "metering.marketplace.us-east-1.amazonaws.com",
+"signing_name": "aws-marketplace"
+},
+"mgh": {
+"endpoint_prefix": "mgh",
+"full_name": "AWS Migration Hub",
+"host": "mgh.us-east-1.amazonaws.com",
+"signing_name": "mgh"
+},
+"mgn": {
+"endpoint_prefix": "mgn",
+"full_name": "Application Migration Service",
+"host": "mgn.us-east-1.amazonaws.com",
+"signing_name": "mgn"
+},
+"migration-hub-refactor-spaces": {
+"endpoint_prefix": "refactor-spaces",
+"full_name": "AWS Migration Hub Refactor Spaces",
+"host": "refactor-spaces.us-east-1.amazonaws.com",
+"signing_name": "refactor-spaces"
+},
+"migrationhub-config": {
+"endpoint_prefix": "migrationhub-config",
+"full_name": "AWS Migration Hub Config",
+"host": "migrationhub-config.us-east-1.amazonaws.com",
+"signing_name": "mgh"
+},
+"migrationhuborchestrator": {
+"endpoint_prefix": "migrationhub-orchestrator",
+"full_name": "AWS Migration Hub Orchestrator",
+"host": "migrationhub-orchestrator.us-east-1.amazonaws.com",
+"signing_name": "migrationhub-orchestrator"
+},
+"migrationhubstrategy": {
+"endpoint_prefix": "migrationhub-strategy",
+"full_name": "Migration Hub Strategy Recommendations",
+"host": "migrationhub-strategy.us-east-1.amazonaws.com",
+"signing_name": "migrationhub-strategy"
+},
+"mpa": {
+"endpoint_prefix": "mpa",
+"full_name": "AWS Multi-party Approval",
+"host": "mpa.us-east-1.amazonaws.com",
+"signing_name": "mpa"
+},
+"mq": {
+"endpoint_prefix": "mq",
+"full_name": "AmazonMQ",
+"host": "mq.us-east-1.amazonaws.com",
+"signing_name": "mq"
+},
+"mturk": {
+"endpoint_prefix": "mturk-requester",
+"full_name": "Amazon Mechanical Turk",
+"host": "mturk-requester.us-east-1.amazonaws.com",
+"signing_name": "mturk-requester"
+},
+"mwaa": {
+"endpoint_prefix": "airflow",
+"full_name": "AmazonMWAA",
+"host": "airflow.us-east-1.amazonaws.com",
+"signing_name": "airflow"
+},
+"mwaa-serverless": {
+"endpoint_prefix": "airflow-serverless",
+"full_name": "AmazonMWAAServerless",
+"host": "airflow-serverless.us-east-1.amazonaws.com",
+"signing_name": "airflow-serverless"
+},
+"neptune": {
+"endpoint_prefix": "rds",
+"full_name": "Amazon Neptune",
+"host": "rds.us-east-1.amazonaws.com",
+"signing_name": "rds"
+},
+"neptune-graph": {
+"endpoint_prefix": "neptune-graph",
+"full_name": "Amazon Neptune Graph",
+"host": "neptune-graph.us-east-1.amazonaws.com",
+"signing_name": "neptune-graph"
+},
+"neptunedata": {
+"endpoint_prefix": "neptune-db",
+"full_name": "Amazon NeptuneData",
+"host": "neptune-db.us-east-1.amazonaws.com",
+"signing_name": "neptune-db"
+},
+"network-firewall": {
+"endpoint_prefix": "network-firewall",
+"full_name": "AWS Network Firewall",
+"host": "network-firewall.us-east-1.amazonaws.com",
+"signing_name": "network-firewall"
+},
+"network-security-manager": {
+"endpoint_prefix": "network-security-manager",
+"full_name": "AWS Network Security Manager Customer API",
+"host": "network-security-manager.us-east-1.amazonaws.com",
+"signing_name": "network-security-manager"
+},
+"networkflowmonitor": {
+"endpoint_prefix": "networkflowmonitor",
+"full_name": "Network Flow Monitor",
+"host": "networkflowmonitor.us-east-1.amazonaws.com",
+"signing_name": "networkflowmonitor"
+},
+"networkmanager": {
+"endpoint_prefix": "networkmanager",
+"full_name": "AWS Network Manager",
+"host": "networkmanager.us-west-2.amazonaws.com",
+"signing_name": "networkmanager"
+},
+"networkmonitor": {
+"endpoint_prefix": "networkmonitor",
+"full_name": "Amazon CloudWatch Network Monitor",
+"host": "networkmonitor.us-east-1.amazonaws.com",
+"signing_name": "networkmonitor"
+},
+"notifications": {
+"endpoint_prefix": "notifications",
+"full_name": "AWS User Notifications",
+"host": "notifications.us-east-1.api.aws",
+"signing_name": "notifications"
+},
+"notificationscontacts": {
+"endpoint_prefix": "notifications-contacts",
+"full_name": "AWS User Notifications Contacts",
+"host": "notifications-contacts.us-east-1.api.aws",
+"signing_name": "notifications-contacts"
+},
+"nova-act": {
+"endpoint_prefix": "nova-act",
+"full_name": "Nova Act Service",
+"host": "nova-act.us-east-1.amazonaws.com",
+"signing_name": "nova-act"
+},
+"oam": {
+"endpoint_prefix": "oam",
+"full_name": "CloudWatch Observability Access Manager",
+"host": "oam.us-east-1.amazonaws.com",
+"signing_name": "oam"
+},
+"observabilityadmin": {
+"endpoint_prefix": "observabilityadmin",
+"full_name": "CloudWatch Observability Admin Service",
+"host": "observabilityadmin.us-east-1.amazonaws.com",
+"signing_name": "observabilityadmin"
+},
+"odb": {
+"endpoint_prefix": "odb",
+"full_name": "odb",
+"host": "odb.us-east-1.amazonaws.com",
+"signing_name": "odb"
+},
+"omics": {
+"endpoint_prefix": "omics",
+"full_name": "Amazon Omics",
+"host": "omics.us-east-1.amazonaws.com",
+"signing_name": "omics"
+},
+"opensearch": {
+"endpoint_prefix": "es",
+"full_name": "Amazon OpenSearch Service",
+"host": "es.us-east-1.amazonaws.com",
+"signing_name": "es"
+},
+"opensearchserverless": {
+"endpoint_prefix": "aoss",
+"full_name": "OpenSearch Service Serverless",
+"host": "aoss.us-east-1.amazonaws.com",
+"signing_name": "aoss"
+},
+"organizations": {
+"endpoint_prefix": "organizations",
+"full_name": "AWS Organizations",
+"host": "organizations.us-east-1.amazonaws.com",
+"signing_name": "organizations"
+},
+"osis": {
+"endpoint_prefix": "osis",
+"full_name": "Amazon OpenSearch Ingestion",
+"host": "osis.us-east-1.amazonaws.com",
+"signing_name": "osis"
+},
+"outposts": {
+"endpoint_prefix": "outposts",
+"full_name": "AWS Outposts",
+"host": "outposts.us-east-1.amazonaws.com",
+"signing_name": "outposts"
+},
+"partnercentral-account": {
+"endpoint_prefix": "partnercentral-account",
+"full_name": "Partner Central Account API",
+"host": "partnercentral-account.us-east-1.amazonaws.com",
+"signing_name": "partnercentral-account"
+},
+"partnercentral-benefits": {
+"endpoint_prefix": "partnercentral-benefits",
+"full_name": "Partner Central Benefits API",
+"host": "partnercentral-benefits.us-east-1.amazonaws.com",
+"signing_name": "partnercentral-benefits"
+},
+"partnercentral-channel": {
+"endpoint_prefix": "partnercentral-channel",
+"full_name": "Partner Central Channel API",
+"host": "partnercentral-channel.us-east-1.amazonaws.com",
+"signing_name": "partnercentral-channel"
+},
+"partnercentral-revenue-measurement": {
+"endpoint_prefix": "partnercentral-prm",
+"full_name": "Partner Central Revenue Measurement API",
+"host": "partnercentral-prm.us-east-1.amazonaws.com",
+"signing_name": "partnercentral"
+},
+"partnercentral-selling": {
+"endpoint_prefix": "partnercentral-selling",
+"full_name": "Partner Central Selling API",
+"host": "partnercentral-selling.us-east-1.amazonaws.com",
+"signing_name": "partnercentral-selling"
+},
+"payment-cryptography": {
+"endpoint_prefix": "controlplane.payment-cryptography",
+"full_name": "Payment Cryptography Control Plane",
+"host": "controlplane.payment-cryptography.us-east-1.amazonaws.com",
+"signing_name": "payment-cryptography"
+},
+"payment-cryptography-data": {
+"endpoint_prefix": "dataplane.payment-cryptography",
+"full_name": "Payment Cryptography Data Plane",
+"host": "dataplane.payment-cryptography.us-east-1.amazonaws.com",
+"signing_name": "payment-cryptography"
+},
+"pca-connector-ad": {
+"endpoint_prefix": "pca-connector-ad",
+"full_name": "PcaConnectorAd",
+"host": "pca-connector-ad.us-east-1.amazonaws.com",
+"signing_name": "pca-connector-ad"
+},
+"pca-connector-scep": {
+"endpoint_prefix": "pca-connector-scep",
+"full_name": "Private CA Connector for SCEP",
+"host": "pca-connector-scep.us-east-1.amazonaws.com",
+"signing_name": "pca-connector-scep"
+},
+"pcs": {
+"endpoint_prefix": "pcs",
+"full_name": "AWS Parallel Computing Service",
+"host": "pcs.us-east-1.amazonaws.com",
+"signing_name": "pcs"
+},
+"personalize": {
+"endpoint_prefix": "personalize",
+"full_name": "Amazon Personalize",
+"host": "personalize.us-east-1.amazonaws.com",
+"signing_name": "personalize"
+},
+"personalize-events": {
+"endpoint_prefix": "personalize-events",
+"full_name": "Amazon Personalize Events",
+"host": "personalize-events.us-east-1.amazonaws.com",
+"signing_name": "personalize"
+},
+"personalize-runtime": {
+"endpoint_prefix": "personalize-runtime",
+"full_name": "Amazon Personalize Runtime",
+"host": "personalize-runtime.us-east-1.amazonaws.com",
+"signing_name": "personalize"
+},
+"pi": {
+"endpoint_prefix": "pi",
+"full_name": "AWS Performance Insights",
+"host": "pi.us-east-1.amazonaws.com",
+"signing_name": "pi"
+},
+"pinpoint": {
+"endpoint_prefix": "pinpoint",
+"full_name": "Amazon Pinpoint",
+"host": "pinpoint.us-east-1.amazonaws.com",
+"signing_name": "mobiletargeting"
+},
+"pinpoint-email": {
+"endpoint_prefix": "email",
+"full_name": "Amazon Pinpoint Email Service",
+"host": "email.us-east-1.amazonaws.com",
+"signing_name": "ses"
+},
+"pinpoint-sms-voice": {
+"endpoint_prefix": "sms-voice.pinpoint",
+"full_name": "Amazon Pinpoint SMS and Voice Service",
+"host": "sms-voice.pinpoint.us-east-1.amazonaws.com",
+"signing_name": "sms-voice"
+},
+"pinpoint-sms-voice-v2": {
+"endpoint_prefix": "sms-voice",
+"full_name": "Amazon Pinpoint SMS Voice V2",
+"host": "sms-voice.us-east-1.amazonaws.com",
+"signing_name": "sms-voice"
+},
+"pipes": {
+"endpoint_prefix": "pipes",
+"full_name": "Amazon EventBridge Pipes",
+"host": "pipes.us-east-1.amazonaws.com",
+"signing_name": "pipes"
+},
+"polly": {
+"endpoint_prefix": "polly",
+"full_name": "Amazon Polly",
+"host": "polly.us-east-1.amazonaws.com",
+"signing_name": "polly"
+},
+"pricing": {
+"endpoint_prefix": "api.pricing",
+"full_name": "AWS Price List Service",
+"host": "api.pricing.us-east-1.amazonaws.com",
+"signing_name": "pricing"
+},
+"pricing-plan-manager": {
+"endpoint_prefix": "pricingplanmanager",
+"full_name": "PricingPlanManager",
+"host": "pricingplanmanager.us-east-1.amazonaws.com",
+"signing_name": "pricingplanmanager"
+},
+"proton": {
+"endpoint_prefix": "proton",
+"full_name": "AWS Proton",
+"host": "proton.us-east-1.amazonaws.com",
+"signing_name": "proton"
+},
+"qapps": {
+"endpoint_prefix": "data.qapps",
+"full_name": "QApps",
+"host": "data.qapps.us-east-1.amazonaws.com",
+"signing_name": "qapps"
+},
+"qbusiness": {
+"endpoint_prefix": "qbusiness",
+"full_name": "QBusiness",
+"host": "qbusiness.us-east-1.api.aws",
+"signing_name": "qbusiness"
+},
+"qconnect": {
+"endpoint_prefix": "wisdom",
+"full_name": "Amazon Q Connect",
+"host": "wisdom.us-east-1.amazonaws.com",
+"signing_name": "wisdom"
+},
+"quicksight": {
+"endpoint_prefix": "quicksight",
+"full_name": "Amazon QuickSight",
+"host": "quicksight.us-east-1.amazonaws.com",
+"signing_name": "quicksight"
+},
+"ram": {
+"endpoint_prefix": "ram",
+"full_name": "AWS Resource Access Manager",
+"host": "ram.us-east-1.amazonaws.com",
+"signing_name": "ram"
+},
+"rbin": {
+"endpoint_prefix": "rbin",
+"full_name": "Amazon Recycle Bin",
+"host": "rbin.us-east-1.amazonaws.com",
+"signing_name": "rbin"
+},
+"rds": {
+"endpoint_prefix": "rds",
+"full_name": "Amazon Relational Database Service",
+"host": "rds.us-east-1.amazonaws.com",
+"signing_name": "rds"
+},
+"rds-data": {
+"endpoint_prefix": "rds-data",
+"full_name": "AWS RDS DataService",
+"host": "rds-data.us-east-1.amazonaws.com",
+"signing_name": "rds-data"
+},
+"redshift": {
+"endpoint_prefix": "redshift",
+"full_name": "Amazon Redshift",
+"host": "redshift.us-east-1.amazonaws.com",
+"signing_name": "redshift"
+},
+"redshift-data": {
+"endpoint_prefix": "redshift-data",
+"full_name": "Redshift Data API Service",
+"host": "redshift-data.us-east-1.amazonaws.com",
+"signing_name": "redshift-data"
+},
+"redshift-serverless": {
+"endpoint_prefix": "redshift-serverless",
+"full_name": "Redshift Serverless",
+"host": "redshift-serverless.us-east-1.amazonaws.com",
+"signing_name": "redshift-serverless"
+},
+"rekognition": {
+"endpoint_prefix": "rekognition",
+"full_name": "Amazon Rekognition",
+"host": "rekognition.us-east-1.amazonaws.com",
+"signing_name": "rekognition"
+},
+"repostspace": {
+"endpoint_prefix": "repostspace",
+"full_name": "AWS re:Post Private",
+"host": "repostspace.us-east-1.amazonaws.com",
+"signing_name": "repostspace"
+},
+"resiliencehub": {
+"endpoint_prefix": "resiliencehub",
+"full_name": "AWS Resilience Hub",
+"host": "resiliencehub.us-east-1.amazonaws.com",
+"signing_name": "resiliencehub"
+},
+"resiliencehubv2": {
+"endpoint_prefix": "resiliencehub",
+"full_name": "AWS Resilience Hub V2",
+"host": "resiliencehub.us-east-1.amazonaws.com",
+"signing_name": "resiliencehub"
+},
+"resource-explorer-2": {
+"endpoint_prefix": "resource-explorer-2",
+"full_name": "AWS Resource Explorer",
+"host": "resource-explorer-2.us-east-1.amazonaws.com",
+"signing_name": "resource-explorer-2"
+},
+"resource-groups": {
+"endpoint_prefix": "resource-groups",
+"full_name": "AWS Resource Groups",
+"host": "resource-groups.us-east-1.amazonaws.com",
+"signing_name": "resource-groups"
+},
+"resourcegroupstaggingapi": {
+"endpoint_prefix": "tagging",
+"full_name": "AWS Resource Groups Tagging API",
+"host": "tagging.us-east-1.amazonaws.com",
+"signing_name": "tagging"
+},
+"rolesanywhere": {
+"endpoint_prefix": "rolesanywhere",
+"full_name": "IAM Roles Anywhere",
+"host": "rolesanywhere.us-east-1.amazonaws.com",
+"signing_name": "rolesanywhere"
+},
+"route53": {
+"endpoint_prefix": "route53",
+"full_name": "Amazon Route 53",
+"host": "route53.amazonaws.com",
+"signing_name": "route53"
+},
+"route53-recovery-cluster": {
+"endpoint_prefix": "route53-recovery-cluster",
+"full_name": "Route53 Recovery Cluster",
+"host": "route53-recovery-cluster.us-east-1.amazonaws.com",
+"signing_name": "route53-recovery-cluster"
+},
+"route53-recovery-control-config": {
+"endpoint_prefix": "route53-recovery-control-config",
+"full_name": "AWS Route53 Recovery Control Config",
+"host": "route53-recovery-control-config.us-east-1.amazonaws.com",
+"signing_name": "route53-recovery-control-config"
+},
+"route53-recovery-readiness": {
+"endpoint_prefix": "route53-recovery-readiness",
+"full_name": "AWS Route53 Recovery Readiness",
+"host": "route53-recovery-readiness.us-east-1.amazonaws.com",
+"signing_name": "route53-recovery-readiness"
+},
+"route53domains": {
+"endpoint_prefix": "route53domains",
+"full_name": "Amazon Route 53 Domains",
+"host": "route53domains.us-east-1.amazonaws.com",
+"signing_name": "route53domains"
+},
+"route53globalresolver": {
+"endpoint_prefix": "route53globalresolver",
+"full_name": "Amazon Route 53 Global Resolver",
+"host": "route53globalresolver.us-east-1.amazonaws.com",
+"signing_name": "route53globalresolver"
+},
+"route53profiles": {
+"endpoint_prefix": "route53profiles",
+"full_name": "Route 53 Profiles",
+"host": "route53profiles.us-east-1.amazonaws.com",
+"signing_name": "route53profiles"
+},
+"route53resolver": {
+"endpoint_prefix": "route53resolver",
+"full_name": "Amazon Route 53 Resolver",
+"host": "route53resolver.us-east-1.amazonaws.com",
+"signing_name": "route53resolver"
+},
+"rtbfabric": {
+"endpoint_prefix": "rtbfabric",
+"full_name": "RTBFabric",
+"host": "rtbfabric.us-east-1.amazonaws.com",
+"signing_name": "rtbfabric"
+},
+"rum": {
+"endpoint_prefix": "rum",
+"full_name": "CloudWatch RUM",
+"host": "rum.us-east-1.amazonaws.com",
+"signing_name": "rum"
+},
+"s3": {
+"endpoint_prefix": "s3",
+"full_name": "Amazon Simple Storage Service",
+"host": "s3.amazonaws.com",
+"signing_name": "s3"
+},
+"s3control": {
+"endpoint_prefix": "s3-control",
+"full_name": "AWS S3 Control",
+"host": "s3-control.us-east-1.amazonaws.com",
+"signing_name": "s3"
+},
+"s3files": {
+"endpoint_prefix": "s3files",
+"full_name": "Amazon S3 Files",
+"host": "s3files.us-east-1.amazonaws.com",
+"signing_name": "s3files"
+},
+"s3outposts": {
+"endpoint_prefix": "s3-outposts",
+"full_name": "Amazon S3 on Outposts",
+"host": "s3-outposts.us-east-1.amazonaws.com",
+"signing_name": "s3-outposts"
+},
+"s3tables": {
+"endpoint_prefix": "s3tables",
+"full_name": "Amazon S3 Tables",
+"host": "s3tables.us-east-1.amazonaws.com",
+"signing_name": "s3tables"
+},
+"s3vectors": {
+"endpoint_prefix": "s3vectors",
+"full_name": "Amazon S3 Vectors",
+"host": "s3vectors.us-east-1.amazonaws.com",
+"signing_name": "s3vectors"
+},
+"sagemaker": {
+"endpoint_prefix": "api.sagemaker",
+"full_name": "Amazon SageMaker Service",
+"host": "api.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemaker-a2i-runtime": {
+"endpoint_prefix": "a2i-runtime.sagemaker",
+"full_name": "Amazon Augmented AI Runtime",
+"host": "a2i-runtime.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemaker-edge": {
+"endpoint_prefix": "edge.sagemaker",
+"full_name": "Amazon Sagemaker Edge Manager",
+"host": "edge.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemaker-featurestore-runtime": {
+"endpoint_prefix": "featurestore-runtime.sagemaker",
+"full_name": "Amazon SageMaker Feature Store Runtime",
+"host": "featurestore-runtime.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemaker-geospatial": {
+"endpoint_prefix": "sagemaker-geospatial",
+"full_name": "Amazon SageMaker geospatial capabilities",
+"host": "sagemaker-geospatial.us-east-1.amazonaws.com",
+"signing_name": "sagemaker-geospatial"
+},
+"sagemaker-metrics": {
+"endpoint_prefix": "metrics.sagemaker",
+"full_name": "Amazon SageMaker Metrics Service",
+"host": "metrics.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemaker-runtime": {
+"endpoint_prefix": "runtime.sagemaker",
+"full_name": "Amazon SageMaker Runtime",
+"host": "runtime.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemakerjobruntime": {
+"endpoint_prefix": "job-runtime.sagemaker",
+"full_name": "Sagemaker Job Runtime Service",
+"host": "job-runtime.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"sagemakertrainingsessionruntime": {
+"endpoint_prefix": "training-session-runtime.sagemaker",
+"full_name": "SageMaker Training Session Runtime",
+"host": "training-session-runtime.sagemaker.us-east-1.amazonaws.com",
+"signing_name": "sagemaker"
+},
+"savingsplans": {
+"endpoint_prefix": "savingsplans",
+"full_name": "AWS Savings Plans",
+"host": "savingsplans.amazonaws.com",
+"signing_name": "savingsplans"
+},
+"scheduler": {
+"endpoint_prefix": "scheduler",
+"full_name": "Amazon EventBridge Scheduler",
+"host": "scheduler.us-east-1.amazonaws.com",
+"signing_name": "scheduler"
+},
+"schemas": {
+"endpoint_prefix": "schemas",
+"full_name": "Schemas",
+"host": "schemas.us-east-1.amazonaws.com",
+"signing_name": "schemas"
+},
+"sdb": {
+"endpoint_prefix": "sdb",
+"full_name": "Amazon SimpleDB",
+"host": "sdb.amazonaws.com",
+"signing_name": "sdb"
+},
+"secretsmanager": {
+"endpoint_prefix": "secretsmanager",
+"full_name": "AWS Secrets Manager",
+"host": "secretsmanager.us-east-1.amazonaws.com",
+"signing_name": "secretsmanager"
+},
+"security-ir": {
+"endpoint_prefix": "security-ir",
+"full_name": "Security Incident Response",
+"host": "security-ir.us-east-1.amazonaws.com",
+"signing_name": "security-ir"
+},
+"securityagent": {
+"endpoint_prefix": "securityagent",
+"full_name": "AWS Security Agent",
+"host": "securityagent.us-east-1.amazonaws.com",
+"signing_name": "securityagent"
+},
+"securityhub": {
+"endpoint_prefix": "securityhub",
+"full_name": "AWS SecurityHub",
+"host": "securityhub.us-east-1.amazonaws.com",
+"signing_name": "securityhub"
+},
+"securitylake": {
+"endpoint_prefix": "securitylake",
+"full_name": "Amazon Security Lake",
+"host": "securitylake.us-east-1.amazonaws.com",
+"signing_name": "securitylake"
+},
+"serverlessrepo": {
+"endpoint_prefix": "serverlessrepo",
+"full_name": "AWSServerlessApplicationRepository",
+"host": "serverlessrepo.us-east-1.amazonaws.com",
+"signing_name": "serverlessrepo"
+},
+"service-quotas": {
+"endpoint_prefix": "servicequotas",
+"full_name": "Service Quotas",
+"host": "servicequotas.us-east-1.amazonaws.com",
+"signing_name": "servicequotas"
+},
+"servicecatalog": {
+"endpoint_prefix": "servicecatalog",
+"full_name": "AWS Service Catalog",
+"host": "servicecatalog.us-east-1.amazonaws.com",
+"signing_name": "servicecatalog"
+},
+"servicecatalog-appregistry": {
+"endpoint_prefix": "servicecatalog-appregistry",
+"full_name": "AWS Service Catalog App Registry",
+"host": "servicecatalog-appregistry.us-east-1.amazonaws.com",
+"signing_name": "servicecatalog"
+},
+"servicediscovery": {
+"endpoint_prefix": "servicediscovery",
+"full_name": "AWS Cloud Map",
+"host": "servicediscovery.us-east-1.amazonaws.com",
+"signing_name": "servicediscovery"
+},
+"ses": {
+"endpoint_prefix": "email",
+"full_name": "Amazon Simple Email Service",
+"host": "email.us-east-1.amazonaws.com",
+"signing_name": "ses"
+},
+"sesv2": {
+"endpoint_prefix": "email",
+"full_name": "Amazon Simple Email Service",
+"host": "email.us-east-1.amazonaws.com",
+"signing_name": "ses"
+},
+"shield": {
+"endpoint_prefix": "shield",
+"full_name": "AWS Shield",
+"host": "shield.us-east-1.amazonaws.com",
+"signing_name": "shield"
+},
+"signer": {
+"endpoint_prefix": "signer",
+"full_name": "AWS Signer",
+"host": "signer.us-east-1.amazonaws.com",
+"signing_name": "signer"
+},
+"signer-data": {
+"endpoint_prefix": "data-signer",
+"full_name": "AWS Signer Data Plane",
+"host": "data-signer.us-east-1.amazonaws.com",
+"signing_name": "signer"
+},
+"signin": {
+"endpoint_prefix": "signin",
+"full_name": "AWS Sign-In Service",
+"host": "signin.us-east-1.amazonaws.com",
+"signing_name": "signin"
+},
+"simpledbv2": {
+"endpoint_prefix": "sdb",
+"full_name": "Amazon SimpleDB v2",
+"host": "sdb.amazonaws.com",
+"signing_name": "sdb"
+},
+"sms-voice": {
+"endpoint_prefix": "sms-voice.pinpoint",
+"full_name": "Amazon Pinpoint SMS and Voice Service",
+"host": "sms-voice.pinpoint.us-east-1.amazonaws.com",
+"signing_name": "sms-voice"
+},
+"snow-device-management": {
+"endpoint_prefix": "snow-device-management",
+"full_name": "AWS Snow Device Management",
+"host": "snow-device-management.us-east-1.amazonaws.com",
+"signing_name": "snow-device-management"
+},
+"snowball": {
+"endpoint_prefix": "snowball",
+"full_name": "Amazon Import/Export Snowball",
+"host": "snowball.us-east-1.amazonaws.com",
+"signing_name": "snowball"
+},
+"sns": {
+"endpoint_prefix": "sns",
+"full_name": "Amazon Simple Notification Service",
+"host": "sns.us-east-1.amazonaws.com",
+"signing_name": "sns"
+},
+"socialmessaging": {
+"endpoint_prefix": "social-messaging",
+"full_name": "AWS End User Messaging Social",
+"host": "social-messaging.us-east-1.amazonaws.com",
+"signing_name": "social-messaging"
+},
+"sqs": {
+"endpoint_prefix": "sqs",
+"full_name": "Amazon Simple Queue Service",
+"host": "sqs.us-east-1.amazonaws.com",
+"signing_name": "sqs"
+},
+"ssm": {
+"endpoint_prefix": "ssm",
+"full_name": "Amazon Simple Systems Manager (SSM)",
+"host": "ssm.us-east-1.amazonaws.com",
+"signing_name": "ssm"
+},
+"ssm-contacts": {
+"endpoint_prefix": "ssm-contacts",
+"full_name": "AWS Systems Manager Incident Manager Contacts",
+"host": "ssm-contacts.us-east-1.amazonaws.com",
+"signing_name": "ssm-contacts"
+},
+"ssm-guiconnect": {
+"endpoint_prefix": "ssm-guiconnect",
+"full_name": "AWS SSM-GUIConnect",
+"host": "ssm-guiconnect.us-east-1.amazonaws.com",
+"signing_name": "ssm-guiconnect"
+},
+"ssm-incidents": {
+"endpoint_prefix": "ssm-incidents",
+"full_name": "AWS Systems Manager Incident Manager",
+"host": "ssm-incidents.us-east-1.amazonaws.com",
+"signing_name": "ssm-incidents"
+},
+"ssm-quicksetup": {
+"endpoint_prefix": "ssm-quicksetup",
+"full_name": "AWS Systems Manager QuickSetup",
+"host": "ssm-quicksetup.us-east-1.amazonaws.com",
+"signing_name": "ssm-quicksetup"
+},
+"ssm-sap": {
+"endpoint_prefix": "ssm-sap",
+"full_name": "AWS Systems Manager for SAP",
+"host": "ssm-sap.us-east-1.amazonaws.com",
+"signing_name": "ssm-sap"
+},
+"sso": {
+"endpoint_prefix": "portal.sso",
+"full_name": "AWS Single Sign-On",
+"host": "portal.sso.us-east-1.amazonaws.com",
+"signing_name": "awsssoportal"
+},
+"sso-admin": {
+"endpoint_prefix": "sso",
+"full_name": "AWS Single Sign-On Admin",
+"host": "sso.us-east-1.amazonaws.com",
+"signing_name": "sso"
+},
+"sso-oidc": {
+"endpoint_prefix": "oidc",
+"full_name": "AWS SSO OIDC",
+"host": "oidc.us-east-1.amazonaws.com",
+"signing_name": "sso-oauth"
+},
+"stepfunctions": {
+"endpoint_prefix": "states",
+"full_name": "AWS Step Functions",
+"host": "states.us-east-1.amazonaws.com",
+"signing_name": "states"
+},
+"storagegateway": {
+"endpoint_prefix": "storagegateway",
+"full_name": "AWS Storage Gateway",
+"host": "storagegateway.us-east-1.amazonaws.com",
+"signing_name": "storagegateway"
+},
+"sts": {
+"endpoint_prefix": "sts",
+"full_name": "AWS Security Token Service",
+"host": "sts.us-east-1.amazonaws.com",
+"signing_name": "sts"
+},
+"supplychain": {
+"endpoint_prefix": "scn",
+"full_name": "AWS Supply Chain",
+"host": "scn.us-east-1.amazonaws.com",
+"signing_name": "scn"
+},
+"support": {
+"endpoint_prefix": "support",
+"full_name": "AWS Support",
+"host": "support.us-east-1.amazonaws.com",
+"signing_name": "support"
+},
+"support-app": {
+"endpoint_prefix": "supportapp",
+"full_name": "AWS Support App",
+"host": "supportapp.us-east-1.amazonaws.com",
+"signing_name": "supportapp"
+},
+"supportauthz": {
+"endpoint_prefix": "supportauthz",
+"full_name": "SupportAuthZ",
+"host": "supportauthz.us-east-1.amazonaws.com",
+"signing_name": "supportauthz"
+},
+"sustainability": {
+"endpoint_prefix": "sustainability",
+"full_name": "AWS Sustainability",
+"host": "sustainability.us-east-1.amazonaws.com",
+"signing_name": "sustainability"
+},
+"swf": {
+"endpoint_prefix": "swf",
+"full_name": "Amazon Simple Workflow Service",
+"host": "swf.us-east-1.amazonaws.com",
+"signing_name": "swf"
+},
+"synthetics": {
+"endpoint_prefix": "synthetics",
+"full_name": "Synthetics",
+"host": "synthetics.us-east-1.amazonaws.com",
+"signing_name": "synthetics"
+},
+"taxsettings": {
+"endpoint_prefix": "tax",
+"full_name": "Tax Settings",
+"host": "tax.us-east-1.amazonaws.com",
+"signing_name": "tax"
+},
+"textract": {
+"endpoint_prefix": "textract",
+"full_name": "Amazon Textract",
+"host": "textract.us-east-1.amazonaws.com",
+"signing_name": "textract"
+},
+"timestream-influxdb": {
+"endpoint_prefix": "timestream-influxdb",
+"full_name": "Timestream InfluxDB",
+"host": "timestream-influxdb.us-east-1.amazonaws.com",
+"signing_name": "timestream-influxdb"
+},
+"timestream-query": {
+"endpoint_prefix": "query.timestream",
+"full_name": "Amazon Timestream Query",
+"host": "query.timestream.us-east-1.amazonaws.com",
+"signing_name": "timestream"
+},
+"timestream-write": {
+"endpoint_prefix": "ingest.timestream",
+"full_name": "Amazon Timestream Write",
+"host": "ingest.timestream.us-east-1.amazonaws.com",
+"signing_name": "timestream"
+},
+"transcribe": {
+"endpoint_prefix": "transcribe",
+"full_name": "Amazon Transcribe Service",
+"host": "transcribe.us-east-1.amazonaws.com",
+"signing_name": "transcribe"
+},
+"transfer": {
+"endpoint_prefix": "transfer",
+"full_name": "AWS Transfer Family",
+"host": "transfer.us-east-1.amazonaws.com",
+"signing_name": "transfer"
+},
+"translate": {
+"endpoint_prefix": "translate",
+"full_name": "Amazon Translate",
+"host": "translate.us-east-1.amazonaws.com",
+"signing_name": "translate"
+},
+"trustedadvisor": {
+"endpoint_prefix": "trustedadvisor",
+"full_name": "TrustedAdvisor Public API",
+"host": "trustedadvisor.us-east-1.amazonaws.com",
+"signing_name": "trustedadvisor"
+},
+"uxc": {
+"endpoint_prefix": "uxc",
+"full_name": "AWS User Experience Customization",
+"host": "uxc.us-east-1.amazonaws.com",
+"signing_name": "uxc"
+},
+"verifiedpermissions": {
+"endpoint_prefix": "verifiedpermissions",
+"full_name": "Amazon Verified Permissions",
+"host": "verifiedpermissions.us-east-1.amazonaws.com",
+"signing_name": "verifiedpermissions"
+},
+"voice-id": {
+"endpoint_prefix": "voiceid",
+"full_name": "Amazon Voice ID",
+"host": "voiceid.us-east-1.amazonaws.com",
+"signing_name": "voiceid"
+},
+"vpc-lattice": {
+"endpoint_prefix": "vpc-lattice",
+"full_name": "Amazon VPC Lattice",
+"host": "vpc-lattice.us-east-1.amazonaws.com",
+"signing_name": "vpc-lattice"
+},
+"waf": {
+"endpoint_prefix": "waf",
+"full_name": "AWS WAF",
+"host": "waf.amazonaws.com",
+"signing_name": "waf"
+},
+"waf-regional": {
+"endpoint_prefix": "waf-regional",
+"full_name": "AWS WAF Regional",
+"host": "waf-regional.us-east-1.amazonaws.com",
+"signing_name": "waf-regional"
+},
+"wafv2": {
+"endpoint_prefix": "wafv2",
+"full_name": "AWS WAFV2",
+"host": "wafv2.us-east-1.amazonaws.com",
+"signing_name": "wafv2"
+},
+"wellarchitected": {
+"endpoint_prefix": "wellarchitected",
+"full_name": "AWS Well-Architected Tool",
+"host": "wellarchitected.us-east-1.amazonaws.com",
+"signing_name": "wellarchitected"
+},
+"wickr": {
+"endpoint_prefix": "admin.wickr",
+"full_name": "AWS Wickr Admin API",
+"host": "admin.wickr.us-east-1.amazonaws.com",
+"signing_name": "wickr"
+},
+"wisdom": {
+"endpoint_prefix": "wisdom",
+"full_name": "Amazon Connect Wisdom Service",
+"host": "wisdom.us-east-1.amazonaws.com",
+"signing_name": "wisdom"
+},
+"workdocs": {
+"endpoint_prefix": "workdocs",
+"full_name": "Amazon WorkDocs",
+"host": "workdocs.us-east-1.amazonaws.com",
+"signing_name": "workdocs"
+},
+"workmail": {
+"endpoint_prefix": "workmail",
+"full_name": "Amazon WorkMail",
+"host": "workmail.us-east-1.amazonaws.com",
+"signing_name": "workmail"
+},
+"workmailmessageflow": {
+"endpoint_prefix": "workmailmessageflow",
+"full_name": "Amazon WorkMail Message Flow",
+"host": "workmailmessageflow.us-east-1.amazonaws.com",
+"signing_name": "workmailmessageflow"
+},
+"workspaces": {
+"endpoint_prefix": "workspaces",
+"full_name": "Amazon WorkSpaces",
+"host": "workspaces.us-east-1.amazonaws.com",
+"signing_name": "workspaces"
+},
+"workspaces-instances": {
+"endpoint_prefix": "workspaces-instances",
+"full_name": "Amazon Workspaces Instances",
+"host": "workspaces-instances.us-east-1.amazonaws.com",
+"signing_name": "workspaces-instances"
+},
+"workspaces-thin-client": {
+"endpoint_prefix": "thinclient",
+"full_name": "Amazon WorkSpaces Thin Client",
+"host": "thinclient.us-east-1.amazonaws.com",
+"signing_name": "thinclient"
+},
+"workspaces-web": {
+"endpoint_prefix": "workspaces-web",
+"full_name": "Amazon WorkSpaces Web",
+"host": "workspaces-web.us-east-1.amazonaws.com",
+"signing_name": "workspaces-web"
+},
+"xray": {
+"endpoint_prefix": "xray",
+"full_name": "AWS X-Ray",
+"host": "xray.us-east-1.amazonaws.com",
+"signing_name": "xray"
+}
+},
+"failed": {},
+"region": "us-east-1"
+}

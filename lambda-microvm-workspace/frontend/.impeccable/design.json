@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-03T19:07:23Z",
+  "title": "Design System: Lambda MicroVM Workspace",
+  "extensions": {
+    "colorMeta": {
+      "brass": {
+        "role": "primary",
+        "displayName": "Desk Brass",
+        "canonical": "oklch(80.0% 0.115 84)",
+        "tonalRamp": [
+          "#110a01",
+          "#2f2103",
+          "#523c08",
+          "#765810",
+          "#a1791a",
+          "#bea065",
+          "#dbc8a3",
+          "#f8edd9"
+        ]
+      },
+      "run": {
+        "role": "secondary",
+        "displayName": "Verdigris",
+        "canonical": "oklch(76.1% 0.115 160)",
+        "tonalRamp": [
+          "#020f07",
+          "#082b1b",
+          "#154b32",
+          "#226d4b",
+          "#329568",
+          "#74b592",
+          "#add6bf",
+          "#dff5e8"
+        ]
+      },
+      "sleep": {
+        "role": "secondary",
+        "displayName": "Night Indigo",
+        "canonical": "oklch(72.1% 0.085 272)",
+        "tonalRamp": [
+          "#080b14",
+          "#1e2336",
+          "#363e5c",
+          "#505b84",
+          "#6e7db4",
+          "#97a3cd",
+          "#c1cae5",
+          "#e9eefd"
+        ]
+      },
+      "deny": {
+        "role": "secondary",
+        "displayName": "Oxide Red",
+        "canonical": "oklch(68.0% 0.150 27)",
+        "tonalRamp": [
+          "#180504",
+          "#3e1512",
+          "#682924",
+          "#963e37",
+          "#ca564d",
+          "#e1897f",
+          "#f5bab2",
+          "#ffe6e1"
+        ]
+      },
+      "series-1": {
+        "role": "tertiary",
+        "displayName": "Series 1 Blue",
+        "canonical": "oklch(62.2% 0.161 255)",
+        "tonalRamp": [
+          "#020b1c",
+          "#082445",
+          "#154073",
+          "#225da4",
+          "#3280dd",
+          "#70a7ed",
+          "#aacdfc",
+          "#ddf0ff"
+        ]
+      },
+      "series-2": {
+        "role": "tertiary",
+        "displayName": "Series 2 Vermilion",
+        "canonical": "oklch(62.2% 0.173 40)",
+        "tonalRamp": [
+          "#190401",
+          "#401403",
+          "#6c2609",
+          "#9b3b12",
+          "#d1521d",
+          "#e78766",
+          "#f9b9a3",
+          "#ffe6d9"
+        ]
+      },
+      "series-3": {
+        "role": "tertiary",
+        "displayName": "Series 3 Green",
+        "canonical": "oklch(62.1% 0.128 163)",
+        "tonalRamp": [
+          "#000f07",
+          "#002c1c",
+          "#014c33",
+          "#036f4d",
+          "#06976a",
+          "#69b794",
+          "#a8d7c0",
+          "#dcf6e8"
+        ]
+      },
+      "series-4": {
+        "role": "tertiary",
+        "displayName": "Series 4 Ochre",
+        "canonical": "oklch(67.0% 0.143 73)",
+        "tonalRamp": [
+          "#140800",
+          "#361e00",
+          "#5b3700",
+          "#835100",
+          "#b27000",
+          "#cc9a56",
+          "#e5c59b",
+          "#feebd5"
+        ]
+      },
+      "n0": {
+        "role": "neutral",
+        "displayName": "Terminal Night",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n1": {
+        "role": "neutral",
+        "displayName": "Lobby",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n2": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n3": {
+        "role": "neutral",
+        "displayName": "Hover",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n4": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n5": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n6": {
+        "role": "neutral",
+        "displayName": "Faint Text / Ramp Grey",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n7": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n8": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n9": {
+        "role": "neutral",
+        "displayName": "Primary Text",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "n10": {
+        "role": "neutral",
+        "displayName": "High Text",
+        "tonalRamp": [
+          "#0e0c09",
+          "#14110e",
+          "#1a1713",
+          "#2d2925",
+          "#5f5a54",
+          "#969189",
+          "#e4e1da",
+          "#f7f5f1"
+        ]
+      },
+      "brass-hi": {
+        "role": "primary",
+        "displayName": "Brass Highlight"
+      },
+      "brass-ink": {
+        "role": "primary",
+        "displayName": "Brass Ink"
+      },
+      "series-other": {
+        "role": "tertiary",
+        "displayName": "Series Other (ramp n6)"
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Toolbar sandbox name and overlay titles; dialog titles 15px, sign-in title 17px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default UI text; pane titles at 600."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, section and chart titles, notes; tabs and buttons at 12.5px."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "State pills, timestamps, table headers, legends, fact labels."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Key counts and usage totals, tabular."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Hosts, paths, ids, placeholders, HTTP methods, DNS codes; 13px in the terminal."
+      }
+    },
+    "shadows": [
+      {
+        "name": "overlay",
+        "value": "0 12px 32px -8px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.4)",
+        "purpose": "Dialogs, toasts, chart tooltips, terminal connection card, newer-events pill, narrow-layout drawers. Nothing else casts a shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All state transitions and entrances."
+      },
+      {
+        "name": "dur",
+        "value": "160ms",
+        "purpose": "Colour and border transitions on controls and rows."
+      },
+      {
+        "name": "rise",
+        "value": "180-200ms: from opacity 0, translateY(6px) scale(0.985)",
+        "purpose": "Dialogs, toasts, overlay cards, the new-sandbox form."
+      },
+      {
+        "name": "slide-left",
+        "value": "200ms: from translateX(24px), opacity 0",
+        "purpose": "Right panel drawer in narrow layouts."
+      },
+      {
+        "name": "pulse",
+        "value": "1.3s ease-in-out infinite, opacity to 0.3",
+        "purpose": "State dot during transitional states, in the target state's hue; the live feed dot pulses at 2.4s."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animations and transitions collapse to 0.01ms",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "1099px",
+        "purpose": "Right panel becomes a fixed drawer."
+      },
+      {
+        "name": "tiny",
+        "value": "759px",
+        "purpose": "Sidebar also becomes a drawer behind a scrim."
+      },
+      {
+        "name": "toolbar-900",
+        "value": "900px (container)",
+        "purpose": "First toolbar buttons collapse to icons."
+      },
+      {
+        "name": "toolbar-720",
+        "value": "720px (container)",
+        "purpose": "All non-primary toolbar buttons collapse."
+      },
+      {
+        "name": "toolbar-640",
+        "value": "640px (container)",
+        "purpose": "Toolbar meta hides."
+      },
+      {
+        "name": "toolbar-520",
+        "value": "520px (container)",
+        "purpose": "Primary collapses last."
+      }
+    ],
+    "terminalTheme": {
+      "background": "#0e0c09",
+      "foreground": "#e4e1da",
+      "cursor": "#e1b761",
+      "selectionBackground": "rgba(225, 183, 97, 0.30)",
+      "ansi": {
+        "black": "#1a1713",
+        "red": "#e66f64",
+        "green": "#69c898",
+        "yellow": "#e1b761",
+        "blue": "#7fa6e8",
+        "magenta": "#c792d9",
+        "cyan": "#6cc4c4",
+        "white": "#d6d2ca"
+      },
+      "note": "xterm.js theme in Workbench.tsx; the terminal's own ANSI palette, not UI tokens."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one brass action per context (Start Claude Code, Create). Disabled drops to the n3 ramp.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start Claude Code</button> <button class=\"ds-btn ds-btn-primary\" disabled>Create</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 10px; border:1px solid transparent; border-radius:var(--radius); background:transparent; color:var(--text-1); font:500 12.5px/1 var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); } .ds-btn:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-btn:active:not(:disabled) { transform:translateY(0.5px); } .ds-btn-primary { background:var(--brass); color:var(--brass-ink); font-weight:600; } .ds-btn-primary:hover:not(:disabled) { background:var(--brass-hi); } .ds-btn-primary:disabled { background:var(--n3); color:var(--text-muted); cursor:default; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Default button: n3 fill with an n5 hairline.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Resume</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 10px; border:1px solid transparent; border-radius:var(--radius); background:transparent; color:var(--text-1); font:500 12.5px/1 var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); } .ds-btn:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-btn:active:not(:disabled) { transform:translateY(0.5px); } .ds-btn-secondary { background:var(--n3); border-color:var(--n5); } .ds-btn-secondary:hover:not(:disabled) { background:var(--n4); color:var(--text-hi); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Toolbar and dialog-cancel actions.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">Detach</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 10px; border:1px solid transparent; border-radius:var(--radius); background:transparent; color:var(--text-1); font:500 12.5px/1 var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); } .ds-btn:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-btn:active:not(:disabled) { transform:translateY(0.5px); } .ds-btn-ghost { color:var(--text-2); } .ds-btn-ghost:hover:not(:disabled) { background:var(--n3); color:var(--text-hi); }"
+    },
+    {
+      "name": "Danger Solid Button",
+      "kind": "button",
+      "refersTo": "button-danger-solid",
+      "description": "Destructive confirm in dialogs only (Terminate, Revoke).",
+      "html": "<button class=\"ds-btn ds-btn-danger\">Revoke for all sandboxes</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 10px; border:1px solid transparent; border-radius:var(--radius); background:transparent; color:var(--text-1); font:500 12.5px/1 var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); } .ds-btn:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-btn:active:not(:disabled) { transform:translateY(0.5px); } .ds-btn-danger { background:var(--deny); color:#1d0a07; font-weight:600; } .ds-btn-danger:hover { background:#ee857b; }"
+    },
+    {
+      "name": "State Pill",
+      "kind": "chip",
+      "refersTo": "state-pill-running",
+      "description": "Hue plus one word on a 12% wash; transitional states pulse the dot.",
+      "html": "<span class=\"ds-pill ds-run\"><span class=\"ds-dot\"></span>Running</span> <span class=\"ds-pill ds-run\"><span class=\"ds-dot ds-pulse\"></span>Resuming</span> <span class=\"ds-pill ds-sleep\"><span class=\"ds-dot\"></span>Suspended</span> <span class=\"ds-pill ds-deny\"><span class=\"ds-dot ds-pulse\"></span>Terminating</span> <span class=\"ds-pill ds-off\"><span class=\"ds-dot\"></span>Terminated</span>",
+      "css": ".ds-pill { display:inline-flex; align-items:center; gap:6px; height:20px; padding:0 8px 0 7px; border-radius:10px; font:600 var(--fs-micro)/1 var(--font-ui); white-space:nowrap; } .ds-dot { width:7px; height:7px; border-radius:50%; background:currentColor; } .ds-pulse { animation:ds-pulse 1.3s ease-in-out infinite; } @keyframes ds-pulse { 50% { opacity:0.3; } } .ds-run { color:var(--run); background:var(--run-wash); } .ds-sleep { color:var(--sleep); background:var(--sleep-wash); } .ds-deny { color:var(--deny); background:var(--deny-wash); } .ds-off { color:var(--text-muted); background:var(--n3); }"
+    },
+    {
+      "name": "Key Fob",
+      "kind": "custom",
+      "refersTo": "fob-board",
+      "description": "Signature: a credential as a brass key tag. Filled on the Credentials board, outline in the proxy feed, dashed empty hook when revoked.",
+      "html": "<span class=\"ds-fob ds-fob-md\"><span class=\"ds-fob-hole\"></span>anthropic</span> <span class=\"ds-fob ds-fob-feed\"><span class=\"ds-fob-hole\"></span>github</span> <span class=\"ds-fob ds-fob-md ds-fob-empty\"><span class=\"ds-fob-hole\"></span>openai</span>",
+      "css": ".ds-fob { display:inline-flex; align-items:center; gap:5px; height:18px; padding:0 7px 0 4px; border:1px solid var(--brass-line); border-radius:9px 4px 4px 9px; background:var(--brass-wash-2); color:var(--brass-hi); font:600 var(--fs-micro)/1 var(--font-ui); white-space:nowrap; } .ds-fob-hole { width:6px; height:6px; border-radius:50%; background:var(--n0); box-shadow:inset 0 0 0 1px var(--brass-line); } .ds-fob-md { height:24px; gap:7px; padding:0 10px 0 6px; border-radius:12px 5px 5px 12px; font-size:var(--fs-body); } .ds-fob-md .ds-fob-hole { width:8px; height:8px; } .ds-fob-feed { gap:4px; padding:0 6px 0 3px; background:transparent; font-size:10.5px; } .ds-fob-feed .ds-fob-hole { width:5px; height:5px; } .ds-fob-empty { background:transparent; border-style:dashed; border-color:var(--n6); color:var(--text-muted); } .ds-fob-empty .ds-fob-hole { background:transparent; box-shadow:inset 0 0 0 1px var(--n6); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "n0 well with an n5 hairline; brass border and halo on focus, oxide on error.",
+      "html": "<input class=\"ds-input\" placeholder=\"sandbox name\"> <input class=\"ds-input\" aria-invalid=\"true\" value=\"bad name!\">",
+      "css": ".ds-input { width:220px; height:30px; padding:0 9px; border:1px solid var(--n5); border-radius:var(--radius); background:var(--n0); color:var(--text-hi); font:400 var(--fs-body) var(--font-ui); caret-color:var(--brass); transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); } .ds-input::placeholder { color:var(--text-muted); } .ds-input:focus { outline:none; border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-wash); } .ds-input[aria-invalid='true'] { border-color:var(--deny); }"
+    },
+    {
+      "name": "Segmented Filter",
+      "kind": "chip",
+      "refersTo": "segmented-item-active",
+      "description": "Feed and DNS filters with tabular counts.",
+      "html": "<div class=\"ds-seg\"><button class=\"ds-seg-item\" aria-pressed=\"true\">All <span class=\"ds-seg-count\">128</span></button><button class=\"ds-seg-item\" aria-pressed=\"false\">Swapped <span class=\"ds-seg-count\">41</span></button><button class=\"ds-seg-item\" aria-pressed=\"false\">Denied <span class=\"ds-seg-count\">3</span></button></div>",
+      "css": ".ds-seg { display:inline-flex; gap:2px; padding:2px; border:1px solid var(--line); border-radius:var(--radius); background:var(--n0); } .ds-seg-item { display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 8px; border:0; border-radius:var(--radius-sm); background:transparent; color:var(--text-muted); font:500 var(--fs-small) var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease), color var(--dur) var(--ease); } .ds-seg-item:hover { color:var(--text-1); } .ds-seg-item:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-seg-item[aria-pressed='true'] { background:var(--n4); color:var(--text-hi); } .ds-seg-count { color:var(--text-muted); font-size:var(--fs-micro); font-variant-numeric:tabular-nums; } .ds-seg-item[aria-pressed='true'] .ds-seg-count { color:var(--text-2); }"
+    },
+    {
+      "name": "Panel Tabs",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "40px tab strip; active tab is n10 with a 2px brass underline on the hairline.",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab\" aria-selected=\"true\">Proxy</button><button class=\"ds-tab\">Keys</button><button class=\"ds-tab\">Claude Code</button><button class=\"ds-tab\">Vitals</button><button class=\"ds-tab\">DNS</button></div>",
+      "css": ".ds-tabs { display:flex; align-items:stretch; gap:2px; height:var(--bar); padding:0 8px; border-bottom:1px solid var(--line); background:var(--bg-app); } .ds-tab { position:relative; padding:0 9px; border:0; background:transparent; color:var(--text-muted); font:500 12.5px var(--font-ui); cursor:pointer; transition:color var(--dur) var(--ease); } .ds-tab:hover { color:var(--text-1); } .ds-tab:focus-visible { outline:2px solid var(--brass); outline-offset:-4px; border-radius:var(--radius); } .ds-tab[aria-selected='true'] { color:var(--text-hi); } .ds-tab[aria-selected='true']::after { content:''; position:absolute; left:9px; right:9px; bottom:-1px; height:2px; border-radius:2px 2px 0 0; background:var(--brass); }"
+    },
+    {
+      "name": "Sandbox Row",
+      "kind": "nav",
+      "refersTo": "sandbox-row-selected",
+      "description": "Sidebar row: name, state word, 3px life bar on the fixed 8 h scale, micro meta; selected gets an inset brass hairline.",
+      "html": "<button class=\"ds-sb ds-sb-sel\"><span class=\"ds-sb-line\"><span class=\"ds-sb-name\">claude-work</span><span class=\"ds-sb-state\">Running</span></span><span class=\"ds-life\"><span class=\"ds-life-cap\" style=\"width:100%\"></span><span class=\"ds-life-used\" style=\"width:38%\"></span></span><span class=\"ds-sb-meta\">3h 02m used · idle in 11:40</span></button>",
+      "css": ".ds-sb { display:grid; gap:6px; width:232px; padding:8px 10px 9px; border:0; border-radius:var(--radius); background:transparent; text-align:left; font:400 var(--fs-body)/1.45 var(--font-ui); cursor:pointer; transition:background-color var(--dur) var(--ease); } .ds-sb:hover { background:var(--n2); } .ds-sb:focus-visible { outline:2px solid var(--brass); outline-offset:1px; } .ds-sb-sel { background:var(--n3); box-shadow:inset 0 0 0 1px var(--brass-line); } .ds-sb-line { display:flex; align-items:center; gap:8px; } .ds-sb-name { flex:1; color:var(--text-hi); font-weight:500; } .ds-sb-state { color:var(--run); font-size:var(--fs-micro); font-weight:600; } .ds-life { position:relative; display:block; height:3px; border-radius:2px; overflow:hidden; } .ds-life-cap, .ds-life-used { position:absolute; top:0; bottom:0; left:0; border-radius:2px; } .ds-life-cap { background:var(--n4); } .ds-life-used { background:var(--run); opacity:0.75; } .ds-sb-meta { color:var(--text-muted); font-size:var(--fs-micro); font-variant-numeric:tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Desk",
+    "overview": "The workspace is a hotel night desk after hours. The desk (iron-proxy) holds the real keys, the rooms (sandboxes) hold only placeholders, and the clerk can see every key that leaves the board. The lobby is a warm charcoal ramp, lit by one brass lamp; everything else is quiet until a state changes.\n\nIt is dense but calm: a 28px row module, 11 to 14px type, hairline dividers, and no cards for metrics. The terminal owns the centre and is the darkest surface; sidebar and panel are one step lighter and serve as peripheral vision. Colour carries meaning only. It refuses the cool-slate cloud console with a neon cyan accent and a card grid of metrics.",
+    "keyCharacteristics": [
+      "One warm neutral ramp (n0 to n10), dark-first, no light theme.",
+      "One accent, brass, rationed to action, focus, selection and keys.",
+      "Four state hues and nothing else: verdigris, night indigo, oxide red, ramp grey.",
+      "Credentials drawn as brass key tags with a punched hole.",
+      "Flat surfaces; shadows only on things that float."
+    ],
+    "rules": [
+      {
+        "name": "The Brass Budget Rule",
+        "body": "Brass marks the primary action, focus, selection and keys. It is never decoration, never a chart series, never a state.",
+        "section": "colors"
+      },
+      {
+        "name": "The Meaning-Only Rule",
+        "body": "A state hue appears only when that state is true. There is no warning orange: anything that needs attention (time running low, quota full, off-allowlist) is oxide red.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ramp Rule",
+        "body": "Every neutral comes from n0 to n10. Do not introduce a grey that is not on the ramp.",
+        "section": "colors"
+      },
+      {
+        "name": "The Series Are Not States Rule",
+        "body": "series-1..4 live inside charts only; state is never encoded with them, and chart lines never borrow state hues.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Means Machine Rule",
+        "body": "Mono only for the terminal, hosts, paths, ids, HTTP methods and DNS codes. Labels, numbers and prose stay in the UI sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every changing number (timers, counts, bytes, quota, axis labels) uses tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Labels are sentence case at their natural weight; there is no uppercase or letter-spaced label style.",
+        "section": "typography"
+      },
+      {
+        "name": "The 28px Row Rule",
+        "body": "One row module across sidebar, feed, DNS, tables and timeline; do not invent a second row height.",
+        "section": "layout"
+      },
+      {
+        "name": "The Fixed Scale Rule",
+        "body": "Every life bar uses one 8 h scale, so sandboxes compare at a glance; time beyond a sandbox's own cap is drawn as track, not stretched.",
+        "section": "layout"
+      },
+      {
+        "name": "The Overlays-Only Rule",
+        "body": "Rows, panes, panels and form surfaces never carry a shadow; selection is an inset brass hairline, not a lift.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Key Tag Silhouette",
+        "body": "The fob is round on the left and squared on the right (9px 4px 4px 9px; 12px 5px 5px 12px at board size) with a punched hole near the round end. The brand mark is the same tag stood upright. Keep this silhouette for credentials only.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** keep brass to the primary action, focus, selection and keys (The Brass Budget Rule).",
+      "**Do** use oxide red for anything that needs attention; there is no warning orange.",
+      "**Do** put every list on the 28px row and every bar at 40px.",
+      "**Do** draw a credential as the key tag: filled on the Credentials board, outline in the proxy feed, dashed empty hook when revoked.",
+      "**Do** use tabular numerals for every live number and mono only for machine strings.",
+      "**Do** use the validated series-1..4 palette, in order, for chart categories, with series-other for the remainder."
+    ],
+    "donts": [
+      "**Don't** use the cool-slate cloud console look: no cool greys, no neon cyan accent, no card grid of metrics.",
+      "**Don't** add a grey outside the n0 to n10 ramp, or a light theme.",
+      "**Don't** paint a terminated sandbox's state pill, dot or life bar red; terminated is ramp grey.",
+      "**Don't** put shadows on rows, panes or panels; shadows belong to overlays only.",
+      "**Don't** label anything twice: a state is its hue plus one word.",
+      "**Don't** overlay the terminal with anything except its own connection state."
+    ]
+  }
+}
