@@ -1,0 +1,241 @@
+{
+ "node": {
+  "nodeName": "node-fixture-a",
+  "startTime": "2026-11-01T05:50:47Z",
+  "cpu": {
+   "time": "2026-11-01T09:27:03Z",
+   "usageNanoCores": 261613882,
+   "usageCoreNanoSeconds": 1134778690000
+  },
+  "memory": {
+   "time": "2026-11-01T09:27:03Z",
+   "availableBytes": 30800351232,
+   "usageBytes": 7580237824,
+   "workingSetBytes": 2288881664,
+   "rssBytes": 621662208
+  }
+ },
+ "pods": [
+  {
+   "podRef": {
+    "name": "opensandbox-server-775f8ddf57-8k74w",
+    "namespace": "opensandbox-system",
+    "uid": "00000000-0000-4000-8000-000000000001"
+   },
+   "startTime": "2026-11-01T09:23:16Z",
+   "containers": [
+    {
+     "name": "main",
+     "startTime": "2026-11-01T09:23:16Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:06Z",
+      "usageNanoCores": 13152929,
+      "usageCoreNanoSeconds": 4811145000
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:06Z",
+      "availableBytes": 2033463296,
+      "usageBytes": 114024448,
+      "workingSetBytes": 114020352,
+      "rssBytes": 109256704
+     }
+    }
+   ],
+   "cpu": {
+    "time": "2026-11-01T09:27:04Z",
+    "usageNanoCores": 11919386,
+    "usageCoreNanoSeconds": 4785374000
+   },
+   "memory": {
+    "time": "2026-11-01T09:27:04Z",
+    "availableBytes": 2033737728,
+    "usageBytes": 113750016,
+    "workingSetBytes": 113745920,
+    "rssBytes": 109289472
+   }
+  },
+  {
+   "podRef": {
+    "name": "opensandbox-controller-manager-d9f6cd768-qgxth",
+    "namespace": "opensandbox-system",
+    "uid": "00000000-0000-4000-8000-000000000002"
+   },
+   "startTime": "2026-11-01T06:10:32Z",
+   "containers": [
+    {
+     "name": "manager",
+     "startTime": "2026-11-01T06:10:35Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:05Z",
+      "usageNanoCores": 8057696,
+      "usageCoreNanoSeconds": 15656072000
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:05Z",
+      "availableBytes": 109768704,
+      "usageBytes": 24453120,
+      "workingSetBytes": 24449024,
+      "rssBytes": 22982656
+     }
+    }
+   ],
+   "cpu": {
+    "time": "2026-11-01T09:26:58Z",
+    "usageNanoCores": 8227900,
+    "usageCoreNanoSeconds": 15625622000
+   },
+   "memory": {
+    "time": "2026-11-01T09:26:58Z",
+    "availableBytes": 109776896,
+    "usageBytes": 24444928,
+    "workingSetBytes": 24440832,
+    "rssBytes": 23015424
+   }
+  },
+  {
+   "podRef": {
+    "name": "echo-85bcfb9b76-8xpws",
+    "namespace": "opensandbox",
+    "uid": "00000000-0000-4000-8000-000000000003"
+   },
+   "startTime": "2026-11-01T06:20:06Z",
+   "containers": [
+    {
+     "name": "echo",
+     "startTime": "2026-11-01T06:20:06Z",
+     "cpu": {
+      "time": "2026-11-01T09:26:50Z",
+      "usageNanoCores": 439077,
+      "usageCoreNanoSeconds": 5319126000
+     },
+     "memory": {
+      "time": "2026-11-01T09:26:50Z",
+      "availableBytes": 116744192,
+      "usageBytes": 19283968,
+      "workingSetBytes": 17473536,
+      "rssBytes": 16494592
+     }
+    }
+   ],
+   "cpu": {
+    "time": "2026-11-01T09:27:04Z",
+    "usageNanoCores": 417762,
+    "usageCoreNanoSeconds": 5349906000
+   },
+   "memory": {
+    "time": "2026-11-01T09:27:04Z",
+    "availableBytes": 116727808,
+    "usageBytes": 19300352,
+    "workingSetBytes": 17489920,
+    "rssBytes": 16531456
+   }
+  },
+  {
+   "podRef": {
+    "name": "kube-proxy-vjw6q",
+    "namespace": "kube-system",
+    "uid": "00000000-0000-4000-8000-000000000004"
+   },
+   "startTime": "2026-11-01T05:51:00Z",
+   "containers": [
+    {
+     "name": "kube-proxy",
+     "startTime": "2026-11-01T05:51:05Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:07Z",
+      "usageNanoCores": 242497,
+      "usageCoreNanoSeconds": 3503818000
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:07Z",
+      "usageBytes": 15265792,
+      "workingSetBytes": 15257600,
+      "rssBytes": 14094336
+     }
+    }
+   ],
+   "cpu": {
+    "time": "2026-11-01T09:26:57Z",
+    "usageNanoCores": 57984,
+    "usageCoreNanoSeconds": 3505961000
+   },
+   "memory": {
+    "time": "2026-11-01T09:26:57Z",
+    "usageBytes": 15486976,
+    "workingSetBytes": 15478784,
+    "rssBytes": 14106624
+   }
+  },
+  {
+   "podRef": {
+    "name": "11111111-1111-4111-8111-111111111111-0",
+    "namespace": "opensandbox",
+    "uid": "00000000-0000-4000-8000-000000000005"
+   },
+   "startTime": "2026-11-01T09:27:03Z",
+   "containers": [
+    {
+     "name": "sandbox",
+     "startTime": "2026-11-01T09:27:03Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:03Z",
+      "usageNanoCores": 2000000,
+      "usageCoreNanoSeconds": 1
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:03Z",
+      "usageBytes": 20975616,
+      "workingSetBytes": 20971520,
+      "rssBytes": 12582912
+     }
+    },
+    {
+     "name": "egress",
+     "startTime": "2026-11-01T09:27:03Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:03Z",
+      "usageNanoCores": 3500000,
+      "usageCoreNanoSeconds": 1
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:03Z",
+      "usageBytes": 83890176,
+      "workingSetBytes": 83886080,
+      "rssBytes": 67108864
+     }
+    }
+   ],
+   "cpu": {
+    "time": "2026-11-01T09:27:03Z",
+    "usageNanoCores": 5600000
+   },
+   "memory": {
+    "time": "2026-11-01T09:27:03Z",
+    "workingSetBytes": 105906176,
+    "rssBytes": 80740352
+   }
+  },
+  {
+   "podRef": {
+    "name": "22222222-2222-4222-8222-222222222222-0",
+    "namespace": "opensandbox",
+    "uid": "00000000-0000-4000-8000-000000000006"
+   },
+   "startTime": "2026-11-01T09:27:03Z",
+   "containers": [
+    {
+     "name": "sandbox",
+     "startTime": "2026-11-01T09:27:03Z",
+     "cpu": {
+      "time": "2026-11-01T09:27:03Z"
+     },
+     "memory": {
+      "time": "2026-11-01T09:27:03Z",
+      "workingSetBytes": 5242880,
+      "rssBytes": 4194304
+     }
+    }
+   ]
+  }
+ ]
+}

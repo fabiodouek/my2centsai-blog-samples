@@ -1,0 +1,52 @@
+# The API ramp of 06_control_plane.py: a one-off Job next to the lifecycle server that runs
+# loadgen/api_load.py (mounted from the ConfigMap osb-stress-api-load, which the script creates from
+# that file). It calls the server through its Service, so no port-forward is in the measurement.
+#
+# 06_control_plane.py fills in ${ECR_REGISTRY}, ${ECR_PREFIX}, ${LEVELS}, ${DURATION} and ${IDS},
+# applies this, reads the Job's log (one JSON line per level) and deletes the Job and the ConfigMap.
+# The API key reaches the pod from the server's own Secret, as an environment variable; the script
+# prints no key and neither does api_load.py.
+#
+# The Job asks for 2 CPU (limit 4) so the client side is never what runs out first, and runs on
+# whichever node has room: the server and the controller are sampled wherever they run.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: osb-stress-api-load
+  namespace: opensandbox-system
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+    example: opensandbox-stress
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 900
+  template:
+    metadata:
+      labels:
+        app: osb-stress-api-load
+        example: opensandbox-stress
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: load
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/python:3.12-slim
+          command: ["python3", "-u", "/app/api_load.py"]
+          args: ["--levels", "${LEVELS}", "--duration", "${DURATION}", "--ids", "${IDS}"]
+          env:
+            - name: OSB_URL
+              value: http://opensandbox-server.opensandbox-system.svc.cluster.local
+            - name: OSB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: opensandbox-server-auth
+                  key: api-key
+          resources:
+            requests: {cpu: "2", memory: 512Mi}
+            limits: {cpu: "4", memory: 2Gi}
+          volumeMounts:
+            - {name: app, mountPath: /app, readOnly: true}
+      volumes:
+        - name: app
+          configMap:
+            name: osb-stress-api-load

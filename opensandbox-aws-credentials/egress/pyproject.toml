@@ -1,0 +1,29 @@
+# Test project for the SigV4 re-signing addon (sigv4_resign.py).
+#
+# The addon itself is standard library only and runs inside the egress image
+# (opensandbox/egress:release-1.2.0: Debian 12, /usr/bin/python3 3.11.2, mitmproxy 11.0.2).
+# These pins match that image, so the tests exercise the same mitmproxy the sidecar runs.
+#
+#   uv run --project egress pytest egress/tests/test_sigv4_resign.py -v   (from the part 5 dir)
+#   uv run pytest tests/test_sigv4_resign.py -v                          (from egress/)
+#
+# The venv lands in egress/.venv (gitignored).
+[project]
+name = "osb-egress-sigv4"
+version = "0.1.0"
+description = "Unit tests for the OpenSandbox egress SigV4 re-signing addon"
+requires-python = "==3.11.*"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mitmproxy==11.0.2",
+    "pytest>=8,<9",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

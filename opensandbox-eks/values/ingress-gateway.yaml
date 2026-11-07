@@ -1,0 +1,52 @@
+# Values for the ingress-gateway chart (release opensandbox-ingress-gateway). 05_gateway.sh
+# fills in ${ECR_REGISTRY} and ${ECR_PREFIX} from env.sh before Helm reads this file.
+#
+# The chart's own Service (opensandbox-ingress-gateway) stays ClusterIP: the chart has no value
+# for Service annotations or a loadBalancerClass, so the NLB is a second Service that selects
+# the same pods (manifests/gateway-nlb.yaml).
+gateway:
+  image:
+    repository: ${ECR_REGISTRY}/${ECR_PREFIX}/ingress
+    tag: release-1.2.0
+
+  # Two replicas, one per zone (below), so the NLB has a healthy target in each zone.
+  replicaCount: 2
+
+  # Header routing: the server returns the gateway address plus the header
+  # OpenSandbox-Ingress-To: <sandbox-id>-<port>. Must match server.gateway.gatewayRouteMode,
+  # which 05_gateway.sh writes into values/server-gateway.yaml.
+  gatewayRouteMode: header
+
+  # The chart asks for 1 CPU / 4 GiB per replica (limits 2 / 8 GiB): 2 CPUs and 8 GiB reserved
+  # on a two-node cluster before the first sandbox. The gateway is a Go reverse proxy with a
+  # cache of BatchSandbox endpoints.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: opensandbox-ingress-gateway
+
+  # This is the one OpenSandbox component that faces the internet, so it runs without root and
+  # without capabilities. The chart sets no security context, and the image (a static Go binary
+  # on Alpine) runs as root by default. It listens on 28888 and writes no files.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: [ALL]

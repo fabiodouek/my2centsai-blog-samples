@@ -1,0 +1,9 @@
+[project]
+name = "opensandbox-architecture"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on OpenSandbox architecture: a local server, the Python SDK and the osb CLI"
+requires-python = ">=3.10"
+dependencies = [
+    "opensandbox==1.2.0",
+    "httpx>=0.27",
+]

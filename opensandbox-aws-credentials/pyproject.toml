@@ -1,0 +1,18 @@
+[project]
+name = "opensandbox-aws-credentials"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on OpenSandbox on Amazon EKS, part 5: AWS credentials through the egress SigV4 addon"
+requires-python = ">=3.11"
+dependencies = [
+    "opensandbox==1.2.0",
+    "httpx>=0.27",
+    "boto3==1.43.123",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["broker", "test_secrets_env.py", "test_common.py"]

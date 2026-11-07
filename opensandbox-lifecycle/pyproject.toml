@@ -1,0 +1,10 @@
+[project]
+name = "opensandbox-lifecycle"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on the OpenSandbox sandbox lifecycle on Amazon EKS: states and TTL, pause and resume to ECR, pools, runc and Kata, failures"
+requires-python = ">=3.11"
+dependencies = [
+    "opensandbox==1.2.0",
+    "opensandbox-cli==1.2.0",
+    "httpx>=0.27",
+]

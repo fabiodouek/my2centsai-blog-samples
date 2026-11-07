@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+# 03_resume_benchmark.sh: the runner's JSONL output and environment.json (they name the
+# registry host, so the account ID)
+results/
+# full Helm and port-forward output
+logs/
+*.jsonl

@@ -1,0 +1,88 @@
+# From console/k8s/console-bff-deployment.example.yaml. 06_console.sh fills in
+# ${ECR_REGISTRY}, ${ECR_PREFIX}, ${BFF_DIGEST} and ${SECRETS_VERSION} before applying.
+# Edits from the example:
+#  - image from ECR
+#  - LIFECYCLE_API_BASE uses the chart's Service port (80), not the example's 8090
+#  - BFF_COOKIE_SECURE=false and CORS for the http port-forward the post uses
+#  - tenants.toml comes from a Secret instead of a ConfigMap
+#  - comments translated
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensandbox-console-bff
+  namespace: opensandbox-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensandbox-console-bff
+  template:
+    metadata:
+      labels:
+        app: opensandbox-console-bff
+      annotations:
+        # The Secrets' resourceVersions: the BFF reads both Secrets at startup, so it restarts
+        # when either changes (and not otherwise). A new image digest changes the image ref.
+        opensandbox-eks/secrets-version: "${SECRETS_VERSION}"
+    spec:
+      serviceAccountName: opensandbox-console-bff
+      # The BFF needs the token: it reads pods, events and Deployments for the platform pages
+      # (console-bff-rbac.yaml).
+      automountServiceAccountToken: true
+      containers:
+        - name: bff
+          # By digest, so a node never runs a stale image cached under the same tag.
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/console-bff@${BFF_DIGEST}
+          ports:
+            - containerPort: 8091
+          env:
+            - name: TZ
+              value: "UTC"
+            - name: LIFECYCLE_API_BASE
+              value: "http://opensandbox-server.opensandbox-system.svc/v1"
+            - name: TENANTS_TOML_PATH
+              value: "/etc/opensandbox/tenants.toml"
+            # The post reaches the console over an http port-forward on localhost. Safari drops
+            # a Secure cookie over http (Chrome and Firefox keep it on localhost). The cookie is
+            # HttpOnly and SameSite=Lax. Set this to true behind HTTPS.
+            - name: BFF_COOKIE_SECURE
+              value: "false"
+            - name: BFF_CORS_ORIGINS
+              value: "http://127.0.0.1:5173,http://localhost:5173"
+            - name: BFF_K8S_PROBE_ENABLED
+              value: "true"
+            - name: BFF_K8S_CONTROLLER_DEPLOYMENT
+              value: "opensandbox-controller-manager"
+            - name: BFF_K8S_INGRESS_DEPLOYMENT
+              value: "opensandbox-ingress-gateway"
+          envFrom:
+            - secretRef:
+                name: opensandbox-console-bff
+          volumeMounts:
+            - name: tenants
+              mountPath: /etc/opensandbox/tenants.toml
+              subPath: tenants.toml
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8091
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: tenants
+          secret:
+            secretName: opensandbox-tenants
+            defaultMode: 0400
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensandbox-console-bff
+  namespace: opensandbox-system
+spec:
+  selector:
+    app: opensandbox-console-bff
+  ports:
+    - port: 8091
+      targetPort: 8091

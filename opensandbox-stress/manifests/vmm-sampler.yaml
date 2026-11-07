@@ -1,0 +1,76 @@
+# The node-side memory sampler for 02_density.py's Kata runs: one of these pods per node.
+#
+# Why it exists: the nodes run Kata with sandbox_cgroup_only = false (configuration-qemu.toml), so
+# the VM's processes (QEMU, virtiofsd and the Kata shim) are not charged to the pod's cgroup, and
+# the kubelet's pod numbers leave them out. This pod reads them from the node instead: with the
+# node's process table (hostPID) it finds every QEMU, Cloud Hypervisor, virtiofsd and Kata shim
+# process every ${EVERY} s and prints its resident memory (VmRSS from /proc/<pid>/status), the
+# Kata sandbox ID from its command line, and the pod that sandbox belongs to (from the sandbox's
+# OCI bundle under /run/containerd, mounted read-only). One line per process:
+#   vmm <unix time> <qemu|clh|virtiofsd|shim> <pid> <rss KiB> <sandbox id> <pod name>
+# 02_density.py reads the log (measure.parse_vmm) and sets it beside the kubelet's numbers.
+#
+# It reads /proc and /run and writes nothing. It is privileged because reading another process's
+# /proc/<pid>/exe needs it; the sandbox namespace already runs at Pod Security level privileged.
+# 02_density.py fills in ${NAME}, ${NODE} and ${EVERY}, creates it before the first Kata run and
+# deletes it in a finally; 99_cleanup.py deletes any left (label app=osb-stress-vmm).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${NAME}
+  namespace: opensandbox
+  labels:
+    app: osb-stress-vmm
+    example: opensandbox-stress
+spec:
+  nodeName: ${NODE}
+  hostPID: true
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  terminationGracePeriodSeconds: 1
+  containers:
+    - name: vmm
+      # Pinned by digest (the manifest list behind busybox:stable): this pod runs privileged.
+      image: public.ecr.aws/docker/library/busybox:stable@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662
+      env:
+        - {name: EVERY, value: "${EVERY}"}
+      command: ["sh", "-c"]
+      args:
+        - |
+          BUNDLES=/host-run/containerd/io.containerd.runtime.v2.task/k8s.io
+          echo "vmm-sampler started $(date +%s)"
+          while true; do
+            t=$(date +%s)
+            for p in /proc/[0-9]*; do
+              exe=$(readlink "$p/exe" 2>/dev/null) || continue
+              case "$exe" in
+                *qemu-system*) kind=qemu ;;
+                *cloud-hypervisor*) kind=clh ;;
+                *virtiofsd*) kind=virtiofsd ;;
+                *containerd-shim-kata*) kind=shim ;;
+                *) continue ;;
+              esac
+              rss=$(sed -n 's/^VmRSS:[^0-9]*\([0-9]*\).*/\1/p' "$p/status" 2>/dev/null)
+              [ -n "$rss" ] || continue
+              sid=$(tr '\0' ' ' <"$p/cmdline" 2>/dev/null | grep -o -E '[0-9a-f]{64}' | head -n 1)
+              pod=-
+              if [ -n "$sid" ] && [ -f "$BUNDLES/$sid/config.json" ]; then
+                pod=$(grep -o -E '"io.kubernetes.cri.sandbox-name": *"[^"]*"' "$BUNDLES/$sid/config.json" \
+                  | head -n 1 | sed 's/.*: *"\(.*\)"/\1/')
+              fi
+              echo "vmm $t $kind ${p#/proc/} $rss ${sid:--} ${pod:--}"
+            done
+            sleep "$EVERY"
+          done
+      securityContext:
+        privileged: true
+      resources:
+        requests: {cpu: 20m, memory: 16Mi}
+        limits: {cpu: 250m, memory: 64Mi}
+      volumeMounts:
+        - {name: run, mountPath: /host-run, readOnly: true}
+  volumes:
+    - name: run
+      hostPath:
+        path: /run
+        type: Directory

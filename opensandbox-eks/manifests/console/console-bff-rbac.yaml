@@ -1,0 +1,32 @@
+# From console/k8s/console-bff-rbac.example.yaml (release-1.2.0), comment translated.
+# The BFF reads pods, events and Deployments to show platform health and sandbox workloads.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opensandbox-console-bff
+  namespace: opensandbox-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opensandbox-console-bff-readonly
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "events"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: opensandbox-console-bff-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opensandbox-console-bff-readonly
+subjects:
+  - kind: ServiceAccount
+    name: opensandbox-console-bff
+    namespace: opensandbox-system

@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+osb.toml
+server.log
+server.pid
+opensandbox.db

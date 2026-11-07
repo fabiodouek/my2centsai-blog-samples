@@ -1,0 +1,56 @@
+# The client 03_latency.py times sandbox creates from: a pod next to the lifecycle server, so the
+# laptop's kubectl port-forward is not in the measured path. It installs the same SDK the laptop uses
+# (loadgen/client-requirements.txt: opensandbox==1.2.0 and every dependency pinned to one version with
+# its hashes, wheels only, from PyPI through the NAT gateway) and then waits; 03_latency.py runs
+# loadgen/create_latency.py in it with `kubectl exec`, one round at a time, and reads one JSON line
+# per round. The script talks to the server's Service (opensandbox-server.opensandbox-system.svc:80)
+# with the server proxy on, as part 5's broker does: the SDK's health check goes through the server
+# too, as it does from the laptop, minus the port-forward.
+#
+# 03_latency.py fills in ${ECR_REGISTRY} and ${ECR_PREFIX}, creates the ConfigMap osb-stress-client
+# from loadgen/create_latency.py and loadgen/client-requirements.txt, applies this, and deletes both at the end (also on failure);
+# 99_cleanup.py deletes them too (label example=opensandbox-stress). The API key reaches the pod from
+# the server's own Secret; nothing prints it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: osb-stress-client
+  namespace: opensandbox-system
+  labels:
+    app: osb-stress-client
+    example: opensandbox-stress
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  terminationGracePeriodSeconds: 2
+  containers:
+    - name: client
+      image: ${ECR_REGISTRY}/${ECR_PREFIX}/python:3.12-slim
+      command: ["sh", "-c"]
+      args:
+        - >-
+          pip install --quiet --no-cache-dir --disable-pip-version-check --root-user-action=ignore --require-hashes --no-deps
+          --only-binary=:all: -r /app/client-requirements.txt &&
+          touch /tmp/ready && exec sleep infinity
+      env:
+        - name: OSB_SERVER_DOMAIN
+          value: opensandbox-server.opensandbox-system.svc:80
+        - name: OSB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: opensandbox-server-auth
+              key: api-key
+      readinessProbe:
+        exec:
+          command: ["test", "-f", "/tmp/ready"]
+        periodSeconds: 2
+      # Room for 100 creates in flight (threads waiting on HTTP), so the client is never the limit.
+      resources:
+        requests: {cpu: "1", memory: 512Mi}
+        limits: {cpu: "4", memory: 2Gi}
+      volumeMounts:
+        - {name: app, mountPath: /app, readOnly: true}
+  volumes:
+    - name: app
+      configMap:
+        name: osb-stress-client

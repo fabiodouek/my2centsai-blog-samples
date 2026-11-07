@@ -1,0 +1,14 @@
+# Values for the controller chart (release opensandbox-controller). 04_install.sh fills in
+# ${ECR_REGISTRY} and ${ECR_PREFIX} from env.sh before Helm reads this file.
+#
+# The chart's default images come from sandbox-registry.cn-zhangjiakou.cr.aliyuncs.com; these
+# point at the copies 03_images.sh made in ECR. Everything else keeps the chart default,
+# including snapshot.containerdSocketPath: it is empty in the 1.2.0 chart, so no
+# --containerd-socket-path flag is passed.
+controller:
+  image:
+    repository: ${ECR_REGISTRY}/${ECR_PREFIX}/controller
+    tag: release-1.2.0
+  snapshot:
+    # The image of the Jobs that commit a paused sandbox's filesystem to an image (part 3)
+    imageCommitterImage: ${ECR_REGISTRY}/${ECR_PREFIX}/image-committer:release-1.2.0

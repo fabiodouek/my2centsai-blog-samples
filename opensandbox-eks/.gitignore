@@ -1,0 +1,15 @@
+.terraform/
+*.tfstate*
+.src/
+.env
+# 04_install.sh's temporary copy while it writes a new key into .env
+.env.*
+!.env.example
+logs/
+env.sh
+# Written by 05_gateway.sh: holds the NLB DNS name of this cluster
+values/server-gateway.yaml
+# 07_first_sandbox.py writes this for the osb CLI
+osb.toml
+__pycache__/
+.venv/
