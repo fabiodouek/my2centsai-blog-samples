@@ -1,0 +1,16 @@
+{
+ "name": "Pricing Example 1: sandboxed environments for coding assistants",
+ "source": "AWS Lambda pricing page, MicroVMs tab (us-east-1, ARM). 100 developers x 20 days.",
+ "baseline_gb": 2,
+ "peak_gb": 8,
+ "sessions": 2000,
+ "active_seconds": 9000,
+ "peak_share": 0.25,
+ "suspended_seconds": 19800,
+ "cycles": 6,
+ "state_gb": 2,
+ "launches_per_session": 1,
+ "image_gb": 2,
+ "images": [{"count": 5, "gb": 2}],
+ "per": {"label": "developer", "divisor": 100}
+}

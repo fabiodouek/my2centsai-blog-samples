@@ -1,0 +1,16 @@
+{
+ "name": "Pricing Example 2: ephemeral environments for security scans and CI/CD jobs",
+ "source": "AWS Lambda pricing page, MicroVMs tab (us-east-1, ARM). 10,000 jobs a month.",
+ "baseline_gb": 8,
+ "peak_gb": 32,
+ "sessions": 10000,
+ "active_seconds": 600,
+ "peak_share": 0.10,
+ "suspended_seconds": 0,
+ "cycles": 0,
+ "state_gb": 0,
+ "launches_per_session": 1,
+ "image_gb": 2,
+ "images": [{"count": 1, "gb": 2}],
+ "per": {"label": "job", "divisor": 10000}
+}
