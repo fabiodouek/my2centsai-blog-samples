@@ -1,0 +1,20 @@
+[
+  "sts:Assume*",
+  "sts:GetDelegatedAccessToken",
+  "sts:GetFederationToken",
+  "sts:GetServiceBearerToken",
+  "sts:GetSessionToken",
+  "sts:GetWebIdentityToken",
+  "sts:SetContext",
+  "sts:SetSourceIdentity",
+  "sts:TagSession",
+  "s3express:CreateSession",
+  "ecr:GetAuthorizationToken",
+  "ecr-public:GetAuthorizationToken",
+  "codeartifact:GetAuthorizationToken",
+  "redshift:GetClusterCredentials",
+  "redshift:GetClusterCredentialsWithIAM",
+  "redshift-serverless:GetCredentials",
+  "secretsmanager:GetSecretValue",
+  "iam:*"
+]

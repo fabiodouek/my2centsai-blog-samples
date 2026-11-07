@@ -1,0 +1,31 @@
+# The BatchSandbox template the server merges into every sandbox it creates. values/server.yaml
+# mounts this ConfigMap at /etc/opensandbox-custom/ and points
+# [kubernetes] batchsandbox_template_file at it. The server reads it once at startup;
+# 04_install.sh restarts the server when it changes.
+#
+# It is the 1.2.0 release's server/opensandbox_server/examples/example.batchsandbox-template.yaml
+# (baked into the server image at /etc/opensandbox/) without its
+#   tolerations:
+#     - operator: "Exists"
+# which tolerates every taint: sandboxes could land on any tainted node, and they would ignore
+# the node.kubernetes.io/not-ready and unreachable NoExecute taints, so they would never be
+# evicted from a failed node. Without it, sandbox pods get Kubernetes' default 300-second
+# tolerations for those two taints.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensandbox-batchsandbox-template
+  namespace: opensandbox-system
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+data:
+  batchsandbox-template.yaml: |
+    # Metadata template (will be merged with runtime-generated metadata)
+    metadata:
+    # Spec template
+    spec:
+      replicas: 1
+      # Pod template specification
+      template:
+        spec:
+          restartPolicy: Never

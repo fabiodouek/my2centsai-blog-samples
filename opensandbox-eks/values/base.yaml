@@ -1,0 +1,10 @@
+# Values for the base chart (release opensandbox-base): the OpenSandbox and fast-sandbox CRDs
+# and their cluster-wide RBAC. No workloads, no images. Everything else keeps the chart default.
+fastSandbox:
+  namespaces:
+    # The chart default (true) renders Namespace opensandbox-system. 04_install.sh creates that
+    # namespace first (manifests/namespace-opensandbox.yaml) because the API key Secret, the PVC
+    # and the template ConfigMap live there, and Helm refuses to adopt it:
+    #   Namespace "opensandbox-system" in namespace "" exists and cannot be imported into the
+    #   current release: invalid ownership metadata
+    createSystem: false

@@ -1,0 +1,28 @@
+# The two OpenSandbox namespaces. 04_install.sh applies this file before any chart.
+#
+# opensandbox-system holds the controller, the server and the objects the server needs before
+# its chart is installed: the API key Secret, the SQLite PVC and the BatchSandbox template
+# ConfigMap. The base chart can create this namespace too (fastSandbox.namespaces.createSystem),
+# but Helm refuses to adopt a namespace that already exists without its ownership labels, so
+# values/base.yaml turns that off and this file owns it.
+#
+# opensandbox is where the server creates sandboxes ([kubernetes] namespace in
+# values/server.yaml). No chart creates it. It runs at Pod Security level "privileged": with a
+# network policy, the server gives each sandbox an egress sidecar with NET_ADMIN and a
+# privileged execd init container (it disables IPv6 in the pod). EKS doesn't enforce Pod
+# Security by default; the label says so explicitly, so a stricter cluster-wide default
+# doesn't block sandboxes.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opensandbox-system
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opensandbox
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+    pod-security.kubernetes.io/enforce: privileged

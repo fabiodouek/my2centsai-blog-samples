@@ -1,0 +1,84 @@
+# The Pool of warm sandbox pods for 03_latency.py: osb-stress-pool (part 3's is osb-pool, and the
+# two never coexist: every script here refuses to start while any Pool exists).
+#
+# common.render_pool() fills in ${ECR_REGISTRY} and ${ECR_PREFIX} from ../opensandbox-eks/env.sh,
+# the pod shape (${CPU}, ${MEMORY}, requests = limits) and the capacity (${BUFFER_MIN},
+# ${BUFFER_MAX}, ${POOL_MAX}), so one file serves the latency levels (40 warm pods at the latency
+# shape) and the delivery test (as many small pods as the nodes have pod slots for).
+#
+# The template is part 3's manifests/pool.yaml (the release's pool example adapted to this cluster:
+# images from our ECR, no tolerate-everything toleration), with the shape made a parameter. A create
+# with extensions={"poolRef": "osb-stress-pool"} takes a Ready pod from the buffer; the server then
+# ignores the request's image, entrypoint and resources, because the pod already exists.
+apiVersion: sandbox.opensandbox.io/v1alpha1
+kind: Pool
+metadata:
+  name: ${POOL_NAME}
+  namespace: opensandbox
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+    example: opensandbox-stress
+spec:
+  template:
+    metadata:
+      labels:
+        example: opensandbox-stress
+    spec:
+      automountServiceAccountToken: false
+      volumes:
+        - name: sandbox-storage
+          emptyDir: {}
+        - name: opensandbox-bin
+          emptyDir: {}
+      initContainers:
+        # task-executor runs the request's entrypoint and env after allocation (as a task on port
+        # 5758), because the pod was started before the request existed.
+        - name: task-executor-installer
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/task-executor:release-1.2.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp /workspace/server /opt/opensandbox/task-executor && chmod +x /opt/opensandbox/task-executor
+          volumeMounts:
+            - name: opensandbox-bin
+              mountPath: /opt/opensandbox
+        # execd (commands, files) and bootstrap.sh, which the allocation task starts.
+        - name: execd-installer
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/execd:release-1.2.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              cp ./execd /opt/opensandbox/execd && cp ./bootstrap.sh /opt/opensandbox/bootstrap.sh &&
+              chmod +x /opt/opensandbox/execd /opt/opensandbox/bootstrap.sh
+          volumeMounts:
+            - name: opensandbox-bin
+              mountPath: /opt/opensandbox
+      containers:
+        - name: sandbox
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/python:3.12-slim
+          command: ["/bin/sh", "-c", "/opt/opensandbox/task-executor -listen-addr=0.0.0.0:5758 -log-dir=/tmp"]
+          env:
+            - name: SANDBOX_MAIN_CONTAINER
+              value: main
+            - name: EXECD_ENVS
+              value: /opt/opensandbox/.env
+            - name: EXECD
+              value: /opt/opensandbox/execd
+          resources:
+            requests:
+              cpu: "${CPU}"
+              memory: ${MEMORY}
+            limits:
+              cpu: "${CPU}"
+              memory: ${MEMORY}
+          volumeMounts:
+            - name: sandbox-storage
+              mountPath: /var/lib/sandbox
+            - name: opensandbox-bin
+              mountPath: /opt/opensandbox
+  capacitySpec:
+    bufferMin: ${BUFFER_MIN}   # Ready, unallocated pods the controller keeps waiting
+    bufferMax: ${BUFFER_MAX}
+    poolMin: 0                 # pods in the pool in all, allocated or not
+    poolMax: ${POOL_MAX}
+  recycleStrategy:
+    type: Delete   # a released pod is deleted and a fresh one replaces it

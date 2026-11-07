@@ -1,0 +1,17 @@
+# Terraform: providers and the local state (it holds the account ID and every ARN)
+.terraform/
+.terraform.lock.hcl
+*.tfstate*
+*.tfplan
+# Written by 01_iam.sh from the Terraform outputs
+broker.env
+broker.env.tmp
+# Secrets never live here; this keeps a stray copy out of git
+.env
+.env.*
+!.env.example
+# Full Terraform and build output
+logs/
+__pycache__/
+.pytest_cache/
+.venv/

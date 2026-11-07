@@ -1,0 +1,36 @@
+[
+  {
+    "Sid": "ListTestBucket",
+    "Effect": "Allow",
+    "Action": ["s3:ListBucket"],
+    "Resource": ["arn:aws:s3:::${bucket}"]
+  },
+  {
+    "Sid": "TestBucketObjects",
+    "Effect": "Allow",
+    "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:AbortMultipartUpload"],
+    "Resource": ["arn:aws:s3:::${bucket}/*"]
+  },
+  {
+    "Sid": "TestTable",
+    "Effect": "Allow",
+    "Action": ["dynamodb:*Item", "dynamodb:Query", "dynamodb:Scan"],
+    "Resource": ["arn:aws:dynamodb:${region}:${account}:table/${table}"]
+  },
+  {
+    "Sid": "OneBedrockModel",
+    "Effect": "Allow",
+    "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+    "Resource": [
+      "arn:aws:bedrock:${region}:${account}:inference-profile/${model}",
+      "arn:aws:bedrock:*::foundation-model/${foundation_model}"
+    ]
+  },
+  {
+    "Sid": "ShortTermBedrockKeys",
+    "Effect": "Allow",
+    "Action": ["bedrock:CallWithBearerToken"],
+    "Resource": ["*"],
+    "Condition": {"StringEquals": {"bedrock:bearerTokenType": "SHORT_TERM"}}
+  }
+]

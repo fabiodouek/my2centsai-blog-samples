@@ -1,0 +1,22 @@
+# An encrypted gp3 StorageClass for the server's SQLite volume (manifests/server-pvc.yaml).
+#
+# The cluster's default class (ebs-csi-default-sc, from the EBS CSI add-on) sets no
+# parameters, so its volumes are encrypted only if the account turns on EBS encryption by
+# default, which is off unless someone enabled it. This class always encrypts, with the
+# account's AWS managed key for EBS (aws/ebs); add kmsKeyId to use your own key.
+# It is not the default class, so nothing else changes.
+#
+# reclaimPolicy Delete: deleting the PVC deletes the EBS volume (99_teardown.sh relies on it).
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3-encrypted
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  encrypted: "true"
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true

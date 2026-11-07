@@ -1,0 +1,138 @@
+# The echo server for 05_egress_ladder.py's rungs 1 to 5: echo-stress.opensandbox.svc.cluster.local.
+#
+# The program, the image and the command are those of part 4's echo server
+# (../opensandbox-egress/manifests/echo-server.yaml): it answers any method on any path with the
+# request it received, as JSON, and prints each request to its log. What differs is the size and
+# the ownership:
+#   - 3 replicas, each requesting 500m with a 1-CPU limit and 256Mi (part 4's is one replica on 25m /
+#     250m), so the egress path, not the echo server, is under test. Each replica is one Python
+#     process, which runs Python on one core at a time; every request of the ladder is a new
+#     connection, so the Service spreads them over the three. The ladder samples every replica and
+#     flags a rung where any of them reached 800m
+#   - its own names (echo-stress, echo-stress-script) and the label example=opensandbox-stress:
+#     05_egress_ladder.py applies it at the start and deletes it in a finally, and 99_cleanup.py
+#     deletes it too, so part 6 does not depend on part 4's echo server being there
+#   - one Service (port 80 -> listener 8080); the second listener of part 4 is not used here
+#
+# Plain HTTP on port 80 on purpose: the egress sidecar's transparent proxy intercepts ports 80 and
+# 443 only, and a vault binding with schemes ["http"] injects there.
+#
+# 05_egress_ladder.py fills in ${ECR_REGISTRY} and ${ECR_PREFIX} from ../opensandbox-eks/env.sh.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: echo-stress-script
+  namespace: opensandbox
+  labels: {app: echo-stress, example: opensandbox-stress}
+data:
+  echo.py: |
+    import json
+    import sys
+    import threading
+    import time
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from urllib.parse import parse_qs, urlsplit
+
+
+    class Echo(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def _reply(self):
+            length = int(self.headers.get("Content-Length") or 0)
+            body = self.rfile.read(length).decode("utf-8", "replace") if length else ""
+            headers = {}
+            for name, value in self.headers.items():
+                headers[name] = f"{headers[name]}, {value}" if name in headers else value
+            parts = urlsplit(self.path)
+            if parts.path == "/stream":
+                # A long-lived response: one line per interval, for the "established connection" test.
+                query = parse_qs(parts.query)
+                count = int(query.get("n", ["30"])[0])
+                interval = float(query.get("interval", ["1"])[0])
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Connection", "close")
+                self.end_headers()
+                try:
+                    for i in range(count):
+                        self.wfile.write(f"tick {i + 1}/{count}\n".encode())
+                        self.wfile.flush()
+                        time.sleep(interval)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+                self.close_connection = True
+                return
+            payload = json.dumps({
+                "method": self.command,
+                "path": self.path,
+                "headers": headers,
+                "body": body,
+                "listener": self.server.server_address[1],
+                "client": self.client_address[0],
+            }).encode()
+            print(json.dumps({"method": self.command, "path": self.path, "headers": headers,
+                              "body": body, "listener": self.server.server_address[1]}), flush=True)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        do_GET = do_POST = do_PUT = do_PATCH = do_DELETE = do_HEAD = _reply
+
+        def log_message(self, *args):
+            pass
+
+
+    def serve(port):
+        ThreadingHTTPServer(("0.0.0.0", port), Echo).serve_forever()
+
+
+    for port in (8081,):
+        threading.Thread(target=serve, args=(port,), daemon=True).start()
+    print("echo listening on 8080 and 8081", flush=True)
+    sys.stdout.flush()
+    serve(8080)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-stress
+  namespace: opensandbox
+  labels: {app: echo-stress, example: opensandbox-stress}
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: echo-stress}
+  template:
+    metadata:
+      labels: {app: echo-stress, example: opensandbox-stress}
+    spec:
+      containers:
+        - name: echo
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/python:3.12-slim
+          command: ["python3", "-u", "/app/echo.py"]
+          ports:
+            - {name: http, containerPort: 8080}
+          readinessProbe:
+            tcpSocket: {port: 8080}
+            periodSeconds: 2
+          resources:
+            requests: {cpu: 500m, memory: 256Mi}
+            limits: {cpu: "1", memory: 256Mi}
+          volumeMounts:
+            - {name: script, mountPath: /app, readOnly: true}
+      volumes:
+        - name: script
+          configMap: {name: echo-stress-script}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-stress
+  namespace: opensandbox
+  labels: {app: echo-stress, example: opensandbox-stress}
+spec:
+  selector: {app: echo-stress}
+  ports:
+    - {name: http, port: 80, targetPort: 8080}

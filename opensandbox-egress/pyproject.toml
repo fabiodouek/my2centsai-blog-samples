@@ -1,0 +1,10 @@
+[project]
+name = "opensandbox-egress"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on OpenSandbox on Amazon EKS, part 4: egress rules, MITM CA trust and the Credential Vault"
+requires-python = ">=3.10"
+dependencies = [
+    "opensandbox==1.2.0",
+    "opensandbox-cli==1.2.0",
+    "httpx>=0.27",
+]

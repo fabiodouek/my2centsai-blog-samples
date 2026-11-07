@@ -1,0 +1,4 @@
+# The build context is the addon alone: the Dockerfile COPYs nothing else, and
+# build_egress.sh hashes exactly these inputs (plus the Dockerfile and the base digest).
+*
+!sigv4_resign.py

@@ -1,0 +1,4 @@
+# The broker image installs exactly these (broker/Dockerfile). The unit tests use them too:
+#   uv run --no-project --with-requirements broker/requirements.txt --with pytest pytest broker/
+opensandbox==1.2.0
+boto3==1.43.123

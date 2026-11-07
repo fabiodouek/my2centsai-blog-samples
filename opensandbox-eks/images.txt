@@ -1,0 +1,9 @@
+docker.io/opensandbox/server:release-1.2.0
+docker.io/opensandbox/execd:release-1.2.0
+docker.io/opensandbox/ingress:release-1.2.0
+docker.io/opensandbox/egress:release-1.2.0
+docker.io/opensandbox/image-committer:release-1.2.0
+docker.io/opensandbox/controller:release-1.2.0
+docker.io/opensandbox/task-executor:release-1.2.0
+docker.io/opensandbox/nodeagent:release-1.2.0
+public.ecr.aws/docker/library/python:3.12-slim

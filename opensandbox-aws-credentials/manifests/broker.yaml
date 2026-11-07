@@ -1,0 +1,142 @@
+# The part 5 credential broker (broker/broker.py) in its own namespace.
+#
+# 02_broker.sh fills in ${BROKER_IMAGE} (the image it pushed, pinned by digest), ${CONFIG_SHA}
+# and ${KEY_VERSION}, and applies this file in two steps: the Namespace (the first document)
+# alone, then the Secret osb-broker-server-key and the ConfigMap osb-broker-env (which it
+# creates), then everything here. Reach the broker with:
+#   kubectl -n opensandbox-broker port-forward svc/osb-broker 18090:80
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opensandbox-broker
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+    pod-security.kubernetes.io/enforce: restricted
+---
+# Its EKS Pod Identity association (role osb-broker) comes from 01_iam.sh.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: osb-broker
+  namespace: opensandbox-broker
+# The broker never calls the Kubernetes API. Pod Identity mounts a token of its own.
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osb-broker
+  namespace: opensandbox-broker
+  labels:
+    app.kubernetes.io/name: osb-broker
+    app.kubernetes.io/part-of: opensandbox
+spec:
+  # One replica: the broker keeps its sandboxes in memory. Recreate, so two broker pods never
+  # rotate the same vaults at once; a new pod adopts the running sandboxes when it starts.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: osb-broker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: osb-broker
+      annotations:
+        # A new broker.env or a new server API key restarts the broker.
+        osb-broker/config-sha: "${CONFIG_SHA}"
+        osb-broker/server-key-version: "${KEY_VERSION}"
+    spec:
+      serviceAccountName: osb-broker
+      # Placement (comments only; the two-node demo does not use it). The broker's Pod Identity token can assume
+      # osb-sandbox, so it should not share a node with sandboxes: without this, a runc breakout on a shared
+      # node reaches the token. With a node group for the broker alone (labelled and tainted as below, and the
+      # sandbox pods not tolerating the taint), uncomment:
+      #
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #         - matchExpressions:
+      #             - key: workload
+      #               operator: In
+      #               values: ["osb-control"]
+      # tolerations:
+      #   - key: workload
+      #     operator: Equal
+      #     value: osb-control
+      #     effect: NoSchedule
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: broker
+          image: ${BROKER_IMAGE}
+          args: ["serve"]
+          ports:
+            - name: http
+              containerPort: 8080
+          # SANDBOX_ROLE_ARN, DDB_TABLE, AWS_TEST_BUCKET, BEDROCK_MODEL_ID, AWS_REGION, ...
+          envFrom:
+            - configMapRef:
+                name: osb-broker-env
+          env:
+            # The lifecycle server's in-cluster Service; it also relays the broker's calls to sandboxes.
+            - name: OSB_SERVER_DOMAIN
+              value: opensandbox-server.opensandbox-system.svc:80
+            - name: OSB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: osb-broker-server-key
+                  key: api-key
+            - name: AWS_STS_REGIONAL_ENDPOINTS
+              value: regional
+          # The API listens on 127.0.0.1 only (BROKER_LISTEN), so the probe runs inside the pod.
+          readinessProbe:
+            exec:
+              command: ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2)"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# A stable name for `kubectl port-forward svc/osb-broker`. The broker listens on 127.0.0.1,
+# so connections to this Service's ClusterIP are refused: only a port-forward (which connects
+# from inside the pod, and needs pods/portforward in this namespace) reaches the API. Nothing
+# else in the cluster, sandboxes included, can ask the broker for credentials.
+apiVersion: v1
+kind: Service
+metadata:
+  name: osb-broker
+  namespace: opensandbox-broker
+  labels:
+    app.kubernetes.io/name: osb-broker
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: osb-broker
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

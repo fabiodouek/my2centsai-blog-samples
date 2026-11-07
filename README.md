@@ -4,6 +4,42 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [opensandbox-architecture](./opensandbox-architecture)
+
+Part 1 of the OpenSandbox on Amazon EKS series. Runs the OpenSandbox 1.2.0 server on your machine with the Docker runtime and drives it three ways: the Python SDK, the `osb` command line, and a runtime egress policy.
+
+Blog post: [OpenSandbox Architecture: How the Pieces Fit Before You Deploy](https://my2cents.ai/deep-dive/opensandbox-architecture)
+
+### [opensandbox-eks](./opensandbox-eks)
+
+Part 2. Terraform for a two-node EKS 1.37 cluster, then scripts that install OpenSandbox 1.2.0 (server, controller, ingress gateway and developer console) from its Helm charts, add Kata Containers for VM isolation, and run a first sandbox from Python. Parts 3 to 6 run on this cluster; `99_teardown.sh` removes it.
+
+Blog post: [OpenSandbox on Amazon EKS: Hands-On with a Self-Hosted Install](https://my2cents.ai/deep-dive/opensandbox-eks)
+
+### [opensandbox-lifecycle](./opensandbox-lifecycle)
+
+Part 3. Python scripts that take a sandbox through its life on the part 2 cluster: states, timeout and renewal, pause and resume to Amazon ECR, warm Pools, runc against Kata, and what happens when a pod is deleted or a node is cordoned. Each script prints timings.
+
+Blog post: [OpenSandbox Sandbox Lifecycle: Hands-On on Amazon EKS](https://my2cents.ai/deep-dive/opensandbox-lifecycle)
+
+### [opensandbox-egress](./opensandbox-egress)
+
+Part 4. The egress sidecar on the part 2 cluster: deny-by-default network rules, how clients trust the proxy's CA, and the Credential Vault, which injects real GitHub and Anthropic keys into requests while the sandbox holds only placeholders. It also tries to get a credential out and records what happens.
+
+Blog post: [OpenSandbox Egress and Credential Vault: Hands-On on Amazon EKS](https://my2cents.ai/deep-dive/opensandbox-egress)
+
+### [opensandbox-aws-credentials](./opensandbox-aws-credentials)
+
+Part 5. A sandbox calls STS, S3, DynamoDB and Bedrock with no AWS key inside it: an in-cluster broker assumes an IAM role per sandbox and writes the temporary credentials into the Credential Vault, and a SigV4 addon in the egress sidecar re-signs each request. Terraform for the roles, plus the broker and the test scripts.
+
+Blog post: [OpenSandbox and AWS Credentials: SigV4 Signing at the Egress](https://my2cents.ai/deep-dive/opensandbox-aws-credentials)
+
+### [opensandbox-stress](./opensandbox-stress)
+
+Part 6. Stress tests for the part 2 cluster: density with and without the egress sidecar and under Kata, create latency cold and from a Pool, a pause storm to ECR, the egress overhead of each layer up to SigV4 signing, control-plane load, and noisy neighbors. Includes the results and charts from the published run.
+
+Blog post: [OpenSandbox on Amazon EKS: Stress Testing Two Nodes](https://my2cents.ai/deep-dive/opensandbox-stress)
+
 ### [lambda-microvm-workspace](./lambda-microvm-workspace)
 
 A deployed browser workspace on AWS Lambda MicroVMs: sign in with Cognito, create a sandbox and get a terminal with Claude Code ready to run. Every sandbox reaches the internet only through part 2's iron-proxy, in transparent mode. Panels show the proxy feed, credential use with a Revoke button, Claude Code's tokens and cost, vitals and DNS lookups. Admins change the shared proxy policy from the browser: the allowlist, injected credentials, and which of four IAM roles (plus an optional session policy) signs sandbox AWS calls. Terraform for CloudFront, Cognito, the ALB, the API on ECS Fargate and DynamoDB, a FastAPI backend and a React frontend.

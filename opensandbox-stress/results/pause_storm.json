@@ -1,0 +1,495 @@
+{
+ "size": 20,
+ "mb": 100,
+ "egress": false,
+ "runs": [
+  {
+   "run": 1,
+   "windows": {
+    "pause_start": "2026-11-01T15:26:31Z",
+    "pause_end": "2026-11-01T15:26:54Z",
+    "resume_start": "2026-11-01T15:26:57Z",
+    "resume_end": "2026-11-01T15:27:08Z"
+   },
+   "problems": [],
+   "create_failed": 0,
+   "pause_accept_ms": {
+    "label": "pause accepted",
+    "n": 20,
+    "min": 377.0,
+    "p50": 379.7,
+    "p95": 427.3,
+    "p99": 428.5,
+    "max": 428.5,
+    "mean": 393.6,
+    "p99_is_max": true
+   },
+   "snapshot_failed": 0,
+   "snapshot_not_durable": 0,
+   "durable_s": [
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    18.1,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4
+   ],
+   "all_durable_s": 21.4,
+   "first_durable_s": 18.1,
+   "all_paused_s": 21.4,
+   "timeline": [
+    [
+     0.4,
+     0,
+     0
+    ],
+    [
+     4.4,
+     0,
+     0
+    ],
+    [
+     8.1,
+     0,
+     0
+    ],
+    [
+     11.4,
+     0,
+     0
+    ],
+    [
+     14.8,
+     0,
+     0
+    ],
+    [
+     18.1,
+     9,
+     10
+    ],
+    [
+     21.4,
+     20,
+     20
+    ]
+   ],
+   "commit_job_s": {
+    "label": "commit Job",
+    "n": 20,
+    "min": 16000.0,
+    "p50": 18000.0,
+    "p95": 20000.0,
+    "p99": 20000.0,
+    "max": 20000.0,
+    "mean": 18300.0,
+    "p99_is_max": true
+   },
+   "commit_jobs_per_node": {
+    "node-a": 11,
+    "node-b": 9
+   },
+   "images": {
+    "count": 20,
+    "bytes": 2963261548,
+    "expected": 20
+   },
+   "resume_healthy_ms": {
+    "label": "resume to healthy",
+    "n": 20,
+    "min": 4656.9,
+    "p50": 6612.1,
+    "p95": 9744.6,
+    "p99": 10123.9,
+    "max": 10123.9,
+    "mean": 7319.4,
+    "p99_is_max": true
+   },
+   "resume_command_ms": {
+    "label": "resume to first command",
+    "n": 20,
+    "min": 5266.6,
+    "p50": 7194.9,
+    "p95": 10301.3,
+    "p99": 10663.7,
+    "max": 10663.7,
+    "mean": 7903.3,
+    "p99_is_max": true
+   },
+   "data_ok": 20,
+   "resume_failed": 0,
+   "resume_errors": [],
+   "failed": 0
+  },
+  {
+   "run": 2,
+   "windows": {
+    "pause_start": "2026-11-01T15:27:35Z",
+    "pause_end": "2026-11-01T15:28:01Z",
+    "resume_start": "2026-11-01T15:28:04Z",
+    "resume_end": "2026-11-01T15:28:15Z"
+   },
+   "problems": [],
+   "create_failed": 0,
+   "pause_accept_ms": {
+    "label": "pause accepted",
+    "n": 20,
+    "min": 319.7,
+    "p50": 411.7,
+    "p95": 466.7,
+    "p99": 467.3,
+    "max": 467.3,
+    "mean": 410.3,
+    "p99_is_max": true
+   },
+   "snapshot_failed": 0,
+   "snapshot_not_durable": 0,
+   "durable_s": [
+    14.2,
+    14.2,
+    14.2,
+    14.2,
+    14.2,
+    14.2,
+    14.2,
+    14.2,
+    17.5,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    20.9,
+    24.4
+   ],
+   "all_durable_s": 24.4,
+   "first_durable_s": 14.2,
+   "all_paused_s": 20.9,
+   "timeline": [
+    [
+     0.5,
+     0,
+     0
+    ],
+    [
+     4.0,
+     0,
+     0
+    ],
+    [
+     7.5,
+     0,
+     0
+    ],
+    [
+     10.8,
+     0,
+     0
+    ],
+    [
+     14.2,
+     8,
+     9
+    ],
+    [
+     17.5,
+     9,
+     9
+    ],
+    [
+     20.9,
+     19,
+     20
+    ],
+    [
+     24.4,
+     20,
+     20
+    ]
+   ],
+   "commit_job_s": {
+    "label": "commit Job",
+    "n": 20,
+    "min": 12000.0,
+    "p50": 19000.0,
+    "p95": 20000.0,
+    "p99": 21000.0,
+    "max": 21000.0,
+    "mean": 16600.0,
+    "p99_is_max": true
+   },
+   "commit_jobs_per_node": {
+    "node-a": 11,
+    "node-b": 9
+   },
+   "images": {
+    "count": 20,
+    "bytes": 2963261571,
+    "expected": 20
+   },
+   "resume_healthy_ms": {
+    "label": "resume to healthy",
+    "n": 20,
+    "min": 1810.8,
+    "p50": 8752.4,
+    "p95": 10178.9,
+    "p99": 10369.4,
+    "max": 10369.4,
+    "mean": 8124.0,
+    "p99_is_max": true
+   },
+   "resume_command_ms": {
+    "label": "resume to first command",
+    "n": 20,
+    "min": 2511.3,
+    "p50": 9358.8,
+    "p95": 10777.8,
+    "p99": 11001.6,
+    "max": 11001.6,
+    "mean": 8736.4,
+    "p99_is_max": true
+   },
+   "data_ok": 20,
+   "resume_failed": 0,
+   "resume_errors": [],
+   "failed": 0
+  },
+  {
+   "run": 3,
+   "windows": {
+    "pause_start": "2026-11-01T15:28:38Z",
+    "pause_end": "2026-11-01T15:29:01Z",
+    "resume_start": "2026-11-01T15:29:04Z",
+    "resume_end": "2026-11-01T15:29:15Z"
+   },
+   "problems": [],
+   "create_failed": 0,
+   "pause_accept_ms": {
+    "label": "pause accepted",
+    "n": 20,
+    "min": 368.1,
+    "p50": 435.7,
+    "p95": 556.2,
+    "p99": 564.6,
+    "max": 564.6,
+    "mean": 472.1,
+    "p99_is_max": true
+   },
+   "snapshot_failed": 0,
+   "snapshot_not_durable": 0,
+   "durable_s": [
+    14.5,
+    14.5,
+    14.5,
+    14.5,
+    14.5,
+    14.5,
+    18.0,
+    18.0,
+    18.0,
+    18.0,
+    18.0,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4,
+    21.4
+   ],
+   "all_durable_s": 21.4,
+   "first_durable_s": 14.5,
+   "all_paused_s": 21.4,
+   "timeline": [
+    [
+     0.6,
+     0,
+     0
+    ],
+    [
+     4.2,
+     0,
+     0
+    ],
+    [
+     7.8,
+     0,
+     0
+    ],
+    [
+     11.2,
+     0,
+     0
+    ],
+    [
+     14.5,
+     6,
+     6
+    ],
+    [
+     18.0,
+     11,
+     11
+    ],
+    [
+     21.4,
+     20,
+     20
+    ]
+   ],
+   "commit_job_s": {
+    "label": "commit Job",
+    "n": 20,
+    "min": 12000.0,
+    "p50": 16000.0,
+    "p95": 19000.0,
+    "p99": 19000.0,
+    "max": 19000.0,
+    "mean": 15900.0,
+    "p99_is_max": true
+   },
+   "commit_jobs_per_node": {
+    "node-a": 11,
+    "node-b": 9
+   },
+   "images": {
+    "count": 20,
+    "bytes": 2963261557,
+    "expected": 20
+   },
+   "resume_healthy_ms": {
+    "label": "resume to healthy",
+    "n": 20,
+    "min": 2050.0,
+    "p50": 7300.6,
+    "p95": 9526.7,
+    "p99": 10485.9,
+    "max": 10485.9,
+    "mean": 7354.6,
+    "p99_is_max": true
+   },
+   "resume_command_ms": {
+    "label": "resume to first command",
+    "n": 20,
+    "min": 2783.4,
+    "p50": 7852.1,
+    "p95": 10127.2,
+    "p99": 11064.2,
+    "max": 11064.2,
+    "mean": 7949.7,
+    "p99_is_max": true
+   },
+   "data_ok": 20,
+   "resume_failed": 0,
+   "resume_errors": [],
+   "failed": 0
+  }
+ ],
+ "phases": [
+  {
+   "name": "pause 1",
+   "start": 13.6,
+   "end": 36.4
+  },
+  {
+   "name": "resume 1",
+   "start": 39.0,
+   "end": 50.0
+  },
+  {
+   "name": "pause 2",
+   "start": 77.1,
+   "end": 103.1
+  },
+  {
+   "name": "resume 2",
+   "start": 105.8,
+   "end": 117.1
+  },
+  {
+   "name": "pause 3",
+   "start": 140.3,
+   "end": 163.1
+  },
+  {
+   "name": "resume 3",
+   "start": 165.9,
+   "end": 177.2
+  }
+ ],
+ "storms_counted": [
+  1,
+  2,
+  3
+ ],
+ "median_includes_failed_storms": false,
+ "all_durable_s": {
+  "median": 21.4,
+  "min": 21.4,
+  "max": 24.4,
+  "spread": 3.0,
+  "spread_pct": 14.0,
+  "runs": [
+   21.4,
+   24.4,
+   21.4
+  ]
+ },
+ "all_paused_s": {
+  "median": 21.4,
+  "min": 20.9,
+  "max": 21.4,
+  "spread": 0.5,
+  "spread_pct": 2.3,
+  "runs": [
+   21.4,
+   20.9,
+   21.4
+  ]
+ },
+ "resume_healthy_p50_ms": {
+  "median": 7300.6,
+  "min": 6612.1,
+  "max": 8752.4,
+  "spread": 2140.3,
+  "spread_pct": 29.3,
+  "runs": [
+   6612.1,
+   8752.4,
+   7300.6
+  ]
+ },
+ "resume_command_p95_ms": {
+  "median": 10301.3,
+  "min": 10127.2,
+  "max": 10777.8,
+  "spread": 650.6,
+  "spread_pct": 6.3,
+  "runs": [
+   10301.3,
+   10777.8,
+   10127.2
+  ]
+ },
+ "repository": "<registry>/opensandbox-eks/snapshots"
+}

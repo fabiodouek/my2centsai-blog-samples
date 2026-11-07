@@ -1,0 +1,6 @@
+# Appended to the lifecycle server's config.toml by ./server_config.py --runtime kata-clh
+# (./switch_runtime.sh kata-clh): the same as runtime-kata-qemu.toml with Cloud Hypervisor as the
+# virtual machine monitor instead of QEMU.
+[secure_runtime]
+type = "kata"
+k8s_runtime_class = "kata-clh"

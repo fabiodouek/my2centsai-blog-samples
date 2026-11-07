@@ -1,0 +1,22 @@
+# The server's SQLite database (snapshot metadata and the template catalog). The server chart
+# has no volume of its own, so by default the database lives in the container and is lost on
+# every restart. values/server.yaml mounts this claim at /data and sets
+# [store] path = "/data/opensandbox.db".
+#
+# An EBS volume sits in one Availability Zone, so the server pod always runs on a node in that
+# zone. That suits the chart's single server replica and its Recreate strategy: the old pod
+# releases the volume before the new one starts.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opensandbox-server-data
+  namespace: opensandbox-system
+  labels:
+    app.kubernetes.io/part-of: opensandbox
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3-encrypted
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,44 @@
+# The ingress gateway behind an internet-facing Network Load Balancer, created by the AWS Load
+# Balancer Controller. 05_gateway.sh fills in ${MY_IP}, your public IPv4 address: the NLB
+# accepts connections from that /32 only, and the script recomputes it on every run.
+#
+# The gateway chart's Service has no value for annotations or a loadBalancerClass, so this is
+# a second Service that selects the same pods.
+#
+# A TCP listener, not TLS or HTTP: the gateway speaks cleartext HTTP/1.1, and WebSocket
+# upgrades (the execd PTY) must reach it as HTTP/1.1. The NLB passes the bytes through.
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensandbox-gateway-nlb
+  namespace: opensandbox-system
+  labels:
+    app.kubernetes.io/component: ingress-gateway
+    app.kubernetes.io/part-of: opensandbox
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    # The NLB sends traffic straight to the pod IPs (the VPC CNI makes them VPC addresses),
+    # so the Service needs no node ports.
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    # The gateway's own liveness endpoint, instead of a bare TCP connect.
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: /status.ok
+    # Each zone's NLB node can reach the gateway pod in the other zone, so a zone without a
+    # gateway pod (both replicas on one node after a scale-down) still answers.
+    service.beta.kubernetes.io/aws-load-balancer-attributes: load_balancing.cross_zone.enabled=true
+spec:
+  type: LoadBalancer
+  # The AWS Load Balancer Controller, not the legacy cloud provider (which would create a
+  # Classic Load Balancer). Immutable once the Service exists.
+  loadBalancerClass: service.k8s.aws/nlb
+  allocateLoadBalancerNodePorts: false
+  loadBalancerSourceRanges:
+    - "${MY_IP}/32"
+  selector:
+    app.kubernetes.io/name: opensandbox-ingress-gateway
+    app.kubernetes.io/instance: opensandbox-ingress-gateway
+  ports:
+    - name: http
+      port: 80
+      targetPort: http   # the gateway container's port 28888
+      protocol: TCP
