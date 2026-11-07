@@ -8,7 +8,7 @@ Video walkthrough: https://youtu.be/s3k7A1qLJx0
 
 ## Requirements
 
-- Python 3.11+. `microvm_cost.py` uses the standard library only.
+- Python 3.11+. `microvm_cost.py` uses the standard library only. `--rates live` needs internet access, but no AWS credentials.
 - For `bill.py`: boto3 and AWS credentials allowed `ce:GetDimensionValues` and `ce:GetCostAndUsage`. Each run makes two Cost Explorer API calls, which AWS bills at $0.01 each.
 
 ```bash
@@ -74,6 +74,7 @@ Copy a scenario file, or override fields with `--set`:
 python microvm_cost.py scenarios/coding-sandboxes.json --set state_gb=1.1 --set cycles=10
 python microvm_cost.py scenarios/ci-jobs.json --set sessions=2500 --set peak_share=0.3
 python microvm_cost.py scenarios/coding-sandboxes.json --rates price-list   # the unrounded rates your bill uses
+python microvm_cost.py scenarios/coding-sandboxes.json --rates live --region eu-west-1   # current rates, any Region
 python microvm_cost.py scenarios/ci-jobs.json --json                        # line items as JSON
 ```
 
@@ -116,4 +117,14 @@ That's the bill for the three-part MicroVMs series on my2cents.ai. Cost Explorer
 
 ## Rates
 
-The defaults are us-east-1, Graviton (ARM), from the pricing page as of November 9, 2026. `page` uses the five-decimal snapshot rates the examples use; `price-list` uses the unrounded rates the bill charges. Other Regions price differently (about +5% in eu-west-1, +27% in eu-central-1): edit `RATES` in `microvm_cost.py`.
+The built-in rates are hardcoded in the `RATES` table near the top of `microvm_cost.py`: us-east-1, Graviton (ARM), from the pricing page as of November 9, 2026. `page` (the default) uses the five-decimal snapshot rates the examples use, so the totals match AWS's to the cent; `price-list` uses the unrounded rates the bill charges. They don't update themselves: if AWS changes a price, edit `RATES`.
+
+`--rates live` downloads the current rates instead, from the public [AWS Price List](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/using-the-aws-price-list-bulk-api.html) file for Lambda (about 0.7 MB, no AWS credentials needed), for any Region and either architecture:
+
+```bash
+python microvm_cost.py scenarios/coding-sandboxes.json --rates live                       # us-east-1, Graviton
+python microvm_cost.py scenarios/coding-sandboxes.json --rates live --region eu-central-1  # another Region
+python microvm_cost.py scenarios/coding-sandboxes.json --rates live --arch x86            # x86 instead of Graviton
+```
+
+It prints which price list it used and when AWS published it. Live rates are the unrounded price-list rates, so Example 1 comes to $1,241.07 in us-east-1 instead of the page's $1,241.22. At the rates as of November 9, 2026, the same example costs $1,308.97 in eu-west-1, $1,573.09 in eu-central-1, and $1,438.73 on x86 in us-east-1.

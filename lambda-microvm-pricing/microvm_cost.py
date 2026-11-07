@@ -6,6 +6,7 @@ works its two examples. Standard library only.
     python microvm_cost.py scenarios/coding-sandboxes.json --steps    # build it up from one MicroVM
     python microvm_cost.py scenarios/ci-jobs.json --set sessions=2500 --set peak_share=0.3
     python microvm_cost.py scenarios/coding-sandboxes.json --rates price-list   # unrounded rates
+    python microvm_cost.py scenarios/coding-sandboxes.json --rates live --region eu-west-1   # today's AWS Price List
 
 A scenario is one kind of MicroVM session (a developer's day, a CI job) repeated `sessions` times a month.
 Every session launches once from an image, runs `active_seconds` (a share of it at peak), and may suspend
@@ -14,10 +15,15 @@ Every session launches once from an image, runs `active_seconds` (a share of it 
 
 import argparse
 import json
+import re
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
-# us-east-1, ARM (Graviton). "page" is what the AWS pricing page uses in its examples (rounded);
+# Built-in rates: us-east-1, ARM (Graviton), as of November 9, 2026. They don't update themselves; edit them here
+# if AWS changes a price, or use --rates live to download the current AWS Price List instead.
+# "page" is what the AWS pricing page uses in its examples (rounded);
 # "price-list" is the AWS price list and what the bill charges (Cost Explorer shows the same values).
 RATES = {
     "page": {
@@ -39,6 +45,56 @@ HOURS_PER_MONTH = 720  # the pricing page's month for snapshot storage
 GB_PER_VCPU = 2        # MicroVMs allocate 1 vCPU per 2 GB of memory
 MAX_BURST = 4          # a MicroVM can scale up to 4x its baseline
 MAX_LIFETIME_S = 8 * 3600  # running and suspended time both count
+
+# The public AWS Price List for Lambda, one file per Region (about 0.7 MB, no AWS credentials needed)
+PRICE_LIST = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSLambda/current/{region}/index.json"
+# Usage type, after any Region prefix such as "EU-" or "USE2-" -> RATES key. {arch} is "-ARM" for Graviton, "" for x86.
+USAGE = {
+    "vCPU-Second{arch}": "vcpu_second",
+    "Memory-GB-Second{arch}": "gb_second",
+    "Snapshot-Write-GB": "snapshot_write_gb",
+    "Snapshot-Read-GB": "snapshot_read_gb",
+    "Snapshot-Storage-GB-Hour": "storage_gb_month",  # priced per GB-hour; converted to a 720-hour month below
+}
+
+
+def rates_from_price_list(doc: dict, arch: str = "arm") -> dict:
+    """The five MicroVM rates from an AWS Price List offer file (AWSLambda, one Region)."""
+    want = {k.format(arch="-ARM" if arch == "arm" else ""): v for k, v in USAGE.items()}
+    r = {}
+    for sku, prod in doc["products"].items():
+        m = re.search(r"(?:^|-)Lambda-MicroVM-(.+)$", prod.get("attributes", {}).get("usagetype", ""))
+        if not m or m.group(1) not in want:
+            continue
+        dims = [d for t in doc["terms"]["OnDemand"].get(sku, {}).values() for d in t["priceDimensions"].values()]
+        if len(dims) != 1:
+            raise ValueError(f"{m.group(0)}: expected one price, found {len(dims)}")
+        key, usd = want[m.group(1)], float(dims[0]["pricePerUnit"]["USD"])
+        if key in r and r[key] != usd:
+            raise ValueError(f"{m.group(0)}: two different prices, {r[key]} and {usd}")
+        r[key] = usd
+    missing = [k for k in want.values() if k not in r]
+    if missing:
+        raise ValueError("no MicroVM rate for " + ", ".join(missing))
+    r["storage_gb_month"] *= HOURS_PER_MONTH
+    return r
+
+
+def live_rates(region: str, arch: str) -> tuple[dict, str]:
+    """Download the current rates for one Region and architecture. Returns the rates and a line naming the source."""
+    try:
+        with urllib.request.urlopen(PRICE_LIST.format(region=region), timeout=60) as resp:
+            doc = json.load(resp)
+    except urllib.error.HTTPError as e:
+        sys.exit(f"no Lambda price list for Region {region!r} (HTTP {e.code}); use a Region code such as eu-west-1")
+    except (urllib.error.URLError, TimeoutError) as e:
+        sys.exit(f"couldn't download the AWS Price List ({e}); offline, use --rates page or --rates price-list")
+    try:
+        r = rates_from_price_list(doc, arch)
+    except ValueError as e:
+        sys.exit(f"{region}: {e}. MicroVMs may not be offered in this Region.")
+    name = "Graviton (ARM)" if arch == "arm" else "x86"
+    return r, f"Rates: AWS Price List for {region}, {name}, published {doc.get('publicationDate', 'unknown')[:10]}"
 
 
 def vcpus(gb: float) -> float:
@@ -212,7 +268,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("scenario", type=Path, help="scenario JSON file")
     ap.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a scenario field")
-    ap.add_argument("--rates", choices=RATES, default="page", help="page (default) or price-list")
+    ap.add_argument("--rates", choices=[*RATES, "live"], default="page",
+                    help="page (default): the pricing page's rounded rates, as in AWS's examples; price-list: the "
+                         "unrounded rates the bill charges; live: download the current AWS Price List")
+    ap.add_argument("--region", default="us-east-1", help="with --rates live: the Region to price (default us-east-1)")
+    ap.add_argument("--arch", choices=["arm", "x86"], default="arm", help="with --rates live: arm (default) or x86")
     ap.add_argument("--steps", action="store_true", help="also show the build-up from one MicroVM")
     ap.add_argument("--json", action="store_true", help="print the line items as JSON")
     a = ap.parse_args()
@@ -224,7 +284,13 @@ def main() -> None:
         sc[k] = coerce(v)
     for w in check(sc):
         print(f"warning: {w}", file=sys.stderr)
-    r = RATES[a.rates]
+    if a.rates == "live":
+        r, source = live_rates(a.region, a.arch)
+        print(source, file=sys.stderr if a.json else sys.stdout)
+    elif a.region != "us-east-1" or a.arch != "arm":
+        sys.exit("--region and --arch need --rates live; the built-in rates are us-east-1, Graviton (ARM)")
+    else:
+        r = RATES[a.rates]
     e = estimate(sc, r)
     if a.json:
         print(json.dumps({k: round(v, 6) for k, v in e.items()}, indent=1))
