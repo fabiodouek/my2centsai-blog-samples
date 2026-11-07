@@ -40,6 +40,12 @@ Part 6. Stress tests for the part 2 cluster: density with and without the egress
 
 Blog post: [OpenSandbox on Amazon EKS: Stress Testing Two Nodes](https://my2cents.ai/deep-dive/opensandbox-stress)
 
+### [lambda-microvm-pricing](./lambda-microvm-pricing)
+
+A calculator that reproduces the two AWS Lambda MicroVMs pricing examples to the cent, builds them up step by step from a single MicroVM (`--steps`), and takes your own numbers. `bill.py` prints your actual MicroVM usage and effective rates from Cost Explorer.
+
+Blog post: [AWS Lambda MicroVMs Pricing, Explained](https://my2cents.ai/deep-dive/lambda-microvms-pricing)
+
 ### [lambda-microvm-workspace](./lambda-microvm-workspace)
 
 A deployed browser workspace on AWS Lambda MicroVMs: sign in with Cognito, create a sandbox and get a terminal with Claude Code ready to run. Every sandbox reaches the internet only through part 2's iron-proxy, in transparent mode. Panels show the proxy feed, credential use with a Revoke button, Claude Code's tokens and cost, vitals and DNS lookups. Admins change the shared proxy policy from the browser: the allowlist, injected credentials, and which of four IAM roles (plus an optional session policy) signs sandbox AWS calls. Terraform for CloudFront, Cognito, the ALB, the API on ECS Fargate and DynamoDB, a FastAPI backend and a React frontend.

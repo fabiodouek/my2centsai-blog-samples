@@ -1,0 +1,12 @@
+[project]
+name = "lambda-microvm-pricing"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai post AWS Lambda MicroVMs Pricing, Explained"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+bill = ["boto3>=1.43"]
+
+[tool.setuptools]
+py-modules = ["microvm_cost", "bill"]
