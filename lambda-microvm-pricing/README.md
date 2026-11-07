@@ -4,6 +4,8 @@ A small calculator that rebuilds the two [AWS Lambda MicroVMs pricing examples](
 
 Companion code for [AWS Lambda MicroVMs Pricing, Explained](https://my2cents.ai/deep-dive/lambda-microvms-pricing).
 
+Video walkthrough: https://youtu.be/s3k7A1qLJx0
+
 ## Requirements
 
 - Python 3.11+. `microvm_cost.py` uses the standard library only.
