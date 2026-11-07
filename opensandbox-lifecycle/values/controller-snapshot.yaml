@@ -1,0 +1,23 @@
+# Pause and resume for the controller release (opensandbox-controller). 00_snapshot_config.sh
+# passes this file after ../opensandbox-eks/values/controller.yaml and fills in ${ECR_REGISTRY}
+# and ${ECR_PREFIX} from env.sh. Helm merges the two maps, so controller.snapshot.imageCommitterImage
+# (the commit Job's image, in ECR) still comes from part 2's file.
+#
+# Pause commits each container's root filesystem to an image and pushes it here; resume starts
+# the sandbox again from that image. The settings live on the controller, not the server: SDK
+# callers just call pause() and resume().
+controller:
+  snapshot:
+    # The registry prefix. Every snapshot goes to this one ECR repository...
+    registry: ${ECR_REGISTRY}/${ECR_PREFIX}/snapshots
+    # ...because the template puts the sandbox and container names in the tag, for example
+    # opensandbox-eks/snapshots:<sandbox id>-sandbox-snap-gen2 (the number is the BatchSandbox's
+    # generation, so a server-created sandbox's first pause is gen2). The default template,
+    # {{.Registry}}/{{.SandboxName}}-{{.ContainerName}}:{{.SnapshotTag}}, makes one repository per
+    # sandbox. Helm passes the value through as is; the controller renders it per snapshot.
+    imageURITemplate: "{{.Registry}}:{{.SandboxName}}-{{.ContainerName}}-{{.SnapshotTag}}"
+    # A kubernetes.io/dockerconfigjson Secret in the sandbox namespace (opensandbox): the commit
+    # Job mounts it to push, and resumed pods get it as an imagePullSecret. It holds an ECR token,
+    # which expires after 12 hours; 00_snapshot_config.sh writes a fresh one.
+    snapshotPushSecret: opensandbox-snapshot-ecr
+    resumePullSecret: opensandbox-snapshot-ecr

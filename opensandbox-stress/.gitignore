@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+# full command output: Terraform, Helm, server_config.py, the load generators (may name the
+# account, the endpoint's /32 or a node's IP)
+logs/
+# results/ and charts/ are kept: results are written anonymized (node-a/node-b, <registry>,
+# no IPs; measure.save() refuses anything else) and the charts are drawn from them
+.ruff_cache/
+# measure.save() writes results/.<name>.json.partial, then renames it: a crash can leave one
+results/.*.partial

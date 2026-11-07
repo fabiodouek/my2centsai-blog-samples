@@ -1,0 +1,73 @@
+# Values for the server chart (release opensandbox-server). 04_install.sh fills in
+# ${ECR_REGISTRY} and ${ECR_PREFIX} from env.sh before Helm reads this file, and adds
+# values/server-gateway.yaml (written by 05_gateway.sh) when it exists.
+server:
+  image:
+    repository: ${ECR_REGISTRY}/${ECR_PREFIX}/server
+    tag: release-1.2.0
+
+  # The chart asks for 1 CPU / 4 GiB (limits 2 / 8 GiB). These are the values the release's
+  # own Helm smoke test uses (manifests/release/smoke-helm-release.sh).
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+
+  # The API key, from the Secret 04_install.sh creates from OSB_API_KEY in .env. The chart's
+  # default config.toml has api_key = "", and without a key the server stops at startup:
+  # "Startup blocked: server.api_key is empty in non-interactive mode".
+  env:
+    - name: OPENSANDBOX_SERVER_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: opensandbox-server-auth
+          key: api-key
+
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: opensandbox-server-data
+    - name: batchsandbox-template
+      configMap:
+        name: opensandbox-batchsandbox-template
+  volumeMounts:
+    - name: data
+      mountPath: /data
+    - name: batchsandbox-template
+      mountPath: /etc/opensandbox-custom
+      readOnly: true
+
+# The server's config.toml. The chart renders it into a ConfigMap and appends the [ingress]
+# section from server.gateway. Changes from the chart default: no api_key line (the key comes
+# from OPENSANDBOX_SERVER_API_KEY above), the two images point at ECR, our BatchSandbox
+# template, and a [store] on the PVC (the chart has none, so SQLite would sit in the container).
+configToml: |
+  [server]
+  host = "0.0.0.0"
+  port = 80
+
+  [log]
+  level = "INFO"
+
+  [runtime]
+  type = "kubernetes"
+  execd_image = "${ECR_REGISTRY}/${ECR_PREFIX}/execd:release-1.2.0"
+
+  [kubernetes]
+  kubeconfig_path = ""
+  namespace = "opensandbox"
+  informer_resync_seconds = 300
+  informer_watch_timeout_seconds = 60
+  workload_provider = "batchsandbox"
+  batchsandbox_template_file = "/etc/opensandbox-custom/batchsandbox-template.yaml"
+
+  [egress]
+  image = "${ECR_REGISTRY}/${ECR_PREFIX}/egress:release-1.2.0"
+  mode = "dns+nft"
+
+  [store]
+  type = "sqlite"
+  path = "/data/opensandbox.db"

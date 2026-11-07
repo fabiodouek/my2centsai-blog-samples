@@ -1,0 +1,8 @@
+# Appended to the lifecycle server's config.toml by ./server_config.py --runtime kata-qemu
+# (./switch_runtime.sh kata). Every sandbox pod then gets runtimeClassName: kata-qemu: its own
+# QEMU virtual machine with its own guest kernel (Kata 3.32.0, installed by part 2's 02_kata.sh).
+# One server process has one [secure_runtime]; a create request cannot choose its runtime, and
+# Pool pods ignore it (a Pool sets runtimeClassName in its own template).
+[secure_runtime]
+type = "kata"
+k8s_runtime_class = "kata-qemu"

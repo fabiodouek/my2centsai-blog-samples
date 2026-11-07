@@ -1,0 +1,47 @@
+# From console/k8s/console-web-deployment.example.yaml, with the image from ECR (06_console.sh
+# fills in ${ECR_REGISTRY}, ${ECR_PREFIX} and ${WEB_DIGEST}). nginx proxies /api to the BFF Service.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensandbox-console-web
+  namespace: opensandbox-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensandbox-console-web
+  template:
+    metadata:
+      labels:
+        app: opensandbox-console-web
+    spec:
+      # nginx serves static files and proxies to the BFF; it never calls the Kubernetes API.
+      automountServiceAccountToken: false
+      containers:
+        - name: web
+          # By digest, so a node never runs a stale image cached under the same tag.
+          image: ${ECR_REGISTRY}/${ECR_PREFIX}/console-web@${WEB_DIGEST}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensandbox-console-web
+  namespace: opensandbox-system
+spec:
+  selector:
+    app: opensandbox-console-web
+  ports:
+    - port: 80
+      targetPort: 8080

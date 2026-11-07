@@ -1,0 +1,4360 @@
+{
+ "shape": {
+  "cpu": "100m",
+  "memory": "128Mi"
+ },
+ "batch": 10,
+ "max": 200,
+ "runs_per_mode": 3,
+ "modes": {
+  "runc": {
+   "ceiling": {
+    "median": 89,
+    "min": 89,
+    "max": 89,
+    "spread": 0,
+    "spread_pct": 0.0,
+    "runs": [
+     89,
+     89,
+     89
+    ]
+   },
+   "valid_runs": 3,
+   "invalid_runs": [],
+   "limit": "pods",
+   "limits": [
+    "pods",
+    "pods",
+    "pods"
+   ],
+   "sandbox_mem_mib": {
+    "median": 5.7,
+    "min": 5.7,
+    "max": 5.8,
+    "spread": 0.1,
+    "spread_pct": 1.8,
+    "runs": [
+     5.7,
+     5.8,
+     5.7
+    ]
+   },
+   "sandbox_rss_mib": {
+    "median": 4.4,
+    "min": 4.4,
+    "max": 4.4,
+    "spread": 0.0,
+    "spread_pct": 0.0,
+    "runs": [
+     4.4,
+     4.4,
+     4.4
+    ]
+   },
+   "sidecar_rss_mib": {
+    "median": null,
+    "min": null,
+    "max": null,
+    "spread": null,
+    "spread_pct": null,
+    "runs": [
+     null,
+     null,
+     null
+    ]
+   },
+   "outside_containers_mib": {
+    "median": 0.6,
+    "min": 0.6,
+    "max": 0.6,
+    "spread": 0.0,
+    "spread_pct": 0.0,
+    "runs": [
+     0.6,
+     0.6,
+     0.6
+    ]
+   },
+   "node_growth_mib": {
+    "median": 12.6,
+    "min": 11.5,
+    "max": 14.8,
+    "spread": 3.3,
+    "spread_pct": 26.2,
+    "runs": [
+     14.8,
+     12.6,
+     11.5
+    ]
+   },
+   "node_growth_span": [
+    70,
+    70,
+    70
+   ],
+   "runs": [
+    {
+     "mode": "runc",
+     "run": 1,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 7,
+        "node-b": 3
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 378.3,
+         "mem_mib": 2271.4
+        },
+        "node-b": {
+         "cpu_m": 213.5,
+         "mem_mib": 2165.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 18,
+         "pods_max": 58,
+         "cpu_pct": 20.1,
+         "mem_pct": 6.4
+        },
+        "node-b": {
+         "pods": 19,
+         "pods_max": 58,
+         "cpu_pct": 16.1,
+         "mem_pct": 4.9
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.2,
+       "batch": 1,
+       "created_ms": [
+        4195,
+        6286,
+        4201,
+        6078,
+        4208,
+        6367,
+        6235,
+        6042,
+        6176,
+        6137
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 296.6,
+         "mem_mib": 2348.1
+        },
+        "node-b": {
+         "cpu_m": 78.8,
+         "mem_mib": 2165.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 4.6,
+       "sandbox_rss_mib": 3.2,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 2,
+       "created_ms": [
+        2669,
+        2669,
+        2542,
+        2582,
+        2737,
+        2632,
+        2730,
+        2547,
+        2729,
+        3356
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 17,
+        "node-b": 13
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 354.3,
+         "mem_mib": 2421.9
+        },
+        "node-b": {
+         "cpu_m": 285.3,
+         "mem_mib": 2295.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 28,
+         "pods_max": 58,
+         "cpu_pct": 32.7,
+         "mem_pct": 10.6
+        },
+        "node-b": {
+         "pods": 29,
+         "pods_max": 58,
+         "cpu_pct": 28.8,
+         "mem_pct": 9.1
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 4.5,
+       "sandbox_rss_mib": 3.2,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 3,
+       "created_ms": [
+        2251,
+        3193,
+        3052,
+        3064,
+        3054,
+        2972,
+        3198,
+        3222,
+        2991,
+        2492
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 22,
+        "node-b": 18
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 293.4,
+         "mem_mib": 2485.9
+        },
+        "node-b": {
+         "cpu_m": 335.1,
+         "mem_mib": 2380.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 33,
+         "pods_max": 58,
+         "cpu_pct": 39.1,
+         "mem_pct": 12.7
+        },
+        "node-b": {
+         "pods": 34,
+         "pods_max": 58,
+         "cpu_pct": 35.1,
+         "mem_pct": 11.2
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 4.6,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 4,
+       "created_ms": [
+        2791,
+        3014,
+        2695,
+        3052,
+        2998,
+        2791,
+        2987,
+        3013,
+        2791,
+        2730
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 26,
+        "node-b": 24
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 321.1,
+         "mem_mib": 2562.1
+        },
+        "node-b": {
+         "cpu_m": 139.6,
+         "mem_mib": 2378.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 37,
+         "pods_max": 58,
+         "cpu_pct": 44.1,
+         "mem_pct": 14.4
+        },
+        "node-b": {
+         "pods": 40,
+         "pods_max": 58,
+         "cpu_pct": 42.7,
+         "mem_pct": 13.7
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 4.8,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.3,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        3947,
+        3856,
+        2524,
+        3900,
+        2559,
+        3924,
+        3842,
+        2549,
+        3956,
+        2360
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 33,
+        "node-b": 27
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 415.9,
+         "mem_mib": 2672.8
+        },
+        "node-b": {
+         "cpu_m": 239.2,
+         "mem_mib": 2484.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 44,
+         "pods_max": 58,
+         "cpu_pct": 53.0,
+         "mem_pct": 17.3
+        },
+        "node-b": {
+         "pods": 43,
+         "pods_max": 58,
+         "cpu_pct": 46.5,
+         "mem_pct": 14.9
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        3720,
+        4341,
+        2841,
+        3643,
+        3674,
+        2770,
+        3655,
+        4357,
+        4332,
+        2771
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 38,
+        "node-b": 32
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 334.8,
+         "mem_mib": 2743.9
+        },
+        "node-b": {
+         "cpu_m": 134.6,
+         "mem_mib": 2522.4
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 49,
+         "pods_max": 58,
+         "cpu_pct": 59.3,
+         "mem_pct": 19.4
+        },
+        "node-b": {
+         "pods": 48,
+         "pods_max": 58,
+         "cpu_pct": 52.8,
+         "mem_pct": 17.0
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 5.0,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.3,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        2806,
+        3685,
+        2876,
+        3663,
+        2972,
+        2835,
+        3031,
+        2996,
+        2959,
+        3049
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 42,
+        "node-b": 38
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 315.5,
+         "mem_mib": 2818.9
+        },
+        "node-b": {
+         "cpu_m": 402.9,
+         "mem_mib": 2650.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 53,
+         "pods_max": 58,
+         "cpu_pct": 64.3,
+         "mem_pct": 21.1
+        },
+        "node-b": {
+         "pods": 54,
+         "pods_max": 58,
+         "cpu_pct": 60.4,
+         "mem_pct": 19.5
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 5.3,
+       "sandbox_rss_mib": 4.0,
+       "main_mem_mib": 4.4,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        3130,
+        2955,
+        3116,
+        3948,
+        3019,
+        3156,
+        3114,
+        3102,
+        3919,
+        3137
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 140.4,
+         "mem_mib": 2922.3
+        },
+        "node-b": {
+         "cpu_m": 130.4,
+         "mem_mib": 2723.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 5.6,
+       "sandbox_rss_mib": 4.3,
+       "main_mem_mib": 5.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        2600,
+        2702,
+        3332,
+        2704,
+        2713,
+        2604,
+        2695,
+        3368,
+        2604
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 151.2,
+        "mem_mib": 2929.2
+       },
+       "node-b": {
+        "cpu_m": 201.8,
+        "mem_mib": 2757.5
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 5.7,
+      "sandbox_rss_mib": 4.4,
+      "main_mem_mib": 5.1,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": 0.6
+     }
+    },
+    {
+     "mode": "runc",
+     "run": 2,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 7,
+        "node-b": 3
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 261.5,
+         "mem_mib": 2383.2
+        },
+        "node-b": {
+         "cpu_m": 118.7,
+         "mem_mib": 2233.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 18,
+         "pods_max": 58,
+         "cpu_pct": 20.1,
+         "mem_pct": 6.4
+        },
+        "node-b": {
+         "pods": 19,
+         "pods_max": 58,
+         "cpu_pct": 16.1,
+         "mem_pct": 4.9
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.2,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 1,
+       "created_ms": [
+        2223,
+        16996,
+        14102,
+        16084,
+        2232,
+        13360,
+        14136,
+        3128,
+        14079,
+        3129
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 349.3,
+         "mem_mib": 2455.3
+        },
+        "node-b": {
+         "cpu_m": 116.7,
+         "mem_mib": 2246.0
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 2.2,
+       "sandbox_rss_mib": 1.6,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -1.8,
+       "batch": 2,
+       "created_ms": [
+        2944,
+        2917,
+        3130,
+        3116,
+        3768,
+        2923,
+        3806,
+        3126,
+        3089,
+        3116
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 17,
+        "node-b": 13
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 365.2,
+         "mem_mib": 2513.1
+        },
+        "node-b": {
+         "cpu_m": 429.0,
+         "mem_mib": 2344.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 28,
+         "pods_max": 58,
+         "cpu_pct": 32.7,
+         "mem_pct": 10.6
+        },
+        "node-b": {
+         "pods": 29,
+         "pods_max": 58,
+         "cpu_pct": 28.8,
+         "mem_pct": 9.1
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 4.6,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 3,
+       "created_ms": [
+        2788,
+        2855,
+        2994,
+        2904,
+        2895,
+        2816,
+        2833,
+        3520,
+        2929,
+        2993
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 22,
+        "node-b": 18
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 368.1,
+         "mem_mib": 2563.2
+        },
+        "node-b": {
+         "cpu_m": 255.3,
+         "mem_mib": 2405.0
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 33,
+         "pods_max": 58,
+         "cpu_pct": 39.1,
+         "mem_pct": 12.7
+        },
+        "node-b": {
+         "pods": 34,
+         "pods_max": 58,
+         "cpu_pct": 35.1,
+         "mem_pct": 11.2
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 4,
+       "created_ms": [
+        2657,
+        3191,
+        3124,
+        2647,
+        3206,
+        3164,
+        2643,
+        3377,
+        3151,
+        3397
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 26,
+        "node-b": 24
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 266.4,
+         "mem_mib": 2630.1
+        },
+        "node-b": {
+         "cpu_m": 168.5,
+         "mem_mib": 2410.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 37,
+         "pods_max": 58,
+         "cpu_pct": 44.1,
+         "mem_pct": 14.4
+        },
+        "node-b": {
+         "pods": 40,
+         "pods_max": 58,
+         "cpu_pct": 42.7,
+         "mem_pct": 13.7
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        2620,
+        3079,
+        3948,
+        2971,
+        2712,
+        2977,
+        4023,
+        3974,
+        2639,
+        2609
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 33,
+        "node-b": 27
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 453.9,
+         "mem_mib": 2714.7
+        },
+        "node-b": {
+         "cpu_m": 296.0,
+         "mem_mib": 2524.4
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 44,
+         "pods_max": 58,
+         "cpu_pct": 53.0,
+         "mem_pct": 17.3
+        },
+        "node-b": {
+         "pods": 43,
+         "pods_max": 58,
+         "cpu_pct": 46.5,
+         "mem_pct": 14.9
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 4.8,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.3,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        3498,
+        2612,
+        4366,
+        2632,
+        3471,
+        4458,
+        2606,
+        3426,
+        3422,
+        4442
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 38,
+        "node-b": 32
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 315.0,
+         "mem_mib": 2770.8
+        },
+        "node-b": {
+         "cpu_m": 109.6,
+         "mem_mib": 2544.0
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 49,
+         "pods_max": 58,
+         "cpu_pct": 59.3,
+         "mem_pct": 19.4
+        },
+        "node-b": {
+         "pods": 48,
+         "pods_max": 58,
+         "cpu_pct": 52.8,
+         "mem_pct": 17.0
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 5.4,
+       "sandbox_rss_mib": 4.1,
+       "main_mem_mib": 4.7,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        2856,
+        2854,
+        3561,
+        2688,
+        2837,
+        3724,
+        3627,
+        2896,
+        3646,
+        2863
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 42,
+        "node-b": 38
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 372.8,
+         "mem_mib": 2832.4
+        },
+        "node-b": {
+         "cpu_m": 329.8,
+         "mem_mib": 2669.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 53,
+         "pods_max": 58,
+         "cpu_pct": 64.3,
+         "mem_pct": 21.1
+        },
+        "node-b": {
+         "pods": 54,
+         "pods_max": 58,
+         "cpu_pct": 60.4,
+         "mem_pct": 19.5
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 5.4,
+       "sandbox_rss_mib": 4.1,
+       "main_mem_mib": 4.8,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        3385,
+        3400,
+        3729,
+        3419,
+        2964,
+        3746,
+        3058,
+        2506,
+        3064,
+        3069
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 166.2,
+         "mem_mib": 2922.5
+        },
+        "node-b": {
+         "cpu_m": 133.4,
+         "mem_mib": 2755.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 5.6,
+       "sandbox_rss_mib": 4.3,
+       "main_mem_mib": 5.1,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        2761,
+        2687,
+        2783,
+        3353,
+        3342,
+        2783,
+        2687,
+        2783,
+        2691
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 158.4,
+        "mem_mib": 2946.3
+       },
+       "node-b": {
+        "cpu_m": 128.5,
+        "mem_mib": 2758.8
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 5.8,
+      "sandbox_rss_mib": 4.4,
+      "main_mem_mib": 5.1,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": 0.6
+     }
+    },
+    {
+     "mode": "runc",
+     "run": 3,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 7,
+        "node-b": 3
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 290.6,
+         "mem_mib": 2427.0
+        },
+        "node-b": {
+         "cpu_m": 290.4,
+         "mem_mib": 2262.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 18,
+         "pods_max": 58,
+         "cpu_pct": 20.1,
+         "mem_pct": 6.4
+        },
+        "node-b": {
+         "pods": 19,
+         "pods_max": 58,
+         "cpu_pct": 16.1,
+         "mem_pct": 4.9
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 4.6,
+       "sandbox_rss_mib": 3.2,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 1,
+       "created_ms": [
+        17552,
+        2696,
+        2695,
+        16370,
+        2821,
+        16672,
+        2829,
+        16351,
+        16437,
+        17596
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 418.4,
+         "mem_mib": 2465.6
+        },
+        "node-b": {
+         "cpu_m": 62.9,
+         "mem_mib": 2247.0
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 3.9,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -3.8,
+       "batch": 2,
+       "created_ms": [
+        2612,
+        2980,
+        2932,
+        2598,
+        3190,
+        2951,
+        3217,
+        2549,
+        2940,
+        3013
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 17,
+        "node-b": 13
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 154.7,
+         "mem_mib": 2477.7
+        },
+        "node-b": {
+         "cpu_m": 287.1,
+         "mem_mib": 2375.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 28,
+         "pods_max": 58,
+         "cpu_pct": 32.7,
+         "mem_pct": 10.6
+        },
+        "node-b": {
+         "pods": 29,
+         "pods_max": 58,
+         "cpu_pct": 28.8,
+         "mem_pct": 9.1
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 4.6,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 3,
+       "created_ms": [
+        3549,
+        2964,
+        2897,
+        2931,
+        2674,
+        2930,
+        2678,
+        2922,
+        2679,
+        3529
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 22,
+        "node-b": 18
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 348.2,
+         "mem_mib": 2584.1
+        },
+        "node-b": {
+         "cpu_m": 207.4,
+         "mem_mib": 2475.5
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 33,
+         "pods_max": 58,
+         "cpu_pct": 39.1,
+         "mem_pct": 12.7
+        },
+        "node-b": {
+         "pods": 34,
+         "pods_max": 58,
+         "cpu_pct": 35.1,
+         "mem_pct": 11.2
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.1,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.5,
+       "batch": 4,
+       "created_ms": [
+        3008,
+        2986,
+        2984,
+        3012,
+        2314,
+        2241,
+        3265,
+        2238,
+        3059,
+        2250
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 27,
+        "node-b": 23
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 274.3,
+         "mem_mib": 2649.6
+        },
+        "node-b": {
+         "cpu_m": 276.0,
+         "mem_mib": 2440.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 38,
+         "pods_max": 58,
+         "cpu_pct": 45.4,
+         "mem_pct": 14.8
+        },
+        "node-b": {
+         "pods": 39,
+         "pods_max": 58,
+         "cpu_pct": 41.4,
+         "mem_pct": 13.3
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 4.7,
+       "sandbox_rss_mib": 3.3,
+       "main_mem_mib": 4.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        2491,
+        2985,
+        2812,
+        3571,
+        2848,
+        2955,
+        2998,
+        2805,
+        2948,
+        2959
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 33,
+        "node-b": 27
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 254.1,
+         "mem_mib": 2653.9
+        },
+        "node-b": {
+         "cpu_m": 278.9,
+         "mem_mib": 2548.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 44,
+         "pods_max": 58,
+         "cpu_pct": 53.0,
+         "mem_pct": 17.3
+        },
+        "node-b": {
+         "pods": 43,
+         "pods_max": 58,
+         "cpu_pct": 46.5,
+         "mem_pct": 14.9
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 4.8,
+       "sandbox_rss_mib": 3.4,
+       "main_mem_mib": 4.1,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        3179,
+        3209,
+        3771,
+        2051,
+        3160,
+        3824,
+        2084,
+        3157,
+        2077,
+        3853
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 38,
+        "node-b": 32
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 347.9,
+         "mem_mib": 2808.5
+        },
+        "node-b": {
+         "cpu_m": 110.6,
+         "mem_mib": 2548.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 49,
+         "pods_max": 58,
+         "cpu_pct": 59.3,
+         "mem_pct": 19.4
+        },
+        "node-b": {
+         "pods": 48,
+         "pods_max": 58,
+         "cpu_pct": 52.8,
+         "mem_pct": 17.0
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 5.2,
+       "sandbox_rss_mib": 3.8,
+       "main_mem_mib": 4.7,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        3825,
+        2797,
+        3119,
+        3166,
+        3096,
+        2857,
+        3061,
+        3760,
+        3807,
+        3175
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 42,
+        "node-b": 38
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 187.2,
+         "mem_mib": 2806.8
+        },
+        "node-b": {
+         "cpu_m": 431.4,
+         "mem_mib": 2689.3
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 53,
+         "pods_max": 58,
+         "cpu_pct": 64.3,
+         "mem_pct": 21.1
+        },
+        "node-b": {
+         "pods": 54,
+         "pods_max": 58,
+         "cpu_pct": 60.4,
+         "mem_pct": 19.5
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 5.5,
+       "sandbox_rss_mib": 4.1,
+       "main_mem_mib": 4.8,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        3042,
+        2660,
+        2987,
+        2639,
+        3014,
+        2620,
+        3008,
+        2712,
+        2989,
+        2961
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 0.0,
+         "mem_mib": 2936.0
+        },
+        "node-b": {
+         "cpu_m": 134.5,
+         "mem_mib": 2747.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 5.6,
+       "sandbox_rss_mib": 4.3,
+       "main_mem_mib": 5.0,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        2741,
+        3269,
+        2668,
+        2761,
+        2656,
+        2712,
+        3278,
+        2766,
+        2679
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 158.4,
+        "mem_mib": 2955.9
+       },
+       "node-b": {
+        "cpu_m": 196.2,
+        "mem_mib": 2772.8
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 5.7,
+      "sandbox_rss_mib": 4.4,
+      "main_mem_mib": 5.1,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": 0.6
+     }
+    }
+   ]
+  },
+  "runc-egress": {
+   "ceiling": {
+    "median": 89,
+    "min": 89,
+    "max": 89,
+    "spread": 0,
+    "spread_pct": 0.0,
+    "runs": [
+     89,
+     89,
+     89
+    ]
+   },
+   "valid_runs": 3,
+   "invalid_runs": [],
+   "limit": "pods",
+   "limits": [
+    "pods",
+    "pods",
+    "pods"
+   ],
+   "sandbox_mem_mib": {
+    "median": 69.0,
+    "min": 69.0,
+    "max": 69.1,
+    "spread": 0.1,
+    "spread_pct": 0.1,
+    "runs": [
+     69.0,
+     69.0,
+     69.1
+    ]
+   },
+   "sandbox_rss_mib": {
+    "median": 63.5,
+    "min": 63.5,
+    "max": 63.5,
+    "spread": 0.0,
+    "spread_pct": 0.0,
+    "runs": [
+     63.5,
+     63.5,
+     63.5
+    ]
+   },
+   "sidecar_rss_mib": {
+    "median": 58.9,
+    "min": 58.9,
+    "max": 59.0,
+    "spread": 0.1,
+    "spread_pct": 0.2,
+    "runs": [
+     59.0,
+     58.9,
+     58.9
+    ]
+   },
+   "outside_containers_mib": {
+    "median": 0.6,
+    "min": 0.6,
+    "max": 0.6,
+    "spread": 0.0,
+    "spread_pct": 0.0,
+    "runs": [
+     0.6,
+     0.6,
+     0.6
+    ]
+   },
+   "node_growth_mib": {
+    "median": 72.2,
+    "min": 72.0,
+    "max": 72.6,
+    "spread": 0.6,
+    "spread_pct": 0.8,
+    "runs": [
+     72.6,
+     72.2,
+     72.0
+    ]
+   },
+   "node_growth_span": [
+    70,
+    70,
+    70
+   ],
+   "runs": [
+    {
+     "mode": "runc-egress",
+     "run": 1,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 6,
+        "node-b": 4
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 300.4,
+         "mem_mib": 2758.8
+        },
+        "node-b": {
+         "cpu_m": 503.8,
+         "mem_mib": 2509.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 18.8,
+         "mem_pct": 6.0
+        },
+        "node-b": {
+         "pods": 20,
+         "pods_max": 58,
+         "cpu_pct": 17.4,
+         "mem_pct": 5.3
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 67.3,
+       "sandbox_rss_mib": 61.1,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.9,
+       "batch": 1,
+       "created_ms": [
+        12124,
+        25531,
+        12072,
+        12743,
+        29779,
+        25985,
+        26793,
+        12659,
+        23725,
+        27909
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1399.1,
+         "mem_mib": 3165.8
+        },
+        "node-b": {
+         "cpu_m": 342.9,
+         "mem_mib": 2788.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 66.7,
+       "sandbox_rss_mib": 61.2,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.6,
+       "batch": 2,
+       "created_ms": [
+        12576,
+        12783,
+        13209,
+        12130,
+        12571,
+        12841,
+        13779,
+        13644,
+        13799,
+        13551
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 16,
+        "node-b": 14
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 927.6,
+         "mem_mib": 3450.7
+        },
+        "node-b": {
+         "cpu_m": 1572.8,
+         "mem_mib": 3209.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 27,
+         "pods_max": 58,
+         "cpu_pct": 31.5,
+         "mem_pct": 10.2
+        },
+        "node-b": {
+         "pods": 30,
+         "pods_max": 58,
+         "cpu_pct": 30.0,
+         "mem_pct": 9.5
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 66.6,
+       "sandbox_rss_mib": 61.2,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.6,
+       "batch": 3,
+       "created_ms": [
+        13264,
+        13039,
+        13459,
+        13721,
+        12271,
+        13533,
+        13007,
+        12745,
+        13255,
+        13015
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 21,
+        "node-b": 19
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1272.0,
+         "mem_mib": 3829.4
+        },
+        "node-b": {
+         "cpu_m": 1242.8,
+         "mem_mib": 3566.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 32,
+         "pods_max": 58,
+         "cpu_pct": 37.8,
+         "mem_pct": 12.3
+        },
+        "node-b": {
+         "pods": 35,
+         "pods_max": 58,
+         "cpu_pct": 36.3,
+         "mem_pct": 11.6
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 67.0,
+       "sandbox_rss_mib": 61.5,
+       "main_mem_mib": 5.1,
+       "sidecar_rss_mib": 57.9,
+       "outside_containers_mib": 0.5,
+       "batch": 4,
+       "created_ms": [
+        12671,
+        13508,
+        12910,
+        13256,
+        12810,
+        13010,
+        13211,
+        13105,
+        13210,
+        12623
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 26,
+        "node-b": 24
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1506.9,
+         "mem_mib": 4181.2
+        },
+        "node-b": {
+         "cpu_m": 492.5,
+         "mem_mib": 3938.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 37,
+         "pods_max": 58,
+         "cpu_pct": 44.1,
+         "mem_pct": 14.4
+        },
+        "node-b": {
+         "pods": 40,
+         "pods_max": 58,
+         "cpu_pct": 42.7,
+         "mem_pct": 13.7
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 67.3,
+       "sandbox_rss_mib": 62.0,
+       "main_mem_mib": 5.3,
+       "sidecar_rss_mib": 57.9,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        13382,
+        13300,
+        12952,
+        13064,
+        12354,
+        13041,
+        12280,
+        12832,
+        12554,
+        12065
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 31,
+        "node-b": 29
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 646.0,
+         "mem_mib": 4552.9
+        },
+        "node-b": {
+         "cpu_m": 1186.9,
+         "mem_mib": 4296.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 42,
+         "pods_max": 58,
+         "cpu_pct": 50.4,
+         "mem_pct": 16.5
+        },
+        "node-b": {
+         "pods": 45,
+         "pods_max": 58,
+         "cpu_pct": 49.0,
+         "mem_pct": 15.8
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 67.6,
+       "sandbox_rss_mib": 62.2,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        13090,
+        14269,
+        14068,
+        14282,
+        11930,
+        14192,
+        14547,
+        12972,
+        13893,
+        13411
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 36,
+        "node-b": 34
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1471.8,
+         "mem_mib": 4913.9
+        },
+        "node-b": {
+         "cpu_m": 421.1,
+         "mem_mib": 4670.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 47,
+         "pods_max": 58,
+         "cpu_pct": 56.8,
+         "mem_pct": 18.6
+        },
+        "node-b": {
+         "pods": 50,
+         "pods_max": 58,
+         "cpu_pct": 55.3,
+         "mem_pct": 17.9
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 67.8,
+       "sandbox_rss_mib": 62.3,
+       "main_mem_mib": 5.5,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        12368,
+        12382,
+        12757,
+        12549,
+        13111,
+        12486,
+        12761,
+        12748,
+        13034,
+        13367
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 40,
+        "node-b": 40
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 507.2,
+         "mem_mib": 5239.6
+        },
+        "node-b": {
+         "cpu_m": 1478.3,
+         "mem_mib": 5111.9
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 51,
+         "pods_max": 58,
+         "cpu_pct": 61.8,
+         "mem_pct": 20.2
+        },
+        "node-b": {
+         "pods": 56,
+         "pods_max": 58,
+         "cpu_pct": 62.9,
+         "mem_pct": 20.4
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 67.9,
+       "sandbox_rss_mib": 62.4,
+       "main_mem_mib": 5.5,
+       "sidecar_rss_mib": 58.1,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        13191,
+        13684,
+        13386,
+        12653,
+        14152,
+        12673,
+        13457,
+        12954,
+        13334,
+        14425
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 244.4,
+         "mem_mib": 5765.1
+        },
+        "node-b": {
+         "cpu_m": 205.7,
+         "mem_mib": 5301.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 68.2,
+       "sandbox_rss_mib": 62.7,
+       "main_mem_mib": 5.6,
+       "sidecar_rss_mib": 58.3,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        12850,
+        14944,
+        14627,
+        14269,
+        13761,
+        13099,
+        13299,
+        13118,
+        13008
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 329.4,
+        "mem_mib": 5792.1
+       },
+       "node-b": {
+        "cpu_m": 263.3,
+        "mem_mib": 5331.0
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 69.0,
+      "sandbox_rss_mib": 63.5,
+      "main_mem_mib": 5.7,
+      "sidecar_rss_mib": 59.0,
+      "outside_containers_mib": 0.6
+     }
+    },
+    {
+     "mode": "runc-egress",
+     "run": 2,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 6,
+        "node-b": 4
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 765.6,
+         "mem_mib": 2801.7
+        },
+        "node-b": {
+         "cpu_m": 542.5,
+         "mem_mib": 2525.0
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 18.8,
+         "mem_pct": 6.0
+        },
+        "node-b": {
+         "pods": 20,
+         "pods_max": 58,
+         "cpu_pct": 17.4,
+         "mem_pct": 5.3
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 66.5,
+       "sandbox_rss_mib": 61.0,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.7,
+       "outside_containers_mib": 0.3,
+       "batch": 1,
+       "created_ms": [
+        12774,
+        25947,
+        27307,
+        12522,
+        25755,
+        11292,
+        12773,
+        27951,
+        25106,
+        24401
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1545.1,
+         "mem_mib": 3208.3
+        },
+        "node-b": {
+         "cpu_m": 392.7,
+         "mem_mib": 2820.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 66.6,
+       "sandbox_rss_mib": 61.1,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.3,
+       "batch": 2,
+       "created_ms": [
+        12950,
+        13896,
+        13476,
+        13261,
+        12848,
+        13069,
+        12601,
+        13621,
+        12975,
+        12606
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 16,
+        "node-b": 14
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 401.6,
+         "mem_mib": 3513.9
+        },
+        "node-b": {
+         "cpu_m": 1423.9,
+         "mem_mib": 3217.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 27,
+         "pods_max": 58,
+         "cpu_pct": 31.5,
+         "mem_pct": 10.2
+        },
+        "node-b": {
+         "pods": 30,
+         "pods_max": 58,
+         "cpu_pct": 30.0,
+         "mem_pct": 9.5
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 66.8,
+       "sandbox_rss_mib": 61.2,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.7,
+       "batch": 3,
+       "created_ms": [
+        12454,
+        12504,
+        12428,
+        12871,
+        13110,
+        11904,
+        12547,
+        12306,
+        11937,
+        12969
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 21,
+        "node-b": 19
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1282.2,
+         "mem_mib": 3845.1
+        },
+        "node-b": {
+         "cpu_m": 451.0,
+         "mem_mib": 3601.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 32,
+         "pods_max": 58,
+         "cpu_pct": 37.8,
+         "mem_pct": 12.3
+        },
+        "node-b": {
+         "pods": 35,
+         "pods_max": 58,
+         "cpu_pct": 36.3,
+         "mem_pct": 11.6
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 67.2,
+       "sandbox_rss_mib": 61.4,
+       "main_mem_mib": 5.3,
+       "sidecar_rss_mib": 57.9,
+       "outside_containers_mib": 0.6,
+       "batch": 4,
+       "created_ms": [
+        12664,
+        14325,
+        12951,
+        13808,
+        12914,
+        14034,
+        12823,
+        12906,
+        12486,
+        12695
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 26,
+        "node-b": 24
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 560.7,
+         "mem_mib": 4223.7
+        },
+        "node-b": {
+         "cpu_m": 1287.1,
+         "mem_mib": 3951.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 37,
+         "pods_max": 58,
+         "cpu_pct": 44.1,
+         "mem_pct": 14.4
+        },
+        "node-b": {
+         "pods": 40,
+         "pods_max": 58,
+         "cpu_pct": 42.7,
+         "mem_pct": 13.7
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 67.6,
+       "sandbox_rss_mib": 62.0,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        13500,
+        13550,
+        13207,
+        13411,
+        12249,
+        13292,
+        13494,
+        14295,
+        13474,
+        14098
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 31,
+        "node-b": 29
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1499.0,
+         "mem_mib": 4580.7
+        },
+        "node-b": {
+         "cpu_m": 417.7,
+         "mem_mib": 4328.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 42,
+         "pods_max": 58,
+         "cpu_pct": 50.4,
+         "mem_pct": 16.5
+        },
+        "node-b": {
+         "pods": 45,
+         "pods_max": 58,
+         "cpu_pct": 49.0,
+         "mem_pct": 15.8
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 67.6,
+       "sandbox_rss_mib": 62.2,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        13099,
+        13521,
+        12479,
+        13164,
+        13461,
+        13553,
+        13354,
+        12667,
+        13115,
+        14065
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 36,
+        "node-b": 34
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 485.6,
+         "mem_mib": 4964.0
+        },
+        "node-b": {
+         "cpu_m": 1124.2,
+         "mem_mib": 4693.3
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 47,
+         "pods_max": 58,
+         "cpu_pct": 56.8,
+         "mem_pct": 18.6
+        },
+        "node-b": {
+         "pods": 50,
+         "pods_max": 58,
+         "cpu_pct": 55.3,
+         "mem_pct": 17.9
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 67.7,
+       "sandbox_rss_mib": 62.3,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        13653,
+        12164,
+        13869,
+        13552,
+        13265,
+        14330,
+        12324,
+        12757,
+        13252,
+        13205
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 40,
+        "node-b": 40
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1175.6,
+         "mem_mib": 5253.1
+        },
+        "node-b": {
+         "cpu_m": 462.1,
+         "mem_mib": 5127.5
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 51,
+         "pods_max": 58,
+         "cpu_pct": 61.8,
+         "mem_pct": 20.2
+        },
+        "node-b": {
+         "pods": 56,
+         "pods_max": 58,
+         "cpu_pct": 62.9,
+         "mem_pct": 20.4
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 68.0,
+       "sandbox_rss_mib": 62.5,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.1,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        13758,
+        13134,
+        13686,
+        12971,
+        14939,
+        13332,
+        13805,
+        13568,
+        13078,
+        13488
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 274.4,
+         "mem_mib": 5837.6
+        },
+        "node-b": {
+         "cpu_m": 287.8,
+         "mem_mib": 5303.4
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 68.4,
+       "sandbox_rss_mib": 62.8,
+       "main_mem_mib": 5.6,
+       "sidecar_rss_mib": 58.3,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        12649,
+        14161,
+        13268,
+        13377,
+        12258,
+        14005,
+        14392,
+        13975,
+        14298
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 302.2,
+        "mem_mib": 5864.3
+       },
+       "node-b": {
+        "cpu_m": 322.9,
+        "mem_mib": 5322.1
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 69.0,
+      "sandbox_rss_mib": 63.5,
+      "main_mem_mib": 5.7,
+      "sidecar_rss_mib": 58.9,
+      "outside_containers_mib": 0.6
+     }
+    },
+    {
+     "mode": "runc-egress",
+     "run": 3,
+     "ceiling": 89,
+     "stop": {
+      "limit": "pods",
+      "detail": "0/2 nodes are available: 2 Too many pods.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 6,
+        "node-b": 4
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 319.4,
+         "mem_mib": 2847.9
+        },
+        "node-b": {
+         "cpu_m": 449.9,
+         "mem_mib": 2571.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 18.8,
+         "mem_pct": 6.0
+        },
+        "node-b": {
+         "pods": 20,
+         "pods_max": 58,
+         "cpu_pct": 17.4,
+         "mem_pct": 5.3
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 67.1,
+       "sandbox_rss_mib": 61.3,
+       "main_mem_mib": 4.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.4,
+       "batch": 1,
+       "created_ms": [
+        12748,
+        12653,
+        11737,
+        28551,
+        25185,
+        12735,
+        27892,
+        28285,
+        23452,
+        26547
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 8
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1474.1,
+         "mem_mib": 3272.9
+        },
+        "node-b": {
+         "cpu_m": 168.5,
+         "mem_mib": 2835.2
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 26.4,
+         "mem_pct": 8.5
+        },
+        "node-b": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 22.4,
+         "mem_pct": 7.0
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 66.8,
+       "sandbox_rss_mib": 61.1,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.6,
+       "batch": 2,
+       "created_ms": [
+        12269,
+        13776,
+        12500,
+        14494,
+        12337,
+        11696,
+        11715,
+        12842,
+        14466,
+        13580
+       ],
+       "failed": 0
+      },
+      {
+       "running": 30,
+       "seen_by_kubelet": 30,
+       "per_node": {
+        "node-a": 16,
+        "node-b": 14
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 320.1,
+         "mem_mib": 3586.6
+        },
+        "node-b": {
+         "cpu_m": 1460.0,
+         "mem_mib": 3247.6
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 27,
+         "pods_max": 58,
+         "cpu_pct": 31.5,
+         "mem_pct": 10.2
+        },
+        "node-b": {
+         "pods": 30,
+         "pods_max": 58,
+         "cpu_pct": 30.0,
+         "mem_pct": 9.5
+        }
+       },
+       "mem_source": {
+        "pod": 30
+       },
+       "sandbox_mem_mib": 67.0,
+       "sandbox_rss_mib": 61.1,
+       "main_mem_mib": 4.6,
+       "sidecar_rss_mib": 57.7,
+       "outside_containers_mib": 0.6,
+       "batch": 3,
+       "created_ms": [
+        13706,
+        13331,
+        14272,
+        13878,
+        13888,
+        12221,
+        12249,
+        14787,
+        12616,
+        12423
+       ],
+       "failed": 0
+      },
+      {
+       "running": 40,
+       "seen_by_kubelet": 40,
+       "per_node": {
+        "node-a": 21,
+        "node-b": 19
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1232.6,
+         "mem_mib": 3933.1
+        },
+        "node-b": {
+         "cpu_m": 270.9,
+         "mem_mib": 3617.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 32,
+         "pods_max": 58,
+         "cpu_pct": 37.8,
+         "mem_pct": 12.3
+        },
+        "node-b": {
+         "pods": 35,
+         "pods_max": 58,
+         "cpu_pct": 36.3,
+         "mem_pct": 11.6
+        }
+       },
+       "mem_source": {
+        "pod": 40
+       },
+       "sandbox_mem_mib": 67.1,
+       "sandbox_rss_mib": 61.3,
+       "main_mem_mib": 4.7,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.6,
+       "batch": 4,
+       "created_ms": [
+        12274,
+        13383,
+        12720,
+        12230,
+        12448,
+        13244,
+        12998,
+        12960,
+        13814,
+        12896
+       ],
+       "failed": 0
+      },
+      {
+       "running": 50,
+       "seen_by_kubelet": 50,
+       "per_node": {
+        "node-a": 26,
+        "node-b": 24
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 436.7,
+         "mem_mib": 4301.7
+        },
+        "node-b": {
+         "cpu_m": 710.5,
+         "mem_mib": 3963.5
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 37,
+         "pods_max": 58,
+         "cpu_pct": 44.1,
+         "mem_pct": 14.4
+        },
+        "node-b": {
+         "pods": 40,
+         "pods_max": 58,
+         "cpu_pct": 42.7,
+         "mem_pct": 13.7
+        }
+       },
+       "mem_source": {
+        "pod": 50
+       },
+       "sandbox_mem_mib": 67.3,
+       "sandbox_rss_mib": 62.0,
+       "main_mem_mib": 5.3,
+       "sidecar_rss_mib": 57.8,
+       "outside_containers_mib": 0.6,
+       "batch": 5,
+       "created_ms": [
+        14580,
+        13611,
+        14434,
+        13885,
+        12864,
+        13635,
+        13293,
+        13168,
+        13176,
+        12347
+       ],
+       "failed": 0
+      },
+      {
+       "running": 60,
+       "seen_by_kubelet": 60,
+       "per_node": {
+        "node-a": 31,
+        "node-b": 29
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1212.7,
+         "mem_mib": 4670.0
+        },
+        "node-b": {
+         "cpu_m": 324.4,
+         "mem_mib": 4348.4
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 42,
+         "pods_max": 58,
+         "cpu_pct": 50.4,
+         "mem_pct": 16.5
+        },
+        "node-b": {
+         "pods": 45,
+         "pods_max": 58,
+         "cpu_pct": 49.0,
+         "mem_pct": 15.8
+        }
+       },
+       "mem_source": {
+        "pod": 60
+       },
+       "sandbox_mem_mib": 67.5,
+       "sandbox_rss_mib": 62.1,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 57.9,
+       "outside_containers_mib": 0.6,
+       "batch": 6,
+       "created_ms": [
+        14121,
+        12497,
+        12571,
+        13571,
+        13151,
+        13331,
+        12630,
+        12630,
+        13629,
+        12547
+       ],
+       "failed": 0
+      },
+      {
+       "running": 70,
+       "seen_by_kubelet": 70,
+       "per_node": {
+        "node-a": 36,
+        "node-b": 34
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 400.7,
+         "mem_mib": 5024.8
+        },
+        "node-b": {
+         "cpu_m": 583.7,
+         "mem_mib": 4712.3
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 47,
+         "pods_max": 58,
+         "cpu_pct": 56.8,
+         "mem_pct": 18.6
+        },
+        "node-b": {
+         "pods": 50,
+         "pods_max": 58,
+         "cpu_pct": 55.3,
+         "mem_pct": 17.9
+        }
+       },
+       "mem_source": {
+        "pod": 70
+       },
+       "sandbox_mem_mib": 67.8,
+       "sandbox_rss_mib": 62.2,
+       "main_mem_mib": 5.4,
+       "sidecar_rss_mib": 58.0,
+       "outside_containers_mib": 0.6,
+       "batch": 7,
+       "created_ms": [
+        13408,
+        12849,
+        13731,
+        12766,
+        12762,
+        13390,
+        13607,
+        14821,
+        14005,
+        12981
+       ],
+       "failed": 0
+      },
+      {
+       "running": 80,
+       "seen_by_kubelet": 80,
+       "per_node": {
+        "node-a": 40,
+        "node-b": 40
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 543.0,
+         "mem_mib": 5338.0
+        },
+        "node-b": {
+         "cpu_m": 1513.7,
+         "mem_mib": 5120.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 51,
+         "pods_max": 58,
+         "cpu_pct": 61.8,
+         "mem_pct": 20.2
+        },
+        "node-b": {
+         "pods": 56,
+         "pods_max": 58,
+         "cpu_pct": 62.9,
+         "mem_pct": 20.4
+        }
+       },
+       "mem_source": {
+        "pod": 80
+       },
+       "sandbox_mem_mib": 67.8,
+       "sandbox_rss_mib": 62.4,
+       "main_mem_mib": 5.5,
+       "sidecar_rss_mib": 58.1,
+       "outside_containers_mib": 0.6,
+       "batch": 8,
+       "created_ms": [
+        13455,
+        12290,
+        12835,
+        13849,
+        12002,
+        12069,
+        12530,
+        14170,
+        12745,
+        13940
+       ],
+       "failed": 0
+      },
+      {
+       "running": 89,
+       "seen_by_kubelet": 89,
+       "per_node": {
+        "node-a": 47,
+        "node-b": 42
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 269.4,
+         "mem_mib": 5850.5
+        },
+        "node-b": {
+         "cpu_m": 243.5,
+         "mem_mib": 5321.5
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 70.7,
+         "mem_pct": 23.2
+        },
+        "node-b": {
+         "pods": 58,
+         "pods_max": 58,
+         "cpu_pct": 65.4,
+         "mem_pct": 21.2
+        }
+       },
+       "mem_source": {
+        "pod": 89
+       },
+       "sandbox_mem_mib": 68.2,
+       "sandbox_rss_mib": 62.7,
+       "main_mem_mib": 5.6,
+       "sidecar_rss_mib": 58.3,
+       "outside_containers_mib": 0.6,
+       "batch": 9,
+       "created_ms": [
+        12972,
+        13287,
+        14509,
+        12849,
+        11881,
+        12404,
+        14113,
+        13241,
+        13793
+       ],
+       "failed": 1
+      }
+     ],
+     "final": {
+      "running": 89,
+      "seen_by_kubelet": 89,
+      "per_node": {
+       "node-a": 47,
+       "node-b": 42
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 294.2,
+        "mem_mib": 5894.9
+       },
+       "node-b": {
+        "cpu_m": 320.4,
+        "mem_mib": 5348.6
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 70.7,
+        "mem_pct": 23.2
+       },
+       "node-b": {
+        "pods": 58,
+        "pods_max": 58,
+        "cpu_pct": 65.4,
+        "mem_pct": 21.2
+       }
+      },
+      "mem_source": {
+       "pod": 89
+      },
+      "sandbox_mem_mib": 69.1,
+      "sandbox_rss_mib": 63.5,
+      "main_mem_mib": 5.7,
+      "sidecar_rss_mib": 58.9,
+      "outside_containers_mib": 0.6
+     }
+    }
+   ]
+  },
+  "kata": {
+   "ceiling": {
+    "median": 24,
+    "min": 24,
+    "max": 25,
+    "spread": 1,
+    "spread_pct": 4.2,
+    "runs": [
+     25,
+     24,
+     24
+    ]
+   },
+   "valid_runs": 3,
+   "invalid_runs": [],
+   "limit": "cpu",
+   "limits": [
+    "cpu",
+    "cpu",
+    "cpu"
+   ],
+   "sandbox_mem_mib": {
+    "median": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "spread": 0.0,
+    "spread_pct": null,
+    "runs": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "sandbox_rss_mib": {
+    "median": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "spread": 0.0,
+    "spread_pct": null,
+    "runs": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "sidecar_rss_mib": {
+    "median": null,
+    "min": null,
+    "max": null,
+    "spread": null,
+    "spread_pct": null,
+    "runs": [
+     null,
+     null,
+     null
+    ]
+   },
+   "outside_containers_mib": {
+    "median": -5.3,
+    "min": -5.3,
+    "max": -5.3,
+    "spread": 0.0,
+    "spread_pct": -0.0,
+    "runs": [
+     -5.3,
+     -5.3,
+     -5.3
+    ]
+   },
+   "node_growth_mib": {
+    "median": 324.4,
+    "min": 321.8,
+    "max": 352.3,
+    "spread": 30.5,
+    "spread_pct": 9.4,
+    "runs": [
+     324.4,
+     352.3,
+     321.8
+    ]
+   },
+   "node_growth_span": [
+    10,
+    10,
+    10
+   ],
+   "runs": [
+    {
+     "mode": "kata",
+     "run": 1,
+     "ceiling": 25,
+     "stop": {
+      "limit": "cpu",
+      "detail": "0/2 nodes are available: 2 Insufficient cpu.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 5,
+        "node-b": 5
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 709.8,
+         "mem_mib": 3359.2
+        },
+        "node-b": {
+         "cpu_m": 1568.8,
+         "mem_mib": 3828.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 33.6,
+         "mem_pct": 8.2
+        },
+        "node-b": {
+         "pods": 22,
+         "pods_max": 58,
+         "cpu_pct": 34.7,
+         "mem_pct": 8.4
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.4,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.4,
+       "batch": 1,
+       "created_ms": [
+        4858,
+        4939,
+        4118,
+        4939,
+        5619,
+        5631,
+        5235,
+        4153,
+        6038,
+        5269
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 11,
+        "node-b": 9
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1988.0,
+         "mem_mib": 5807.8
+        },
+        "node-b": {
+         "cpu_m": 849.6,
+         "mem_mib": 4624.3
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 23,
+         "pods_max": 58,
+         "cpu_pct": 60.2,
+         "mem_pct": 13.9
+        },
+        "node-b": {
+         "pods": 26,
+         "pods_max": 58,
+         "cpu_pct": 52.4,
+         "mem_pct": 12.2
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.4,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.4,
+       "batch": 2,
+       "created_ms": [
+        5479,
+        4750,
+        5481,
+        4733,
+        4673,
+        5007,
+        5067,
+        5081,
+        5003,
+        5466
+       ],
+       "failed": 0
+      },
+      {
+       "running": 25,
+       "seen_by_kubelet": 25,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 13
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 167.5,
+         "mem_mib": 6133.9
+        },
+        "node-b": {
+         "cpu_m": 181.2,
+         "mem_mib": 6284.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 64.6,
+         "mem_pct": 14.8
+        },
+        "node-b": {
+         "pods": 30,
+         "pods_max": 58,
+         "cpu_pct": 70.1,
+         "mem_pct": 15.9
+        }
+       },
+       "mem_source": {
+        "pod": 25
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 5.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -5.2,
+       "batch": 3,
+       "created_ms": [
+        4574,
+        4481,
+        5026,
+        4529,
+        5306
+       ],
+       "failed": 5
+      }
+     ],
+     "final": {
+      "running": 25,
+      "seen_by_kubelet": 25,
+      "per_node": {
+       "node-a": 12,
+       "node-b": 13
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 176.5,
+        "mem_mib": 6139.5
+       },
+       "node-b": {
+        "cpu_m": 210.1,
+        "mem_mib": 6295.9
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 24,
+        "pods_max": 58,
+        "cpu_pct": 64.6,
+        "mem_pct": 14.8
+       },
+       "node-b": {
+        "pods": 30,
+        "pods_max": 58,
+        "cpu_pct": 70.1,
+        "mem_pct": 15.9
+       }
+      },
+      "mem_source": {
+       "pod": 25
+      },
+      "sandbox_mem_mib": 0.0,
+      "sandbox_rss_mib": 0.0,
+      "main_mem_mib": 5.3,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": -5.3,
+      "vmm": {
+       "vms": 25,
+       "pods": 25,
+       "joined": 25,
+       "vmm_total_mib": 507.7,
+       "qemu_mib": 364.5,
+       "clh_mib": null,
+       "virtiofsd_mib": 99.1,
+       "shim_mib": 44.3,
+       "kubelet_mem_mib": 0.0,
+       "kubelet_rss_mib": 0.0,
+       "paired_by": "pod",
+       "gap_mib": 507.7,
+       "kubelet_mem_source": {
+        "pod": 25
+       }
+      }
+     }
+    },
+    {
+     "mode": "kata",
+     "run": 2,
+     "ceiling": 24,
+     "stop": {
+      "limit": "cpu",
+      "detail": "0/2 nodes are available: 2 Insufficient cpu.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 5,
+        "node-b": 5
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1721.2,
+         "mem_mib": 4130.9
+        },
+        "node-b": {
+         "cpu_m": 1465.9,
+         "mem_mib": 3576.7
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 33.6,
+         "mem_pct": 8.2
+        },
+        "node-b": {
+         "pods": 22,
+         "pods_max": 58,
+         "cpu_pct": 34.7,
+         "mem_pct": 8.4
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.5,
+       "batch": 1,
+       "created_ms": [
+        4967,
+        4977,
+        5378,
+        4402,
+        4385,
+        4274,
+        4967,
+        4983,
+        5757,
+        4395
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 10,
+        "node-b": 10
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1619.7,
+         "mem_mib": 5649.0
+        },
+        "node-b": {
+         "cpu_m": 1624.3,
+         "mem_mib": 5581.8
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 22,
+         "pods_max": 58,
+         "cpu_pct": 55.8,
+         "mem_pct": 13.0
+        },
+        "node-b": {
+         "pods": 27,
+         "pods_max": 58,
+         "cpu_pct": 56.8,
+         "mem_pct": 13.1
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.5,
+       "batch": 2,
+       "created_ms": [
+        5359,
+        4538,
+        4583,
+        5956,
+        5886,
+        5860,
+        5966,
+        5142,
+        4537,
+        4507
+       ],
+       "failed": 0
+      },
+      {
+       "running": 24,
+       "seen_by_kubelet": 24,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 12
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 245.2,
+         "mem_mib": 6136.0
+        },
+        "node-b": {
+         "cpu_m": 258.0,
+         "mem_mib": 6035.4
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 64.6,
+         "mem_pct": 14.8
+        },
+        "node-b": {
+         "pods": 29,
+         "pods_max": 58,
+         "cpu_pct": 65.7,
+         "mem_pct": 15.0
+        }
+       },
+       "mem_source": {
+        "pod": 24
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 5.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -5.2,
+       "batch": 3,
+       "created_ms": [
+        4031,
+        4474,
+        4039,
+        4470
+       ],
+       "failed": 6
+      }
+     ],
+     "final": {
+      "running": 24,
+      "seen_by_kubelet": 24,
+      "per_node": {
+       "node-a": 12,
+       "node-b": 12
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 250.2,
+        "mem_mib": 6143.1
+       },
+       "node-b": {
+        "cpu_m": 211.2,
+        "mem_mib": 6042.0
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 24,
+        "pods_max": 58,
+        "cpu_pct": 64.6,
+        "mem_pct": 14.8
+       },
+       "node-b": {
+        "pods": 29,
+        "pods_max": 58,
+        "cpu_pct": 65.7,
+        "mem_pct": 15.0
+       }
+      },
+      "mem_source": {
+       "pod": 24
+      },
+      "sandbox_mem_mib": 0.0,
+      "sandbox_rss_mib": 0.0,
+      "main_mem_mib": 5.3,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": -5.3,
+      "vmm": {
+       "vms": 24,
+       "pods": 24,
+       "joined": 24,
+       "vmm_total_mib": 507.4,
+       "qemu_mib": 364.2,
+       "clh_mib": null,
+       "virtiofsd_mib": 98.9,
+       "shim_mib": 44.1,
+       "kubelet_mem_mib": 0.0,
+       "kubelet_rss_mib": 0.0,
+       "paired_by": "pod",
+       "gap_mib": 507.4,
+       "kubelet_mem_source": {
+        "pod": 24
+       }
+      }
+     }
+    },
+    {
+     "mode": "kata",
+     "run": 3,
+     "ceiling": 24,
+     "stop": {
+      "limit": "cpu",
+      "detail": "0/2 nodes are available: 2 Insufficient cpu.",
+      "errors": [
+       "SandboxTimeoutException: Request timed out: timed out | [TIMEOUT] Request timed out: timed out"
+      ]
+     },
+     "batches": [
+      {
+       "running": 10,
+       "seen_by_kubelet": 10,
+       "per_node": {
+        "node-a": 5,
+        "node-b": 5
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1575.9,
+         "mem_mib": 4019.9
+        },
+        "node-b": {
+         "cpu_m": 1572.8,
+         "mem_mib": 3891.5
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 17,
+         "pods_max": 58,
+         "cpu_pct": 33.6,
+         "mem_pct": 8.2
+        },
+        "node-b": {
+         "pods": 22,
+         "pods_max": 58,
+         "cpu_pct": 34.7,
+         "mem_pct": 8.4
+        }
+       },
+       "mem_source": {
+        "pod": 10
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.4,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.4,
+       "batch": 1,
+       "created_ms": [
+        5196,
+        4811,
+        4779,
+        5093,
+        4699,
+        5149,
+        5519,
+        5933,
+        5968,
+        4721
+       ],
+       "failed": 0
+      },
+      {
+       "running": 20,
+       "seen_by_kubelet": 20,
+       "per_node": {
+        "node-a": 10,
+        "node-b": 10
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 1687.6,
+         "mem_mib": 5563.3
+        },
+        "node-b": {
+         "cpu_m": 1713.0,
+         "mem_mib": 5566.1
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 22,
+         "pods_max": 58,
+         "cpu_pct": 55.8,
+         "mem_pct": 13.0
+        },
+        "node-b": {
+         "pods": 27,
+         "pods_max": 58,
+         "cpu_pct": 56.8,
+         "mem_pct": 13.1
+        }
+       },
+       "mem_source": {
+        "pod": 20
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 4.5,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -4.5,
+       "batch": 2,
+       "created_ms": [
+        5497,
+        4749,
+        4731,
+        6000,
+        4726,
+        5980,
+        4705,
+        5254,
+        6085,
+        5231
+       ],
+       "failed": 0
+      },
+      {
+       "running": 24,
+       "seen_by_kubelet": 24,
+       "per_node": {
+        "node-a": 12,
+        "node-b": 12
+       },
+       "node_totals": {
+        "node-a": {
+         "cpu_m": 732.7,
+         "mem_mib": 6123.2
+        },
+        "node-b": {
+         "cpu_m": 239.0,
+         "mem_mib": 6040.3
+        }
+       },
+       "requested": {
+        "node-a": {
+         "pods": 24,
+         "pods_max": 58,
+         "cpu_pct": 64.6,
+         "mem_pct": 14.8
+        },
+        "node-b": {
+         "pods": 29,
+         "pods_max": 58,
+         "cpu_pct": 65.7,
+         "mem_pct": 15.0
+        }
+       },
+       "mem_source": {
+        "pod": 24
+       },
+       "sandbox_mem_mib": 0.0,
+       "sandbox_rss_mib": 0.0,
+       "main_mem_mib": 5.2,
+       "sidecar_rss_mib": null,
+       "outside_containers_mib": -5.2,
+       "batch": 3,
+       "created_ms": [
+        4424,
+        4992,
+        4414,
+        4991
+       ],
+       "failed": 6
+      }
+     ],
+     "final": {
+      "running": 24,
+      "seen_by_kubelet": 24,
+      "per_node": {
+       "node-a": 12,
+       "node-b": 12
+      },
+      "node_totals": {
+       "node-a": {
+        "cpu_m": 720.8,
+        "mem_mib": 6131.2
+       },
+       "node-b": {
+        "cpu_m": 217.1,
+        "mem_mib": 6051.2
+       }
+      },
+      "requested": {
+       "node-a": {
+        "pods": 24,
+        "pods_max": 58,
+        "cpu_pct": 64.6,
+        "mem_pct": 14.8
+       },
+       "node-b": {
+        "pods": 29,
+        "pods_max": 58,
+        "cpu_pct": 65.7,
+        "mem_pct": 15.0
+       }
+      },
+      "mem_source": {
+       "pod": 24
+      },
+      "sandbox_mem_mib": 0.0,
+      "sandbox_rss_mib": 0.0,
+      "main_mem_mib": 5.3,
+      "sidecar_rss_mib": null,
+      "outside_containers_mib": -5.3,
+      "vmm": {
+       "vms": 24,
+       "pods": 24,
+       "joined": 24,
+       "vmm_total_mib": 507.7,
+       "qemu_mib": 364.6,
+       "clh_mib": null,
+       "virtiofsd_mib": 99.1,
+       "shim_mib": 44.2,
+       "kubelet_mem_mib": 0.0,
+       "kubelet_rss_mib": 0.0,
+       "paired_by": "pod",
+       "gap_mib": 507.7,
+       "kubelet_mem_source": {
+        "pod": 24
+       }
+      }
+     }
+    }
+   ],
+   "runtimeclass_overhead": {
+    "cpu": "250m",
+    "memory": "160Mi"
+   },
+   "node_side": {
+    "vmm_total_mib": {
+     "median": 507.7,
+     "min": 507.4,
+     "max": 507.7,
+     "spread": 0.3,
+     "spread_pct": 0.1,
+     "runs": [
+      507.7,
+      507.4,
+      507.7
+     ]
+    },
+    "qemu_mib": {
+     "median": 364.5,
+     "min": 364.2,
+     "max": 364.6,
+     "spread": 0.4,
+     "spread_pct": 0.1,
+     "runs": [
+      364.5,
+      364.2,
+      364.6
+     ]
+    },
+    "virtiofsd_mib": {
+     "median": 99.1,
+     "min": 98.9,
+     "max": 99.1,
+     "spread": 0.2,
+     "spread_pct": 0.2,
+     "runs": [
+      99.1,
+      98.9,
+      99.1
+     ]
+    },
+    "shim_mib": {
+     "median": 44.2,
+     "min": 44.1,
+     "max": 44.3,
+     "spread": 0.2,
+     "spread_pct": 0.5,
+     "runs": [
+      44.3,
+      44.1,
+      44.2
+     ]
+    },
+    "kubelet_mem_mib": {
+     "median": 0.0,
+     "min": 0.0,
+     "max": 0.0,
+     "spread": 0.0,
+     "spread_pct": null,
+     "runs": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "kubelet_rss_mib": {
+     "median": 0.0,
+     "min": 0.0,
+     "max": 0.0,
+     "spread": 0.0,
+     "spread_pct": null,
+     "runs": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "gap_mib": {
+     "median": 507.7,
+     "min": 507.4,
+     "max": 507.7,
+     "spread": 0.3,
+     "spread_pct": 0.1,
+     "runs": [
+      507.7,
+      507.4,
+      507.7
+     ]
+    },
+    "paired_by": [
+     "pod",
+     "pod",
+     "pod"
+    ]
+   }
+  }
+ },
+ "phases": [
+  {
+   "name": "runc run 1",
+   "start": 0.0,
+   "end": 177.7,
+   "mode": "runc",
+   "run": 1
+  },
+  {
+   "name": "runc run 2",
+   "start": 198.8,
+   "end": 391.0,
+   "mode": "runc",
+   "run": 2
+  },
+  {
+   "name": "runc run 3",
+   "start": 412.1,
+   "end": 599.6,
+   "mode": "runc",
+   "run": 3
+  },
+  {
+   "name": "runc-egress run 1",
+   "start": 620.6,
+   "end": 894.4,
+   "mode": "runc-egress",
+   "run": 1
+  },
+  {
+   "name": "runc-egress run 2",
+   "start": 916.1,
+   "end": 1191.0,
+   "mode": "runc-egress",
+   "run": 2
+  },
+  {
+   "name": "runc-egress run 3",
+   "start": 1213.4,
+   "end": 1491.1,
+   "mode": "runc-egress",
+   "run": 3
+  },
+  {
+   "name": "kata run 1",
+   "start": 1554.1,
+   "end": 1653.5,
+   "mode": "kata",
+   "run": 1
+  },
+  {
+   "name": "kata run 2",
+   "start": 1660.3,
+   "end": 1759.8,
+   "mode": "kata",
+   "run": 2
+  },
+  {
+   "name": "kata run 3",
+   "start": 1768.9,
+   "end": 1870.0,
+   "mode": "kata",
+   "run": 3
+  }
+ ],
+ "sampler": {
+  "every_s": 5.0,
+  "started_at": "2026-11-01T13:58:55Z"
+ },
+ "egress_memory_ratio": 12.11,
+ "egress_node_cost_mib": 59.6
+}
