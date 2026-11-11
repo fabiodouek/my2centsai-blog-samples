@@ -1,0 +1,55 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "attest-isolated",
+    "namespace": "default"
+  },
+  "spec": {
+    "serviceAccountName": "attest",
+    "runtimeClassName": "isolated-sandbox",
+    "nodeSelector": {
+      "node.kubernetes.io/instance-type": "m8g.xlarge"
+    },
+    "containers": [
+      {
+        "name": "attest",
+        "image": "public.ecr.aws/amazonlinux/amazonlinux:2023",
+        "command": [
+          "bash",
+          "-c",
+          "dnf install -y -q openssl awscli-2 python3 >/dev/null 2>&1; echo \"$NSM_PY_B64\" | base64 -d > /tmp/nsm.py; cd /tmp; echo \"kernel: $(uname -rv)\"; ls -la /dev/nsm 2>&1; openssl genrsa -out key.pem 2048 2>/dev/null && openssl rsa -in key.pem -pubout -outform DER -out pub.der 2>/dev/null; python3 nsm.py attest pub.der att.doc && python3 nsm.py pcrs att.doc | grep -E \"module_id|PCR0:|PCR8:|PCR17:\"; echo \"$SECRET_CT\" | base64 -d > ct.bin; if aws kms decrypt --region us-east-1 --ciphertext-blob fileb://ct.bin --recipient \"KeyEncryptionAlgorithm=RSAES_OAEP_SHA_256,AttestationDocument=$(base64 -w0 att.doc)\" --query CiphertextForRecipient --output text > cfr.b64 2> err.txt; then base64 -d cfr.b64 > cfr.der; echo \"SECRET: $(openssl cms -decrypt -inform DER -in cfr.der -inkey key.pem)\"; else echo \"KMS: $(sed 's/User: arn[^ ]* //' err.txt | head -c 260)\"; fi; echo ATTEST_DONE; sleep 3600"
+        ],
+        "env": [
+          {
+            "name": "NSM_PY_B64",
+            "value": "<NSM_PY_B64>"
+          },
+          {
+            "name": "SECRET_CT",
+            "value": "<SECRET_CT>"
+          },
+          {
+            "name": "AWS_REGION",
+            "value": "us-east-1"
+          },
+          {
+            "name": "AWS_DEFAULT_REGION",
+            "value": "us-east-1"
+          }
+        ],
+        "resources": {
+          "requests": {
+            "cpu": "500m",
+            "memory": "512Mi"
+          },
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          }
+        }
+      }
+    ],
+    "enableServiceLinks": false
+  }
+}

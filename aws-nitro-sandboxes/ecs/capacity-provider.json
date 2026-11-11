@@ -1,0 +1,22 @@
+{
+  "name": "my2cents-nitro-cp",
+  "cluster": "my2cents-nitro-ecs",
+  "managedInstancesProvider": {
+    "infrastructureRoleArn": "<INFRASTRUCTURE_ROLE_ARN>",
+    "instanceLaunchTemplate": {
+      "ec2InstanceProfileArn": "<INSTANCE_PROFILE_ARN>",
+      "networkConfiguration": {
+        "subnets": ["<PRIVATE_SUBNET_1>", "<PRIVATE_SUBNET_2>"],
+        "securityGroups": ["<SECURITY_GROUP_ID>"]
+      },
+      "storageConfiguration": { "storageSizeGiB": 30 },
+      "localStorageConfiguration": { "useLocalStorage": false },
+      "instanceRequirements": {
+        "vCpuCount": { "min": 4, "max": 4 },
+        "memoryMiB": { "min": 16384, "max": 16384 },
+        "allowedInstanceTypes": ["m8g.xlarge"]
+      },
+      "nitroEnclavesEnabled": true
+    }
+  }
+}

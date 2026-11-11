@@ -1,0 +1,20 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: sandbox-m8g
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: default
+      requirements:
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values: ["m8g.xlarge"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+  limits:
+    cpu: "4"   # one m8g.xlarge, never two
