@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AccountAdmin",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::<ACCOUNT_ID>:root" },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DecryptOnlyFromAttestedConfidentialTask",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::<ACCOUNT_ID>:role/my2cents-nitro-ecs-task" },
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringEqualsIgnoreCase": {
+          "kms:RecipientAttestation:PCR17": "<PCR17>",
+          "kms:RecipientAttestation:PCR8:ServiceName": "ecs.amazonaws.com"
+        }
+      }
+    }
+  ]
+}

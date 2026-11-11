@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: density
+spec:
+  replicas: 22
+  selector:
+    matchLabels: {app: density}
+  template:
+    metadata:
+      labels: {app: density}
+    spec:
+      runtimeClassName: isolated-sandbox
+      nodeSelector:
+        node.kubernetes.io/instance-type: m8g.xlarge
+      containers:
+      - name: app
+        image: public.ecr.aws/amazonlinux/amazonlinux:2023
+        command: ["sleep", "infinity"]
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}

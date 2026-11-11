@@ -1,0 +1,44 @@
+{
+  "family": "my2cents-genpolicy",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "MANAGED_INSTANCES"
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "ARM64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/my2cents-nitro-ecs-execution",
+  "containerDefinitions": [
+    {
+      "name": "genpolicy",
+      "image": "public.ecr.aws/amazonlinux/amazonlinux:2023",
+      "essential": true,
+      "command": [
+        "bash",
+        "-c",
+        "dnf install -y -q tar gzip openssl findutils >/dev/null 2>&1; cd /tmp\nU=https://d1uvmbvklg8rt.cloudfront.net/latest/aarch64\ncurl -fsSLO $U/nitro-sandboxes-runtime.tar.gz && curl -fsSLO $U/SHA256SUM && curl -fsSLO $U/SHA256SUM.sig\nprintf '%s' \"$PUBKEY\" > nitro-sandboxes-runtime-v1.pub\nopenssl dgst -sha384 -verify nitro-sandboxes-runtime-v1.pub -signature SHA256SUM.sig SHA256SUM && sha256sum -c SHA256SUM --ignore-missing\ntar -xzf nitro-sandboxes-runtime.tar.gz 2>/dev/null; GP=$(find /tmp -name ecs-nitro-sandbox-genpolicy -type f | head -1); chmod +x $GP; echo \"genpolicy: $GP\"; $GP --version 2>&1 | head -2\necho \"$TD_B64\" | base64 -d > td.json\n$GP --image-architecture arm64 --task-definition td.json > policy.b64 2> gp.err; echo \"exit=$? bytes=$(wc -c < policy.b64)\"; tail -3 gp.err\necho POLICY_BEGIN; fold -w 4000 policy.b64; echo; echo POLICY_END\n$GP --image-architecture arm64 --task-definition td.json --output pcrs 2>&1 | tail -12\necho RUNNER_DONE; sleep 600\n"
+      ],
+      "environment": [
+        {
+          "name": "PUBKEY",
+          "value": "-----BEGIN PUBLIC KEY-----\nMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAESqdVXO82n+Zh5+IFLh1xjmxZLkjjZWvf\nDCS927SdVYjP0AZ92XCxS+ucrs9cjuNlTaDARTHov2XVfMVgau8TEPFKGDRmVZXJ\nc25CVihKHLFK8T8hNMIL+fbGcvE2fwIO\n-----END PUBLIC KEY-----\n"
+        },
+        {
+          "name": "TD_B64",
+          "value": "<TD_B64>"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/my2cents-nitro-sandbox",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "my2cents-genpolicy"
+        }
+      }
+    }
+  ]
+}

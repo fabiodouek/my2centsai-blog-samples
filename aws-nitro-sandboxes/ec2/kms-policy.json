@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AccountAdmin",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::<ACCOUNT_ID>:root" },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DecryptOnlyFromThisSandboxImage",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::<ACCOUNT_ID>:role/nitro-sandbox-ec2" },
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringEqualsIgnoreCase": {
+          "kms:RecipientAttestation:ImageSha384": "<PCR0>"
+        }
+      }
+    }
+  ]
+}
