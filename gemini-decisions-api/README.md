@@ -7,6 +7,8 @@ and measurements of latency, billed tokens, calibration and error handling.
 The Decisions API answers closed questions (yes/no, pick one option, rate on a rubric) about one
 shared input and returns probabilities instead of text. It bills input tokens only.
 
+Video walkthrough: https://youtu.be/a8b4cjJByVE
+
 ## Requirements
 
 - Python 3.11+
