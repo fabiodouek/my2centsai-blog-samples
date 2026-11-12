@@ -1,0 +1,195 @@
+{
+  "combined": {
+    "ms": 1723,
+    "result": {
+      "answers": {
+        "statement_shows_duplicate": {
+          "confidence": 0.9650006055730634,
+          "noul": 0.9650006055730634,
+          "type": "noul"
+        },
+        "caller_tone": {
+          "choice": "annoyed",
+          "confidence": 0.9307582398616312,
+          "probabilities": {
+            "cheerful": 0.0020453276003003346,
+            "calm": 0.023135010824055353,
+            "annoyed": 0.9307582398616312,
+            "furious": 0.04406142171401307
+          },
+          "type": "choice"
+        },
+        "voice_deadline": {
+          "choice": "friday",
+          "confidence": 0.9724770700661572,
+          "probabilities": {
+            "no_deadline": 0.025698908998154406,
+            "monday": 0.0007738448535045099,
+            "wednesday": 0.0010501760821838217,
+            "friday": 0.9724770700661572
+          },
+          "type": "choice"
+        },
+        "video_error_appears": {
+          "confidence": 0.6754836802484652,
+          "noul": 0.3245163197515348,
+          "type": "noul"
+        },
+        "error_code_is_pay_4012": {
+          "confidence": 0.9209517065407112,
+          "noul": 0.9209517065407112,
+          "type": "noul"
+        },
+        "statement_contradicts_app": {
+          "confidence": 0.9514119220433267,
+          "noul": 0.9514119220433267,
+          "type": "noul"
+        },
+        "refund_amount": {
+          "choice": "eur_89",
+          "confidence": 0.9988392453192279,
+          "probabilities": {
+            "eur_178": 0.0005271733705596621,
+            "eur_0": 0.0006335813102125173,
+            "eur_89": 0.9988392453192279
+          },
+          "type": "choice"
+        },
+        "screenshot_shows_error": {
+          "confidence": 0.9010278565737078,
+          "noul": 0.9010278565737078,
+          "type": "noul"
+        }
+      },
+      "usage": {
+        "input_tokens_by_modality": [
+          {
+            "modality": "text",
+            "tokens": 899
+          },
+          {
+            "modality": "image",
+            "tokens": 2327
+          },
+          {
+            "modality": "audio",
+            "tokens": 579
+          }
+        ],
+        "total_input_tokens": 3805,
+        "total_output_tokens": 0,
+        "total_tokens": 3805
+      }
+    }
+  },
+  "per_file": [
+    {
+      "file": "screenshot.png",
+      "resolution": null,
+      "total": 1165,
+      "by_modality": {
+        "text": 90,
+        "image": 1075
+      }
+    },
+    {
+      "file": "screenshot.png",
+      "resolution": "low",
+      "total": 342,
+      "by_modality": {
+        "text": 90,
+        "image": 252
+      }
+    },
+    {
+      "file": "screenshot.png",
+      "resolution": "medium",
+      "total": 630,
+      "by_modality": {
+        "text": 90,
+        "image": 540
+      }
+    },
+    {
+      "file": "screenshot.png",
+      "resolution": "high",
+      "total": 1165,
+      "by_modality": {
+        "text": 90,
+        "image": 1075
+      }
+    },
+    {
+      "file": "screenshot.png",
+      "resolution": "ultra_high",
+      "total": 2286,
+      "by_modality": {
+        "text": 90,
+        "image": 2196
+      }
+    },
+    {
+      "file": "voice_note.mp3",
+      "resolution": null,
+      "total": 643,
+      "by_modality": {
+        "text": 124,
+        "audio": 519
+      }
+    },
+    {
+      "file": "screen_recording.mp4",
+      "resolution": null,
+      "total": 892,
+      "by_modality": {
+        "text": 112,
+        "image": 720,
+        "audio": 60
+      }
+    },
+    {
+      "file": "screen_recording.mp4",
+      "resolution": "low",
+      "total": 892,
+      "by_modality": {
+        "text": 112,
+        "image": 720,
+        "audio": 60
+      }
+    },
+    {
+      "file": "screen_recording.mp4",
+      "resolution": "medium",
+      "total": 892,
+      "by_modality": {
+        "text": 112,
+        "image": 720,
+        "audio": 60
+      }
+    },
+    {
+      "file": "screen_recording.mp4",
+      "resolution": "high",
+      "total": 3196,
+      "by_modality": {
+        "text": 112,
+        "image": 3024,
+        "audio": 60
+      }
+    },
+    {
+      "file": "statement.pdf",
+      "resolution": null,
+      "total": 794,
+      "by_modality": {
+        "text": 262,
+        "image": 532
+      }
+    }
+  ],
+  "question_overhead_tokens": 89,
+  "files_api": {
+    "tokens": 907,
+    "noul": 0.9288947211812434
+  }
+}

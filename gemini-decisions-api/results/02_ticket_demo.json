@@ -1,0 +1,59 @@
+{
+  "answers": {
+    "mentions_legal_action": {
+      "confidence": 0.8825278751979668,
+      "noul": 0.11747212480203315,
+      "type": "noul"
+    },
+    "queue": {
+      "choice": "billing",
+      "confidence": 0.9201020162044349,
+      "probabilities": {
+        "other": 0.003957434487609392,
+        "account": 0.017352884117865834,
+        "shipping": 0.003210334291653919,
+        "billing": 0.9201020162044349,
+        "technical": 0.05537733089843604
+      },
+      "type": "choice"
+    },
+    "double_charge": {
+      "confidence": 0.99,
+      "noul": 0.99,
+      "type": "noul"
+    },
+    "churn_risk": {
+      "confidence": 0.734077312461139,
+      "legend": {
+        "1": "Mild frustration",
+        "3": "States they will leave",
+        "2": "Mentions alternatives or a deadline",
+        "0": "No churn signal"
+      },
+      "probabilities": {
+        "2": 0.734077312461139,
+        "0": 0.0006141080837521508,
+        "3": 0.25119715331258935,
+        "1": 0.014111426142519493
+      },
+      "score": 2.235857511002566,
+      "type": "score"
+    },
+    "asks_for_refund": {
+      "confidence": 0.9745869766540525,
+      "noul": 0.9745869766540525,
+      "type": "noul"
+    }
+  },
+  "usage": {
+    "input_tokens_by_modality": [
+      {
+        "modality": "text",
+        "tokens": 520
+      }
+    ],
+    "total_input_tokens": 520,
+    "total_output_tokens": 0,
+    "total_tokens": 520
+  }
+}

@@ -1,0 +1,3099 @@
+{
+  "n": 500,
+  "errors": 0,
+  "topic": {
+    "accuracy": 0.884,
+    "ece": 0.0403,
+    "reliability": [
+      {
+        "bin": "0.4-0.5",
+        "n": 8,
+        "mean_confidence": 0.484,
+        "accuracy": 0.5
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 36,
+        "mean_confidence": 0.552,
+        "accuracy": 0.583
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 31,
+        "mean_confidence": 0.655,
+        "accuracy": 0.806
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 27,
+        "mean_confidence": 0.742,
+        "accuracy": 0.704
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 39,
+        "mean_confidence": 0.857,
+        "accuracy": 0.795
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 359,
+        "mean_confidence": 0.983,
+        "accuracy": 0.953
+      }
+    ]
+  },
+  "is_sports": {
+    "accuracy": 0.99,
+    "ece": 0.0117,
+    "reliability": [
+      {
+        "bin": "0.5-0.6",
+        "n": 1,
+        "mean_confidence": 0.509,
+        "accuracy": 1.0
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 2,
+        "mean_confidence": 0.673,
+        "accuracy": 0.5
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 3,
+        "mean_confidence": 0.767,
+        "accuracy": 1.0
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 7,
+        "mean_confidence": 0.866,
+        "accuracy": 1.0
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 487,
+        "mean_confidence": 0.985,
+        "accuracy": 0.992
+      }
+    ],
+    "min": 0.01,
+    "max": 0.99
+  },
+  "latency": {
+    "n": 500,
+    "p50_ms": 275,
+    "p95_ms": 423,
+    "min_ms": 127,
+    "max_ms": 1341
+  },
+  "total_tokens": 111657,
+  "determinism": {
+    "choice_flips": 0,
+    "max_confidence_spread": 0.0,
+    "items_with_spread": 0
+  },
+  "answers": [
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.997599508324446,
+      "is_sports": 0.983214704052165
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9782024911810724,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.991517356472098,
+      "is_sports": 0.02499540039065648
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9542211632937652,
+      "is_sports": 0.027110108579790203
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.821388426404508,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998376471691237,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7672127617646373,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9980751215946989,
+      "is_sports": 0.9893497521561738
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9996727007656845,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.871580936202437,
+      "is_sports": 0.02434488743153199
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9455114947352165,
+      "is_sports": 0.018012376855919072
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8893022147507413,
+      "is_sports": 0.013255178587815358
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997838209419146,
+      "is_sports": 0.9853367498038333
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9991799201081182,
+      "is_sports": 0.9845287007741186
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.9759054701923747,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7532352371291614,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9914664090595032,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5748313314416141,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9711324649901142,
+      "is_sports": 0.021131889432163736
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9852951716216767,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.5965326556437546,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.984192352317621,
+      "is_sports": 0.01441731245720262
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9933410364913803,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9867238694685213,
+      "is_sports": 0.011453221601565231
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9779078981754663,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9849749461503428,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "sports",
+      "confidence": 0.5874141394458231,
+      "is_sports": 0.6873899234775582
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9899607736337663,
+      "is_sports": 0.012483894559944317
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9965596208145278,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9782769727735505,
+      "is_sports": 0.012694930740443448
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8954554970099269,
+      "is_sports": 0.012572597118630407
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994404842828315,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.46149692329595693,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8813172874394947,
+      "is_sports": 0.017587255440581154
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999704514638342,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998003416994757,
+      "is_sports": 0.9869811837218306
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9560909287140031,
+      "is_sports": 0.01734191685257728
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9781138428687147,
+      "is_sports": 0.010855829163337438
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9736687076216947,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9935655817697332,
+      "is_sports": 0.022330494263382752
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9892762848848756,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9921594595202026,
+      "is_sports": 0.010904021319619005
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.5683033085014662,
+      "is_sports": 0.012314738661997136
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6906203059845808,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9901651518791303,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.989820922553584,
+      "is_sports": 0.011689924485491965
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5012387850546715,
+      "is_sports": 0.024207025086324427
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.8732437891634898,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997928582057214,
+      "is_sports": 0.9869460668840253
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9821478279985455,
+      "is_sports": 0.0145440481238213
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.4969206768726131,
+      "is_sports": 0.021506598633133592
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9955632265517078,
+      "is_sports": 0.011503466717499074
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9945120199240912,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9986314580218701,
+      "is_sports": 0.9784086997728024
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9815409651679823,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9978640165117306,
+      "is_sports": 0.020031669847011456
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.7150651309046102,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997348508212269,
+      "is_sports": 0.98516719486917
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9834592775323464,
+      "is_sports": 0.017378838264775737
+    },
+    {
+      "label": "business",
+      "choice": "world",
+      "confidence": 0.9915698665485487,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.994144923651793,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.8064963595666477,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9832982091010516,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9494310935126997,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.998637577082749,
+      "is_sports": 0.9738970705864846
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.6083351159777399,
+      "is_sports": 0.02525917689594365
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9731855831044861,
+      "is_sports": 0.01644970371213905
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9962489033511193,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6922754033746201,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9429621838257393,
+      "is_sports": 0.011828771360208351
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9162356856078507,
+      "is_sports": 0.014847372093553125
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.882502366614742,
+      "is_sports": 0.02552747863625431
+    },
+    {
+      "label": "sports",
+      "choice": "business",
+      "confidence": 0.539786452916979,
+      "is_sports": 0.8904448703135545
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999571181498848,
+      "is_sports": 0.9787035650562114
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.6804702060610778,
+      "is_sports": 0.21983994679900384
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6243095217213103,
+      "is_sports": 0.03302472634064831
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9946585372439108,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9978212767351613,
+      "is_sports": 0.9786957244913689
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9916420284946884,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9810503181313808,
+      "is_sports": 0.01052508733100174
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7128776811707607,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9830300109372314,
+      "is_sports": 0.016221126149262636
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.988747604728779,
+      "is_sports": 0.9589136407889398
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5794842112449075,
+      "is_sports": 0.016936378926469285
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6989773206492647,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.5996823970321726,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9044150297787255,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9769601829851092,
+      "is_sports": 0.010506575436986224
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9979961248668725,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.8758540833672036,
+      "is_sports": 0.9247911032739801
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5276417640390756,
+      "is_sports": 0.013095225726428532
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.7958643773539507,
+      "is_sports": 0.012450847917920707
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9924619486857279,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.874520952887208,
+      "is_sports": 0.9621879622622044
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9945634192143901,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9872815336114624,
+      "is_sports": 0.016734811937311203
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9938619229580049,
+      "is_sports": 0.0250163030765145
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9361680037169843,
+      "is_sports": 0.021010979528071932
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997266588380908,
+      "is_sports": 0.9809305615353517
+    },
+    {
+      "label": "world",
+      "choice": "sports",
+      "confidence": 0.9989361474734212,
+      "is_sports": 0.9848681740162503
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.991013389259637,
+      "is_sports": 0.020737443938088667
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998192081600611,
+      "is_sports": 0.9841387682769224
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7329310553496987,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9722361453196743,
+      "is_sports": 0.018211541554036738
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.6573928252578722,
+      "is_sports": 0.014233872156686506
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9935981799243552,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9882050617859724,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.9906016954611323,
+      "is_sports": 0.020042567488644407
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9919622862271228,
+      "is_sports": 0.026076066639716927
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9790107440884569,
+      "is_sports": 0.01485603024788619
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995381402655524,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9917197153025453,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.6789032024467925,
+      "is_sports": 0.024460715634996844
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9226221747080936,
+      "is_sports": 0.043133801716958325
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9989274594601436,
+      "is_sports": 0.9820249846422607
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.6349953890154993,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9873072404421586,
+      "is_sports": 0.01219407037116579
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9842645387927095,
+      "is_sports": 0.018010274825590786
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9992634285858576,
+      "is_sports": 0.9880849665277766
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9982932946813644,
+      "is_sports": 0.987267252466275
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9931374272850286,
+      "is_sports": 0.9825888403884157
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994384013761552,
+      "is_sports": 0.9884141943623435
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.993097204689262,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9942491851120089,
+      "is_sports": 0.012820223916115727
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999447471021963,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9990014140514993,
+      "is_sports": 0.9874165920318178
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.998219701226272,
+      "is_sports": 0.9863974896005573
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9039744289173149,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5930207835693123,
+      "is_sports": 0.017980616198744775
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9946053238431994,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.981772520555849,
+      "is_sports": 0.509051959224515
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6865205627326262,
+      "is_sports": 0.01631350826976156
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9760685051789649,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.982714217468742,
+      "is_sports": 0.014734433405821815
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9959935813684644,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.8624554234317467,
+      "is_sports": 0.018046654342655198
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9437810726107981,
+      "is_sports": 0.0385862406714554
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995558675676968,
+      "is_sports": 0.9859430505681852
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9655175819883483,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9901541266638622,
+      "is_sports": 0.015504732170554513
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9801668716317996,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9921883238906793,
+      "is_sports": 0.011382906930566414
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7270723734528488,
+      "is_sports": 0.16919434567844718
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.9661639272306629,
+      "is_sports": 0.02147621911225834
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5754130941046927,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9936266922025269,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9895613300630444,
+      "is_sports": 0.012489309772128145
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.8198887279749028,
+      "is_sports": 0.0229087942629094
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9983738769633452,
+      "is_sports": 0.9762180130431733
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.6088915634222238,
+      "is_sports": 0.01717615802394683
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9865526166604865,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997709445818853,
+      "is_sports": 0.9824827748197754
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5729674359209994,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9404140277277963,
+      "is_sports": 0.011306965719790698
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9444211915280625,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9832082825051107,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9990706543793628,
+      "is_sports": 0.9712242187158969
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9259124929995561,
+      "is_sports": 0.025544963260948406
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9874356172636576,
+      "is_sports": 0.015704498104782257
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6399370988445403,
+      "is_sports": 0.010938147576026765
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.992050781850023,
+      "is_sports": 0.012345072085552009
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9511317245607077,
+      "is_sports": 0.9877862575099842
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9313458467074731,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994535826684577,
+      "is_sports": 0.9744780668774012
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6252052024619181,
+      "is_sports": 0.012494409526562219
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9882975371969296,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8392314594688944,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9691130400600158,
+      "is_sports": 0.012336759830947282
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.995596389712985,
+      "is_sports": 0.013547853654127359
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5064313927103249,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9939291285269879,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9885631968909678,
+      "is_sports": 0.985805340585903
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5906344045205653,
+      "is_sports": 0.017412455126294267
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9971193654809016,
+      "is_sports": 0.02183809612957145
+    },
+    {
+      "label": "business",
+      "choice": "world",
+      "confidence": 0.730016876763712,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9046861273387777,
+      "is_sports": 0.021237626756948846
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7070475529475524,
+      "is_sports": 0.011088163280621609
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997196726654523,
+      "is_sports": 0.9846973331154772
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7985134339782721,
+      "is_sports": 0.01600459743331016
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9971324876241489,
+      "is_sports": 0.01614318276785152
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.99989301215135,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9753450300018484,
+      "is_sports": 0.013182131359871316
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.966583741360953,
+      "is_sports": 0.015923348858583857
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9962067598902532,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9513138780530458,
+      "is_sports": 0.016759715176649332
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9932884053848079,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9253055636606593,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994077527678604,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9992565999268194,
+      "is_sports": 0.99
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.8930529126476061,
+      "is_sports": 0.02266065601537709
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998534091933512,
+      "is_sports": 0.9863796419750129
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9749845585378059,
+      "is_sports": 0.019169614780448103
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9902474082582874,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9945892823014792,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5225110143916707,
+      "is_sports": 0.010242258441935305
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995963557781812,
+      "is_sports": 0.9770639882418404
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9523248607195384,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.7283856675710001,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9812018373969112,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9975719263503526,
+      "is_sports": 0.9802666191138815
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998468312030719,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8385441839549157,
+      "is_sports": 0.02856689174997496
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995397152764566,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9911297962629554,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8879577873570043,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9596104677908591,
+      "is_sports": 0.9336171041309212
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9910451465911019,
+      "is_sports": 0.012712729867307211
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9906682769654468,
+      "is_sports": 0.013964511043332243
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9954658011918489,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.4999513519290578,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9932447695393378,
+      "is_sports": 0.9868544981219538
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.625849643454936,
+      "is_sports": 0.01600367248346718
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999767533385039,
+      "is_sports": 0.9824602679633604
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9922682487569263,
+      "is_sports": 0.015119934656025898
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9981468479206262,
+      "is_sports": 0.9835104521206539
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999369803922222,
+      "is_sports": 0.9853487629036618
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.9779793056240293,
+      "is_sports": 0.01692125851426386
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.864291420656376,
+      "is_sports": 0.028909301059415318
+    },
+    {
+      "label": "sci_tech",
+      "choice": "world",
+      "confidence": 0.8815385976685879,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.94642840589834,
+      "is_sports": 0.013633981434386416
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9983675514339736,
+      "is_sports": 0.9727178915159093
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9964207561970381,
+      "is_sports": 0.987535599341577
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9729249414228586,
+      "is_sports": 0.02560194414056191
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9371344411197868,
+      "is_sports": 0.014027312668670234
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9860574430921464,
+      "is_sports": 0.01759637614173452
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9991101497897321,
+      "is_sports": 0.9814484791430481
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5099848717588948,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9968791410024231,
+      "is_sports": 0.011491702833956608
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9974304603103362,
+      "is_sports": 0.9767760170119646
+    },
+    {
+      "label": "business",
+      "choice": "world",
+      "confidence": 0.9790537060583354,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.8844046680025069,
+      "is_sports": 0.01722095346064537
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.7398684268950866,
+      "is_sports": 0.011510470026007085
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9947648320113486,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.7378883606210769,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.5214969303530549,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9952788637791795,
+      "is_sports": 0.018589845110770838
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.5059677288413241,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9911021378545691,
+      "is_sports": 0.01521359334786907
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9897511383889559,
+      "is_sports": 0.01901233517434616
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9338038523216884,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "sports",
+      "confidence": 0.9998892884643867,
+      "is_sports": 0.9692513443742162
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5912363837726481,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.6304703461373374,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9991135268481885,
+      "is_sports": 0.9894565821253087
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995341077302075,
+      "is_sports": 0.99
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.857892163783764,
+      "is_sports": 0.01242249698477638
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9914219432158955,
+      "is_sports": 0.015515020882868356
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9166414130174995,
+      "is_sports": 0.010613653891644243
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.511477150406444,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9881810108431336,
+      "is_sports": 0.017597433050955444
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8370508334533562,
+      "is_sports": 0.02145877793419512
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5974309101372665,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9896694980547165,
+      "is_sports": 0.016920377200186805
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9967988249627595,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.976330774077708,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9672344505304115,
+      "is_sports": 0.013007033423605204
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.7145893112069791,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.994187817555292,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6879547656346587,
+      "is_sports": 0.018350574089844644
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9777606610210917,
+      "is_sports": 0.01671362050945062
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9335908376853819,
+      "is_sports": 0.12470128358736973
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9945318206672658,
+      "is_sports": 0.01911614105578065
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9615607184246265,
+      "is_sports": 0.012012312369869495
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9944793249243807,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9934790848342637,
+      "is_sports": 0.010617874392833038
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.8393688205392988,
+      "is_sports": 0.02193697893301781
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9640707222099852,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.998375173392627,
+      "is_sports": 0.987152942656065
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9747174170290448,
+      "is_sports": 0.0199393322288101
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.9469070134589522,
+      "is_sports": 0.020587262310746934
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.659552900711311,
+      "is_sports": 0.025553239153081265
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8283345442152152,
+      "is_sports": 0.01598217333848745
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9984555978132522,
+      "is_sports": 0.9677968514349374
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.5846882640174703,
+      "is_sports": 0.01465395052489871
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9815746223495675,
+      "is_sports": 0.973296406219179
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9894009496918729,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.8519702894732939,
+      "is_sports": 0.9742993740243361
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.4959548119544123,
+      "is_sports": 0.02553388095095274
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995696595468753,
+      "is_sports": 0.9873224011780162
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.951139318983792,
+      "is_sports": 0.014484829881970862
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9987284319326729,
+      "is_sports": 0.9706128504296336
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.998706771361923,
+      "is_sports": 0.9864960210276966
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.7745781547257188,
+      "is_sports": 0.12815293928596105
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9989635876987496,
+      "is_sports": 0.979714741044197
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9490014744253068,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9993371651240867,
+      "is_sports": 0.9827593009334553
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9904526667282801,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9844295461925274,
+      "is_sports": 0.04847356547935359
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9680410977138019,
+      "is_sports": 0.01707519048339587
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5131783229309116,
+      "is_sports": 0.01530435795127212
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9897922248961718,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9991847682831513,
+      "is_sports": 0.99
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.9963854733039769,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9970041704443633,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5377121257533571,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7027899181267068,
+      "is_sports": 0.013304112088106243
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9986954618617458,
+      "is_sports": 0.9786957113541607
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9939243296602365,
+      "is_sports": 0.947839076520146
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9922619511878622,
+      "is_sports": 0.01308263789510135
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994500503575987,
+      "is_sports": 0.9672000454547819
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5763294728351106,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9440349402834262,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.988121977231503,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.6555292474114348,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.9737510870321486,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7484682166510558,
+      "is_sports": 0.012741633669920446
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9951984447221074,
+      "is_sports": 0.9831647994455021
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.989746545292066,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.8708745904665564,
+      "is_sports": 0.7530757151250917
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9825928729861487,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994109552421981,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998362904547743,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9996968878705262,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9964381580789698,
+      "is_sports": 0.9887325753844297
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8871385961026645,
+      "is_sports": 0.018588992034317676
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5516291214677466,
+      "is_sports": 0.0422783833471173
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6140237264988759,
+      "is_sports": 0.014030674514979899
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9204905639134171,
+      "is_sports": 0.014740431700918322
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9999152448552658,
+      "is_sports": 0.9895763578116642
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9954524332320047,
+      "is_sports": 0.9839635826271743
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5684487636229668,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.9761536276533704,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9918329979259682,
+      "is_sports": 0.01459931941897516
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5399815355673155,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8207206445444113,
+      "is_sports": 0.013381953824181024
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9932772575797055,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.905890199196843,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9028630366380848,
+      "is_sports": 0.024554580249428574
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7212054872703131,
+      "is_sports": 0.01102694958340702
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9866364602554434,
+      "is_sports": 0.017536509205853618
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9752516266541257,
+      "is_sports": 0.018418392039689886
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9994166270024327,
+      "is_sports": 0.9725406867769825
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9144396584106378,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9919137818365805,
+      "is_sports": 0.9724062643504536
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9993386039086861,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9782710912351842,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9755543183356834,
+      "is_sports": 0.018164820763641114
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9825488056255967,
+      "is_sports": 0.8288174205540251
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9900700807660783,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9812495830354242,
+      "is_sports": 0.01748479689790283
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9794674949076771,
+      "is_sports": 0.03054665715035621
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9996846983525519,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.989560778719607,
+      "is_sports": 0.012524769257095562
+    },
+    {
+      "label": "sci_tech",
+      "choice": "world",
+      "confidence": 0.7642386016137822,
+      "is_sports": 0.013355743438095107
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6481966822641344,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6469552766345086,
+      "is_sports": 0.01518766778267525
+    },
+    {
+      "label": "world",
+      "choice": "sci_tech",
+      "confidence": 0.5423935750702243,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9913575199650206,
+      "is_sports": 0.01701376124785569
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.5185462413567098,
+      "is_sports": 0.01627309231688088
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9996511952044046,
+      "is_sports": 0.9861492260981362
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.993496509085343,
+      "is_sports": 0.9748952664586967
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9996973211668285,
+      "is_sports": 0.9762191643792206
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.97450425965676,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.711067546043875,
+      "is_sports": 0.023645800923850463
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9863598188391368,
+      "is_sports": 0.014476157894471268
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9984873174474079,
+      "is_sports": 0.9779236858410669
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9758496885005888,
+      "is_sports": 0.023101031375886788
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8970247073370301,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.993784862900032,
+      "is_sports": 0.9709310621153372
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9252692335581557,
+      "is_sports": 0.8717498543818708
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6640994181255996,
+      "is_sports": 0.04590455304003316
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9896581651106519,
+      "is_sports": 0.012231935403947793
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.7646404390559095,
+      "is_sports": 0.7676483432503141
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9910313608116752,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9643960962653958,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9849200019802219,
+      "is_sports": 0.019277147405043448
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.7548802784183997,
+      "is_sports": 0.020358238606293648
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9960003659307123,
+      "is_sports": 0.9795215403147465
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.988089271177809,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.4941131437565938,
+      "is_sports": 0.015167652609324001
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8307232772876504,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9880419558213546,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9866472573226974,
+      "is_sports": 0.013577026728570293
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9901897838796663,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9984070618355099,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9901336594769609,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9764831427953807,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.997709376388213,
+      "is_sports": 0.02345719779186491
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9693997954042898,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.883702209075604,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9288701407662725,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9740053766161064,
+      "is_sports": 0.10670194932536167
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9013988249129042,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "business",
+      "confidence": 0.9795883201745905,
+      "is_sports": 0.016819275453773312
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9781239134480839,
+      "is_sports": 0.013659801264250615
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.935220384395033,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6412746538013422,
+      "is_sports": 0.011602798697404442
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9869308177329724,
+      "is_sports": 0.010474370989452893
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9987790335294437,
+      "is_sports": 0.9800828147077273
+    },
+    {
+      "label": "world",
+      "choice": "sports",
+      "confidence": 0.9980319535185871,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9057285875522221,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995701965446128,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9948041356624057,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9993652853515032,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9534526737740562,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9896278561823284,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.7475437529429507,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9328801252452251,
+      "is_sports": 0.021798845955823373
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.931053234333759,
+      "is_sports": 0.014648482474152104
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9937521120291946,
+      "is_sports": 0.9897503084307265
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9827357860464271,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.996850072333869,
+      "is_sports": 0.989210611418285
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997741294298704,
+      "is_sports": 0.9880297078273274
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9914312502660853,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9907412019571505,
+      "is_sports": 0.9610683357761711
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9989544840801196,
+      "is_sports": 0.9838476538688645
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998110521086566,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9416709213417417,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.9959060210434248,
+      "is_sports": 0.01187254518781121
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9926881427171552,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995502725127918,
+      "is_sports": 0.9880238919753739
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9584667164891799,
+      "is_sports": 0.6595883445679372
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.764390057558434,
+      "is_sports": 0.023647601276760615
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9913354405456742,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9876669238709462,
+      "is_sports": 0.0233290716292965
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9966284546958318,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.6928262170480299,
+      "is_sports": 0.017431291880884395
+    },
+    {
+      "label": "world",
+      "choice": "sports",
+      "confidence": 0.9999054511049973,
+      "is_sports": 0.9894541708385273
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8068795113313252,
+      "is_sports": 0.010943534450412977
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9846441993138979,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9796527926833951,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998277883437876,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.6732683889810948,
+      "is_sports": 0.012398984617683406
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.6480543341006493,
+      "is_sports": 0.013920233812152995
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999454662230188,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5325373016134765,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9829329380429339,
+      "is_sports": 0.015338290587344936
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.994671782818535,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9978076011242251,
+      "is_sports": 0.99
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.950376537810219,
+      "is_sports": 0.011460253756183267
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9982681916658145,
+      "is_sports": 0.010047176457978459
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8412962894341308,
+      "is_sports": 0.011945051197514836
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9051529061519406,
+      "is_sports": 0.02259336284959298
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.8189377410560842,
+      "is_sports": 0.014748652093648118
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6492923196612407,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5232917323288107,
+      "is_sports": 0.011906384136868255
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9976523855346314,
+      "is_sports": 0.9827801748841327
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.994993422888001,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.49990033433215775,
+      "is_sports": 0.027175356313858798
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9962183919533883,
+      "is_sports": 0.978269703157684
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9971785561714911,
+      "is_sports": 0.010370377234695003
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5550578437768624,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9670901209153958,
+      "is_sports": 0.02046614425649182
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9778272449324908,
+      "is_sports": 0.02250362156767959
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9957104541365941,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.999678745857946,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995950525193925,
+      "is_sports": 0.9803956333143711
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9999381434591913,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.728035308142428,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9990839256248346,
+      "is_sports": 0.99
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8953266190368185,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9214464761064453,
+      "is_sports": 0.018762276748377823
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6799792120453519,
+      "is_sports": 0.023625767699567868
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8184511965814234,
+      "is_sports": 0.01134481469029891
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9920705275402274,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9964389572288295,
+      "is_sports": 0.013373722389152127
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9441093607997054,
+      "is_sports": 0.012609209193166925
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9993015764480541,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5180490664442808,
+      "is_sports": 0.01
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9939327544558745,
+      "is_sports": 0.016190983882049717
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.984124302638025,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.7597089221676004,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8600229438380774,
+      "is_sports": 0.018744680313041016
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9288664684362483,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6597272661364608,
+      "is_sports": 0.019029397130692214
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9993689145794115,
+      "is_sports": 0.9681706550156807
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9944297087981806,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.983177212699982,
+      "is_sports": 0.02071006007418947
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9902129622621412,
+      "is_sports": 0.01194611398958243
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.4256971355831487,
+      "is_sports": 0.014358993854800717
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9805414680720448,
+      "is_sports": 0.015345137024643157
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9816498486035841,
+      "is_sports": 0.01975225016314021
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.7351742332506134,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.8498403686920136,
+      "is_sports": 0.017783919404523174
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9997064998115376,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.5763261817859223,
+      "is_sports": 0.01
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995902258221461,
+      "is_sports": 0.9669545065340218
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9731085893040617,
+      "is_sports": 0.010713707203605479
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9749567871068368,
+      "is_sports": 0.989967070072072
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9992742268686324,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9995945824638187,
+      "is_sports": 0.9842537825275979
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6914501677977438,
+      "is_sports": 0.01910177129185856
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9896251841625737,
+      "is_sports": 0.012942319981347558
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9981948222918966,
+      "is_sports": 0.9811863348306958
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9986721847455455,
+      "is_sports": 0.9769986651101733
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9949320977222424,
+      "is_sports": 0.021827905945743603
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9955977429489071,
+      "is_sports": 0.012980821428613794
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.9845530435137787,
+      "is_sports": 0.010709371374974323
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.5473111782256258,
+      "is_sports": 0.01701664240047528
+    },
+    {
+      "label": "sci_tech",
+      "choice": "business",
+      "confidence": 0.4999173955039124,
+      "is_sports": 0.025594872778126845
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.9998505670492401,
+      "is_sports": 0.99
+    },
+    {
+      "label": "sports",
+      "choice": "sports",
+      "confidence": 0.8665856340644379,
+      "is_sports": 0.9859130461648323
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9585385573102952,
+      "is_sports": 0.019118331869094934
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9398775127797176,
+      "is_sports": 0.015100564082763914
+    },
+    {
+      "label": "sci_tech",
+      "choice": "sci_tech",
+      "confidence": 0.6232714660845649,
+      "is_sports": 0.024612219320630013
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.990842031193473,
+      "is_sports": 0.01666895788228524
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9935355651560993,
+      "is_sports": 0.01
+    },
+    {
+      "label": "business",
+      "choice": "business",
+      "confidence": 0.9553587866078007,
+      "is_sports": 0.01864481534738545
+    },
+    {
+      "label": "world",
+      "choice": "world",
+      "confidence": 0.9843024490133816,
+      "is_sports": 0.010721308761435195
+    },
+    {
+      "label": "business",
+      "choice": "sci_tech",
+      "confidence": 0.8019764939034338,
+      "is_sports": 0.013910040287741858
+    }
+  ]
+}

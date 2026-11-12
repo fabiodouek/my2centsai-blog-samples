@@ -51,18 +51,18 @@ a = result.answers
 
 banner("yes/no (noul): probability of yes, clamped to 0.01..0.99")
 for key in ("double_charge", "asks_for_refund", "mentions_legal_action"):
-    print(f"{key:<24} P(yes)={a[key].noul:<6} confidence={a[key].confidence}")
+    print(f"{key:<24} P(yes)={a[key].noul:.4f}  confidence={a[key].confidence:.4f}")
 
-banner("choice: I sent the options as technical, billing, shipping, account, other")
-print(f"choice={a['queue'].choice}  confidence={a['queue'].confidence}")
-print("keys in the order the API returned them:")
-for option, p in a["queue"].probabilities.items():
-    print(f"  {option:<10} {p}")
+banner("choice: probabilities over the five queues")
+print(f"choice={a['queue'].choice}  confidence={a['queue'].confidence:.4f}")
+for option, p in sorted(a["queue"].probabilities.items(), key=lambda kv: -kv[1]):
+    print(f"  {option:<10} {p:.4f}")
+print(f"  sum        {sum(a['queue'].probabilities.values()):.4f}")
 
 banner("score: probability-weighted average of the level index (0-based)")
-print(f"score={a['churn_risk'].score}  confidence={a['churn_risk'].confidence}")
-for level, p in a["churn_risk"].probabilities.items():
-    print(f"  {level} {p:<6} {a['churn_risk'].legend[level]}")
+print(f"score={a['churn_risk'].score:.4f}  confidence={a['churn_risk'].confidence:.4f}")
+for level, p in sorted(a["churn_risk"].probabilities.items()):
+    print(f"  {level}  {p:.4f}  {a['churn_risk'].legend[level]}")
 
 banner("triage rule built on the answers")
 if a["queue"].confidence < 0.6:

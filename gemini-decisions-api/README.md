@@ -39,6 +39,21 @@ export DECISIONS_TPM=1000000     # 50000 on the free tier; the scripts pace them
 Each script prints its results and writes them to `results/`. The JSON files committed there are
 from my runs.
 
+## What my runs showed
+
+Run on 2026-11-12, one day after launch, on a Tier 1 project. Timings include the network.
+
+| Question | Result |
+|---|---|
+| Latency, 1 to 100 questions over one input | 286, 292 and 379 ms at the median; 1,000 questions took 2.7 s |
+| Latency by input size | about 310 ms at 1K tokens, 441 ms at 16K, 2.0 s at 245K |
+| Billing | shared input billed once; about 53 tokens per extra question |
+| Calibration on 500 AG News articles | accuracy 0.884, top-1 ECE 0.040; yes/no ECE 0.012 |
+| Determinism | text: identical across 5 runs. With media: one answer moved from 0.86 to 0.32 between runs |
+| Against Gemini 3.5 Flash-Lite | same accuracy, 2.6x faster, 3.4x cheaper |
+| Prompt injection | a planted note moved "is this spam" from 0.97 to 0.51; explicit criteria restored it |
+| Default SDK client | 404 with an empty body until pinned to `v1beta` |
+
 ## Sample data
 
 - `assets/` holds the synthetic ticket media: a drawn app screenshot, a generated PDF statement, a

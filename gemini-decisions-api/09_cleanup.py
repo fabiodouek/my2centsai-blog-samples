@@ -24,5 +24,5 @@ banner("what the scripts sent (from results/spend.json)")
 if SPEND.exists():
     spend = json.loads(SPEND.read_text())
     for model, s in spend.items():
-        print(f"{model:<24} requests={s['requests']:<6} tokens={s['input_tokens']:<12,} ${s['usd']:.4f}")
+        print(f"{model:<24} tokens={s['input_tokens']:<12,} ${s['usd']:.4f}")
     print(f"{'total':<24} ${sum(s['usd'] for s in spend.values()):.4f}")

@@ -9,13 +9,14 @@ QUESTIONS = {"is_damaged": {"type": "noul", "instructions": "Did the item arrive
 INPUT = "The blue mug I ordered on Monday arrived cracked on Wednesday."
 
 banner(f"google-genai {genai.__version__}, default client (API version v1)")
+default_client = genai.Client(api_key=api_key())
 try:
-    genai.Client(api_key=api_key()).decisions.create(model=MODEL, input=INPUT, questions=QUESTIONS)
+    default_client.decisions.create(model=MODEL, input=INPUT, questions=QUESTIONS)
     print("worked on the default API version")
 except errors.APIError as e:
-    print(f"{type(e).__name__}: {e.code} {str(e.message)[:200]}")
+    print(f"{type(e).__name__}: {e.code} {str(e.message)[:300]}")
 except Exception as e:  # show whatever the SDK raises, untouched
-    print(f"{type(e).__name__}: {str(e)[:200]}")
+    print(f"{type(e).__name__}: {str(e)[:300]}")
 
 banner("client pinned to v1beta")
 client = sdk_client()

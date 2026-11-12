@@ -77,9 +77,11 @@ record_sdk_usage(result)
 for key, ans in result.answers.items():
     d = ans.model_dump(exclude_none=True)
     top = d.get("noul", d.get("choice"))
-    print(f"{key:<28} {str(top):<10} confidence={d['confidence']}")
+    top = f"{top:.4f}" if isinstance(top, float) else top
+    print(f"{key:<28} {top:<10} confidence={d["confidence"]:.4f}")
 u = result.usage.model_dump(exclude_none=True)
-print(f"\n{ms:.0f} ms, usage: {u}")
+by = ", ".join(f"{m['modality']}={m['tokens']:,}" for m in u["input_tokens_by_modality"])
+print(f"\n{ms:.0f} ms, input tokens={u['total_input_tokens']:,} ({by}), output tokens={u['total_output_tokens']}")
 print(f"cost: {usd(u['total_input_tokens'])}")
 out = {"combined": {"ms": round(ms), "result": result.model_dump(exclude_none=True)}, "per_file": []}
 
@@ -114,7 +116,7 @@ r = client.decisions.create(
     questions={"video_error_appears": QUESTIONS["video_error_appears"]},
 )
 record_sdk_usage(r)
-print(f"P(yes)={r.answers['video_error_appears'].noul} tokens={r.usage.total_input_tokens}")
+print(f"P(yes)={r.answers['video_error_appears'].noul:.4f} tokens={r.usage.total_input_tokens}")
 print("The file stays in the Files API until it expires or 09_cleanup.py deletes it.")
 out["files_api"] = {"tokens": r.usage.total_input_tokens, "noul": r.answers["video_error_appears"].noul}
 save("03_multimodal", out)

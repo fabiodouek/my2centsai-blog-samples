@@ -43,7 +43,7 @@ for n in (1, 10, 100, 1000):
         continue
     row = {"questions": n, "input_tokens": tokens, "answers": len(body["answers"]), **summary(times)}
     rows.append(row)
-    print(row)
+    print(f"answers={row['answers']} input_tokens={tokens:,} p50={row['p50_ms']} ms p95={row['p95_ms']} ms")
 
 banner("summary")
 print(f"{'questions':>9} {'tokens':>8} {'tokens/extra q':>15} {'p50 ms':>7} {'p95 ms':>7} {'cost/request':>13} {'cost/question':>14}")
@@ -51,5 +51,5 @@ base = rows[0]["input_tokens"] if rows else 0
 for r in rows:
     per_q = (r["input_tokens"] - base) / (r["questions"] - 1) if r["questions"] > 1 else 0
     print(f"{r['questions']:>9} {r['input_tokens']:>8} {per_q:>15.1f} {r['p50_ms']:>7} {r['p95_ms']:>7} "
-          f"{usd(r['input_tokens']):>13} ${r['input_tokens'] * 0.10 / 1e6 / r['questions']:>13.8f}")
+          f"{usd(r["input_tokens"]):>13} {"$%.8f" % (r["input_tokens"] * 0.10 / 1e6 / r["questions"]):>14}")
 save("04_fanout", rows)

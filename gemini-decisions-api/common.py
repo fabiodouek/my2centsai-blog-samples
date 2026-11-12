@@ -15,6 +15,7 @@ import json
 import os
 import statistics
 import sys
+import threading
 import time
 from collections import deque
 from pathlib import Path
@@ -74,23 +75,26 @@ class Pacer:
 
 
 PACER = Pacer()
+_LOCK = threading.Lock()  # the calibration scripts call post() from several threads
 SPEND = RESULTS / "spend.json"
 
 
 def _record(tokens: int, model: str = MODEL, usd: float | None = None) -> None:
-    RESULTS.mkdir(exist_ok=True)
-    s = json.loads(SPEND.read_text()) if SPEND.exists() else {}
-    m = s.setdefault(model, {"requests": 0, "input_tokens": 0, "usd": 0.0})
-    m["requests"] += 1
-    m["input_tokens"] += tokens
-    m["usd"] = round(m["usd"] + (tokens * PRICE_PER_M / 1e6 if usd is None else usd), 6)
-    SPEND.write_text(json.dumps(s, indent=2))
+    with _LOCK:
+        RESULTS.mkdir(exist_ok=True)
+        s = json.loads(SPEND.read_text()) if SPEND.exists() else {}
+        m = s.setdefault(model, {"requests": 0, "input_tokens": 0, "usd": 0.0})
+        m["requests"] += 1
+        m["input_tokens"] += tokens
+        m["usd"] = round(m["usd"] + (tokens * PRICE_PER_M / 1e6 if usd is None else usd), 6)
+        SPEND.write_text(json.dumps(s, indent=2))
 
 
 def post(body: dict, expect_tokens: int = 0, pace: bool = True) -> tuple[int, dict, float]:
     """POST one Decisions request. Returns (status, body, milliseconds)."""
     if pace and expect_tokens:
-        PACER.wait(expect_tokens)
+        with _LOCK:
+            PACER.wait(expect_tokens)
     t0 = time.perf_counter()
     r = http().post(ENDPOINT, json={"model": MODEL, **body})
     ms = (time.perf_counter() - t0) * 1000
