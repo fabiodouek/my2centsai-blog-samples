@@ -7,12 +7,13 @@ and measurements of latency, billed tokens, calibration and error handling.
 The Decisions API answers closed questions (yes/no, pick one option, rate on a rubric) about one
 shared input and returns probabilities instead of text. It bills input tokens only.
 
-Video walkthrough: https://youtu.be/a8b4cjJByVE
+Video walkthrough: https://youtu.be/yzwpMd_A2YY
 
 ## Requirements
 
 - Python 3.11+
-- A Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
+- A Gemini API key: from the Google Cloud console (APIs & Services > Credentials, restricted to the Gemini API),
+  from `./00_setup_gcloud.sh`, or from [Google AI Studio](https://aistudio.google.com/apikey)
 - For `05_context_scaling.py` and the 1,000-question run in `04_fanout.py`: a project on the paid
   tier. The free tier allows 50,000 tokens per minute, less than one of those requests.
 
@@ -27,6 +28,7 @@ export DECISIONS_TPM=1000000     # 50000 on the free tier; the scripts pace them
 
 | Script | What it shows |
 |---|---|
+| `00_setup_gcloud.sh` | Optional: enable the Gemini API, create a key restricted to it, save it to `.env`, first request. `--delete` removes the key. Needs `gcloud` and `GOOGLE_CLOUD_PROJECT` |
 | `01_first_call.sh` | One yes/no question over curl |
 | `01_first_call.py` | The same through google-genai 3.2, and why the client must be pinned to `v1beta` |
 | `02_ticket_demo.py` | One support ticket, yes/no + choice + score questions in one request, and a triage rule on the answers |
@@ -74,5 +76,6 @@ running total of what the scripts sent.
 python 09_cleanup.py     # Files API uploads
 ```
 
-Then delete the API key in [AI Studio](https://aistudio.google.com/apikey), or with
-`gcloud services api-keys delete KEY_ID`.
+Then delete the API key: `./00_setup_gcloud.sh --delete` if the script made it, otherwise on the console's
+Credentials page or in [AI Studio](https://aistudio.google.com/apikey). A key with recent traffic refuses a plain
+`gcloud services api-keys delete`; `--no-check-existing-usage` skips that check.
