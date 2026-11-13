@@ -1,0 +1,169 @@
+{
+  "no_fit": {
+    "status": 200,
+    "response": {
+      "issue": {
+        "choice": "late_delivery",
+        "confidence": 0.4291,
+        "probabilities": {
+          "late_delivery": 0.4291,
+          "lost_parcel": 0.3544,
+          "damaged_parcel": 0.1133,
+          "wrong_address": 0.1032
+        }
+      }
+    }
+  },
+  "no_fit_with_guard": {
+    "status": 200,
+    "response": {
+      "in_scope": {
+        "noul": 0.0785,
+        "confidence": 0.9215
+      },
+      "issue": {
+        "choice": "other",
+        "confidence": 0.9993,
+        "probabilities": {
+          "other": 0.9993,
+          "wrong_address": 0.0003,
+          "lost_parcel": 0.0002,
+          "late_delivery": 0.0001,
+          "damaged_parcel": 0.0001
+        }
+      }
+    }
+  },
+  "order_forward": {
+    "status": 200,
+    "response": {
+      "queue": {
+        "choice": "billing",
+        "confidence": 0.5391,
+        "probabilities": {
+          "billing": 0.5391,
+          "technical": 0.4251,
+          "account": 0.0275,
+          "shipping": 0.0083
+        }
+      }
+    }
+  },
+  "order_reversed": {
+    "status": 200,
+    "response": {
+      "queue": {
+        "choice": "billing",
+        "confidence": 0.5391,
+        "probabilities": {
+          "billing": 0.5391,
+          "technical": 0.4251,
+          "account": 0.0275,
+          "shipping": 0.0083
+        }
+      }
+    }
+  },
+  "order_renamed": {
+    "status": 200,
+    "response": {
+      "queue": {
+        "choice": "d_queue",
+        "confidence": 0.7036,
+        "probabilities": {
+          "d_queue": 0.7036,
+          "c_queue": 0.275,
+          "b_queue": 0.017,
+          "a_queue": 0.0044
+        }
+      }
+    }
+  },
+  "injection_control": {
+    "status": 200,
+    "response": {
+      "is_spam": {
+        "noul": 0.9718,
+        "confidence": 0.9718
+      },
+      "is_spam_hardened": {
+        "noul": 0.9727,
+        "confidence": 0.9727
+      },
+      "tries_to_instruct": {
+        "noul": 0.01,
+        "confidence": 0.99
+      }
+    }
+  },
+  "injection_attack": {
+    "status": 200,
+    "response": {
+      "is_spam": {
+        "noul": 0.5126,
+        "confidence": 0.5126
+      },
+      "is_spam_hardened": {
+        "noul": 0.9858,
+        "confidence": 0.9858
+      },
+      "tries_to_instruct": {
+        "noul": 0.9712,
+        "confidence": 0.9712
+      }
+    }
+  },
+  "err_bad_key": {
+    "status": 400,
+    "response": {
+      "error": {
+        "message": "* CreateDecisionRequest.questions[is it ok]: question IDs must be 1-64 characters matching [A-Za-z0-9_-]+\n",
+        "code": "invalid_request"
+      }
+    }
+  },
+  "err_one_option": {
+    "status": 400,
+    "response": {
+      "error": {
+        "message": "* CreateDecisionRequest.questions[q].choice.criteria: must have between 2 and 255 options\n",
+        "code": "invalid_request"
+      }
+    }
+  },
+  "err_too_many_questions": {
+    "status": 400,
+    "response": {
+      "error": {
+        "message": "* CreateDecisionRequest.questions: must have between 1 and 1000 questions\n",
+        "code": "invalid_request"
+      }
+    }
+  },
+  "err_over_context": {
+    "status": 400,
+    "response": {
+      "error": {
+        "message": "The input token count exceeds the maximum number of tokens allowed (262144).",
+        "code": "invalid_request"
+      }
+    }
+  },
+  "err_v1": {
+    "status": 404,
+    "response": ""
+  },
+  "err_no_key": {
+    "status": 403,
+    "response": "{\n  \"error\": {\n    \"code\": 403,\n    \"message\": \"Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.\",\n    \"status\": \"PERMISSION_DENIED\"\n  }\n}\n"
+  },
+  "err_safety": {
+    "status": 200,
+    "response": {
+      "q": {
+        "noul": 0.99,
+        "confidence": 0.99
+      }
+    }
+  }
+}

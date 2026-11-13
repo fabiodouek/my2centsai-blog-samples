@@ -1,0 +1,42 @@
+[
+  {
+    "questions": 1,
+    "input_tokens": 1835,
+    "answers": 1,
+    "n": 10,
+    "p50_ms": 286,
+    "p95_ms": 338,
+    "min_ms": 193,
+    "max_ms": 338
+  },
+  {
+    "questions": 10,
+    "input_tokens": 2303,
+    "answers": 10,
+    "n": 10,
+    "p50_ms": 292,
+    "p95_ms": 370,
+    "min_ms": 169,
+    "max_ms": 370
+  },
+  {
+    "questions": 100,
+    "input_tokens": 7064,
+    "answers": 100,
+    "n": 10,
+    "p50_ms": 379,
+    "p95_ms": 527,
+    "min_ms": 293,
+    "max_ms": 527
+  },
+  {
+    "questions": 1000,
+    "input_tokens": 55574,
+    "answers": 1000,
+    "n": 10,
+    "p50_ms": 2655,
+    "p95_ms": 3015,
+    "min_ms": 2422,
+    "max_ms": 3015
+  }
+]

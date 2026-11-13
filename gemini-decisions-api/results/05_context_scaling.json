@@ -1,0 +1,80 @@
+[
+  {
+    "target": 1000,
+    "input_tokens": 1132,
+    "n": 10,
+    "p50_ms": 309,
+    "p95_ms": 361,
+    "min_ms": 168,
+    "max_ms": 361,
+    "answers": {
+      "mentions_refund": 0.018,
+      "worst_severity": "error"
+    }
+  },
+  {
+    "target": 4000,
+    "input_tokens": 4052,
+    "n": 10,
+    "p50_ms": 323,
+    "p95_ms": 420,
+    "min_ms": 182,
+    "max_ms": 420,
+    "answers": {
+      "mentions_refund": 0.0169,
+      "worst_severity": "error"
+    }
+  },
+  {
+    "target": 16000,
+    "input_tokens": 15748,
+    "n": 10,
+    "p50_ms": 441,
+    "p95_ms": 585,
+    "min_ms": 302,
+    "max_ms": 585,
+    "answers": {
+      "mentions_refund": 0.0464,
+      "worst_severity": "error"
+    }
+  },
+  {
+    "target": 64000,
+    "input_tokens": 62632,
+    "n": 10,
+    "p50_ms": 697,
+    "p95_ms": 934,
+    "min_ms": 565,
+    "max_ms": 934,
+    "answers": {
+      "mentions_refund": 0.0139,
+      "worst_severity": "error"
+    }
+  },
+  {
+    "target": 128000,
+    "input_tokens": 125268,
+    "n": 5,
+    "p50_ms": 1087,
+    "p95_ms": 1186,
+    "min_ms": 1039,
+    "max_ms": 1186,
+    "answers": {
+      "mentions_refund": 0.0182,
+      "worst_severity": "error"
+    }
+  },
+  {
+    "target": 250000,
+    "input_tokens": 244544,
+    "n": 5,
+    "p50_ms": 2042,
+    "p95_ms": 2404,
+    "min_ms": 1996,
+    "max_ms": 2404,
+    "answers": {
+      "mentions_refund": 0.0356,
+      "worst_severity": "error"
+    }
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "n": 500,
+  "accuracy": 0.884,
+  "p50_ms": 679,
+  "p95_ms": 926,
+  "min_ms": 430,
+  "max_ms": 1444,
+  "input_tokens": 54712,
+  "output_tokens": 5599,
+  "thought_tokens": 0,
+  "usd": 0.030411,
+  "usd_per_1k_items": 0.06082,
+  "decisions": {
+    "n": 500,
+    "accuracy": 0.884,
+    "p50_ms": 259,
+    "p95_ms": 352,
+    "min_ms": 126,
+    "max_ms": 1095,
+    "input_tokens": 89157,
+    "usd_per_1k_items": 0.01783,
+    "cost_ratio": 3.41,
+    "agreement": 0.952
+  }
+}
