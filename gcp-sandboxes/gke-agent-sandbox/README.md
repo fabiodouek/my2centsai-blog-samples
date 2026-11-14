@@ -2,6 +2,8 @@
 
 Companion code for [GKE Agent Sandbox: Hands-On with Warm Pools, Pod Snapshots and the Silent Fallback](https://www.my2cents.ai/deep-dive/gcp-gke-agent-sandbox/), part 5 of 6 in the Google Cloud Sandboxes series.
 
+Video walkthrough: https://youtu.be/8ajdaIy3y60
+
 One script per test, run in order against a GKE Standard cluster. They create real resources and cost money while the cluster runs (about $0.41 an hour at list price, plus $0.10 to $0.20 an hour for each temporary node pool). `teardown.sh` deletes everything and checks.
 
 ## Setup
