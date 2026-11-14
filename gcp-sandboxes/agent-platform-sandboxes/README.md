@@ -29,7 +29,7 @@ For Computer Use, create a service account with `roles/aiplatform.user`, give yo
 | `t4_ttl.py` | Default TTLs, TTL reset on execute, deletion at expiry |
 | `t5_limits.py`, `t5b_upload.py` | Code Execution: JavaScript, pip, libraries, output files; the 100 MB input cap |
 | `t6_pause_snapshot.py` | Pause, resume, snapshot, restore: what survives |
-| `t7_computer_use.py`, `cu_loop.py` | Raw CDP, the Gemini 3.8 Flash loop (about 60 lines), noVNC, pause and snapshot of a browser |
+| `t7_computer_use.py`, `cu_loop.py` | Raw CDP, the Gemini 3.8 Flash loop (about 100 lines), noVNC, pause and snapshot of a browser |
 | `t8_byoc.py`, `byoc/` | Three custom container images and what the platform does with them |
 | `t9_audit.py` | Which operations reach Cloud Logging, and whether the code does |
 | `teardown.py` | Deletes everything and verifies |
