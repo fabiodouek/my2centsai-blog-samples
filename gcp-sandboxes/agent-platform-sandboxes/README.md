@@ -2,6 +2,8 @@
 
 Companion code for [Agent Platform Sandboxes: Hands-On with Code Execution, Shell, Computer Use and Custom Containers](https://www.my2cents.ai/deep-dive/gcp-agent-platform-sandboxes/), part 3 of 6 in the Google Cloud Sandboxes series.
 
+Video walkthrough: https://youtu.be/DLlibgYAXEc
+
 One script per test. They create real sandboxes in your project and cost money while the sandboxes exist (list price $0.085 per vCPU-hour and $0.009 per GiB-hour). Every sandbox gets a short `ttl` and is deleted when its script ends, but read `teardown.py` before you start, and run it when you finish.
 
 ## Setup
