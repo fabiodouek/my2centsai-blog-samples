@@ -44,7 +44,7 @@ Run one with `./run.sh <script>`: it picks the atespace, starts the port-forward
 | 7 Latency and control-plane load | `t7a_latency.py`, `t7b_control_plane.py` | N = 1 to 40, three rounds; 120 tasks, 20 in flight |
 | 8 Wake by CPU limit, bursts | `t8_wake_burst.py` | 50m / 250m / 1 CPU; bursts of 1, 10, 30 |
 | 9 Noisy neighbors | `t9_noisy.py` | six victims against CPU, disk and memory hogs |
-| 10 Snapshot storm, failures, resources | `t10a_snapshot_storm.py`, `t10b_failures.py`, `t10c_monitoring.py` | 20 x 100 MB; command exit, worker pod deletion, WorkerPool patch (last); Cloud NAT and Cloud Storage bytes, node CPU/memory |
+| 10 Snapshot storm, failures, resources | `t10a_snapshot_storm.py`, `t10b_failures.py`, `t10c_monitoring.py`, `t10d_nat_sanity.py` | 20 x 100 MB; command exit, worker pod deletion, WorkerPool patch (last); Cloud NAT and Cloud Storage bytes, node CPU/memory |
 
 `t0_rtt.py` records the client-path baseline (the median of 10 x `ax get tasks`), `t0_window.py` marks the start of the measured window for `t10c_monitoring.py`, and `charts.py` draws `charts/` from `results/` and `eks-baseline/`. `cleanup.py` and `cleanup_lifecycle.py` delete the tasks. `manifests/` holds the native probe actor, and `router-probe.yaml` the curl pod the router accepts as a client.
 
