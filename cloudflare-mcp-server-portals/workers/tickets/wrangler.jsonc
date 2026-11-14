@@ -1,0 +1,6 @@
+{
+  "name": "tickets-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-02",
+  "compatibility_flags": ["nodejs_compat"]
+}
