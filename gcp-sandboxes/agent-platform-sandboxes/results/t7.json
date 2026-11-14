@@ -1,0 +1,83 @@
+{
+ "cdp": {
+  "png_bytes": 190371,
+  "title": "Google Cloud Documentation"
+ },
+ "loop": {
+  "steps": [
+   {
+    "step": 1,
+    "action": "click",
+    "args": {
+     "x": 608,
+     "intent": "Click the search bar in Google Cloud docs",
+     "y": 33
+    },
+    "model_seconds": 3.7
+   },
+   {
+    "step": 2,
+    "action": "type",
+    "args": {
+     "intent": "Type 'Agent Platform sandboxes' into the search bar and press enter",
+     "text": "Agent Platform sandboxes",
+     "press_enter": true
+    },
+    "model_seconds": 3.8
+   },
+   {
+    "step": 3,
+    "action": "scroll",
+    "args": {
+     "y": 500,
+     "x": 500,
+     "magnitude_in_pixels": 400,
+     "intent": "Scroll down to view search results",
+     "direction": "down"
+    },
+    "model_seconds": 3.3
+   },
+   {
+    "step": 4,
+    "action": "click",
+    "args": {
+     "y": 84,
+     "x": 432,
+     "intent": "Click on the first search result: Sandboxes overview | Gemini Enterprise Agent Platform"
+    },
+    "model_seconds": 4.0
+   }
+  ],
+  "tokens": 30313,
+  "wall_seconds": 34,
+  "final_text": "I have searched the Google Cloud documentation for \"Agent Platform sandboxes\" and opened the first result, \"Sandboxes overview | Gemini Enterprise Agent Platform\".",
+  "final_title": "Sandboxes overview | Gemini Enterprise Agent Platform | Google Cloud Documentation",
+  "final_url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox"
+ },
+ "novnc": {
+  "port": 5091,
+  "bytes": 15850,
+  "title": "noVNC",
+  "container_ports": [
+   5091,
+   8080,
+   9222
+  ]
+ },
+ "pause_resume": {
+  "before": [
+   "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox",
+   "Sandboxes overview | Gemini Enterprise Agent Platform | Google Cloud Documentation"
+  ],
+  "after": [
+   "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox",
+   "Sandboxes overview | Gemini Enterprise Agent Platform | Google Cloud Documentation"
+  ]
+ },
+ "restore": {
+  "page": [
+   "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox",
+   "Sandboxes overview | Gemini Enterprise Agent Platform | Google Cloud Documentation"
+  ]
+ }
+}
