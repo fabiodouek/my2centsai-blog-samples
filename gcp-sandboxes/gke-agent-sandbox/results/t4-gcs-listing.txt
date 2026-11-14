@@ -1,0 +1,34 @@
+gs://<bucket>/:
+
+gs://<bucket>/snapshots/:
+
+gs://<bucket>/snapshots/10683e3e-ab0b-4c61-a670-63769f333414/:
+    483532  2026-11-14T14:22:52Z  gs://<bucket>/snapshots/10683e3e-ab0b-4c61-a670-63769f333414/checkpoint.img
+      2452  2026-11-14T14:22:52Z  gs://<bucket>/snapshots/10683e3e-ab0b-4c61-a670-63769f333414/metadata
+  13938688  2026-11-14T14:22:52Z  gs://<bucket>/snapshots/10683e3e-ab0b-4c61-a670-63769f333414/pages.img
+      2108  2026-11-14T14:22:51Z  gs://<bucket>/snapshots/10683e3e-ab0b-4c61-a670-63769f333414/pages_meta.img
+
+gs://<bucket>/snapshots/205d2ef3-356c-47ac-b2b4-a82f01b42ce4/:
+    462462  2026-11-14T14:22:11Z  gs://<bucket>/snapshots/205d2ef3-356c-47ac-b2b4-a82f01b42ce4/checkpoint.img
+      2452  2026-11-14T14:22:11Z  gs://<bucket>/snapshots/205d2ef3-356c-47ac-b2b4-a82f01b42ce4/metadata
+  13938688  2026-11-14T14:22:11Z  gs://<bucket>/snapshots/205d2ef3-356c-47ac-b2b4-a82f01b42ce4/pages.img
+      2126  2026-11-14T14:22:11Z  gs://<bucket>/snapshots/205d2ef3-356c-47ac-b2b4-a82f01b42ce4/pages_meta.img
+
+gs://<bucket>/snapshots/4b1212bb-cf96-4604-ab04-79112070b411/:
+    478572  2026-11-14T14:22:31Z  gs://<bucket>/snapshots/4b1212bb-cf96-4604-ab04-79112070b411/checkpoint.img
+      2452  2026-11-14T14:22:32Z  gs://<bucket>/snapshots/4b1212bb-cf96-4604-ab04-79112070b411/metadata
+  13938688  2026-11-14T14:22:31Z  gs://<bucket>/snapshots/4b1212bb-cf96-4604-ab04-79112070b411/pages.img
+      2108  2026-11-14T14:22:31Z  gs://<bucket>/snapshots/4b1212bb-cf96-4604-ab04-79112070b411/pages_meta.img
+
+gs://<bucket>/snapshots/56780fcc-887e-455e-a13e-e799815ebecb/:
+    481815  2026-11-14T14:23:32Z  gs://<bucket>/snapshots/56780fcc-887e-455e-a13e-e799815ebecb/checkpoint.img
+      2452  2026-11-14T14:23:33Z  gs://<bucket>/snapshots/56780fcc-887e-455e-a13e-e799815ebecb/metadata
+  13938688  2026-11-14T14:23:33Z  gs://<bucket>/snapshots/56780fcc-887e-455e-a13e-e799815ebecb/pages.img
+      2108  2026-11-14T14:23:32Z  gs://<bucket>/snapshots/56780fcc-887e-455e-a13e-e799815ebecb/pages_meta.img
+
+gs://<bucket>/snapshots/fd6fc2e8-605e-492a-a671-8c5342d5f145/:
+    488471  2026-11-14T14:23:12Z  gs://<bucket>/snapshots/fd6fc2e8-605e-492a-a671-8c5342d5f145/checkpoint.img
+      2452  2026-11-14T14:23:13Z  gs://<bucket>/snapshots/fd6fc2e8-605e-492a-a671-8c5342d5f145/metadata
+  13938688  2026-11-14T14:23:12Z  gs://<bucket>/snapshots/fd6fc2e8-605e-492a-a671-8c5342d5f145/pages.img
+      2108  2026-11-14T14:23:12Z  gs://<bucket>/snapshots/fd6fc2e8-605e-492a-a671-8c5342d5f145/pages_meta.img
+TOTAL: 20 objects, 72111110 bytes (68.77MiB)

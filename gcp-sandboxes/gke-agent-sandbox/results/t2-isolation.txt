@@ -1,0 +1,44 @@
+pod/runc-probe created
+pod/target created
+sandboxtemplate.extensions.agents.x-k8s.io/python-sandbox-template created
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool created
+sandbox.agents.x-k8s.io/direct-sandbox created
+pod/runc-probe condition met
+pod/target condition met
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool condition met
+sandbox.agents.x-k8s.io/direct-sandbox condition met
+sandboxclaim.extensions.agents.x-k8s.io/t2-claim created
+sandboxclaim.extensions.agents.x-k8s.io/t2-claim condition met
+
+=== runc pod (system node) ===
+kernel:   6.18.53+
+dmesg:    dmesg: read kernel buffer failed: Operation not permitted|
+virt:     n/a
+metadata token: HTTP 200
+cluster DNS: 34.118.224.1
+pod-to-pod: HTTP 200
+internet (google.com): HTTP 200
+
+=== templated Sandbox (gVisor) ===
+kernel:   4.19.0-gvisor
+dmesg:    [    0.000000] Starting gVisor...|[    0.185440] Digging up root...|
+virt:     n/a
+metadata token: URLError: timed out
+cluster DNS: gaierror
+pod-to-pod: URLError: timed out
+internet (google.com): HTTP 200
+
+=== direct Sandbox (gVisor) ===
+kernel:   4.19.0-gvisor
+dmesg:    [    0.000000] Starting gVisor...|[    0.410758] Checking naughty and nice process list...|
+virt:     n/a
+metadata token: HTTP 200
+cluster DNS: 34.118.224.1
+pod-to-pod: HTTP 200
+internet (google.com): HTTP 200
+
+=== reach the templated Sandbox from the runc pod (NetworkPolicy ingress) ===
+command terminated with exit code 1
+
+NAMESPACE   NAME                                     POD-SELECTOR                                         AGE
+default     python-sandbox-template-network-policy   agents.x-k8s.io/sandbox-template-ref-hash=d274c066   31s

@@ -1,0 +1,20 @@
+# Should be rejected by secure-sandbox-policy: runtimeClassName microvm.
+apiVersion: agents.x-k8s.io/v1beta1
+kind: Sandbox
+metadata:
+  name: reject-microvm
+  namespace: default
+spec:
+  podTemplate:
+    spec:
+      runtimeClassName: microvm
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 1000}
+      containers:
+      - name: c
+        image: busybox
+        command: ["sleep", "3600"]
+        securityContext:
+          capabilities: {drop: ["ALL"]}
+        resources:
+          limits: {cpu: "100m", memory: "64Mi"}

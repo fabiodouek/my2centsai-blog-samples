@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: python-sandbox-template-network-policy
+  namespace: default
+  ownerReferences:
+  - apiVersion: extensions.agents.x-k8s.io/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: SandboxTemplate
+    name: python-sandbox-template
+spec:
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+        - 169.254.0.0/16
+    - ipBlock:
+        cidr: ::/0
+        except:
+        - fc00::/7
+        - fe80::/10
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: agent-sandbox-system
+      podSelector:
+        matchLabels:
+          app: sandbox-router
+  podSelector:
+    matchLabels:
+      agents.x-k8s.io/sandbox-template-ref-hash: d274c066
+  policyTypes:
+  - Ingress
+  - Egress

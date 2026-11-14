@@ -1,0 +1,100 @@
+{
+ "top": {
+  "runc": "POD         NAME   CPU(cores)   MEMORY(bytes)   \nburn-runc   burn   500m         104Mi",
+  "gvisor": "POD           NAME   CPU(cores)   MEMORY(bytes)   \nburn-gvisor   burn   500m         111Mi"
+ },
+ "kubelet_summary": {
+  "runc": {
+   "cpu_usageNanoCores": 499743916,
+   "memory_workingSetBytes": 109711360,
+   "containers": [
+    {
+     "name": "burn",
+     "cpu": 500049276,
+     "memory": 109441024
+    }
+   ]
+  },
+  "gvisor": {
+   "cpu_usageNanoCores": 501128720,
+   "memory_workingSetBytes": 141021184,
+   "containers": [
+    {
+     "name": "burn",
+     "cpu": 497449474,
+     "memory": 117301248
+    }
+   ]
+  }
+ },
+ "monitoring": {
+  "runc": {
+   "core_usage_time": {
+    "series": [
+     {
+      "memory_type": null,
+      "points": 7,
+      "latest": 0.5435711302462968,
+      "oldest": 0.05828621498044851
+     }
+    ]
+   },
+   "used_bytes": {
+    "series": [
+     {
+      "memory_type": "evictable",
+      "points": 6,
+      "latest": 32768,
+      "oldest": 32768
+     },
+     {
+      "memory_type": "non-evictable",
+      "points": 6,
+      "latest": 109441024,
+      "oldest": 109441024
+     }
+    ]
+   }
+  },
+  "gvisor": {
+   "core_usage_time": {
+    "series": [
+     {
+      "memory_type": null,
+      "points": 7,
+      "latest": 0.5000054828362228,
+      "oldest": 0.08167571258685401
+     }
+    ]
+   },
+   "used_bytes": {
+    "series": [
+     {
+      "memory_type": "evictable",
+      "points": 6,
+      "latest": 0,
+      "oldest": 0
+     },
+     {
+      "memory_type": "non-evictable",
+      "points": 6,
+      "latest": 117301248,
+      "oldest": 117301248
+     }
+    ]
+   }
+  }
+ },
+ "logging": {
+  "runc": [
+   "tick 361",
+   "tick 360",
+   "tick 359"
+  ],
+  "gvisor": [
+   "tick 364",
+   "tick 361",
+   "tick 360"
+  ]
+ }
+}

@@ -1,0 +1,29 @@
+# Cluster-scoped storage config (bucket + folder) and a manual-trigger policy for sandboxes labelled app=agent-sandbox-workload.
+# Replace BUCKET with your bucket name: sed "s/BUCKET/$BUCKET/" snapshot-config.yaml | kubectl apply -f -
+apiVersion: podsnapshot.gke.io/v1
+kind: PodSnapshotStorageConfig
+metadata:
+  name: cpu-pssc-gcs
+spec:
+  snapshotStorageConfig:
+    gcs:
+      bucket: "BUCKET"
+      path: "snapshots"
+---
+apiVersion: podsnapshot.gke.io/v1
+kind: PodSnapshotPolicy
+metadata:
+  name: cpu-psp
+  namespace: pod-snapshots-ns
+spec:
+  storageConfigName: cpu-pssc-gcs
+  selector:
+    matchLabels:
+      app: agent-sandbox-workload
+  triggerConfig:
+    type: manual
+    postCheckpoint: resume
+  snapshotGroupingRules:
+    groupByLabelValue:
+      labels:
+      - agents.x-k8s.io/sandbox-name-hash
