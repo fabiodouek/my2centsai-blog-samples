@@ -24,6 +24,8 @@ export GEMINI_API_KEY=...   # never commit it
 | `t5-idle.sh` | What survives an idle restore (waits 35 minutes) |
 | `t6-teardown.sh` | Deletes every environment for this API key |
 
+On 2026-11-12 `t4-hooks.sh` let the command through in case 1 (the docs' `code_execution` matcher); on 2026-11-14 the same script blocked it, so expect the current behavior to differ from the first run described in the post.
+
 Run them from this directory, for example `bash t2-egress.sh`. `lib.sh` holds the shared `ask` and `say` helpers; the `probe*.sh` files are what runs inside the sandbox.
 
 ## Cost and cleanup
