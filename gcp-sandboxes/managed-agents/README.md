@@ -2,6 +2,8 @@
 
 Companion code for [Managed Agents in the Gemini API: Hands-On with the Sandbox, Its Egress Proxy and Hooks](https://www.my2cents.ai/deep-dive/gcp-managed-agents/), part 2 of the Google Cloud Sandboxes series.
 
+Video walkthrough: https://youtu.be/sX0Fb4gett0
+
 Managed Agents has no exec API: every command runs through Google's Antigravity agent. These scripts send a small probe script into the agent's sandbox as an inline file, ask the agent to run it, and print only what the sandbox printed. That keeps each test repeatable and makes the network and credential settings explicit, which the AI Studio Playground doesn't expose.
 
 ## What you need
