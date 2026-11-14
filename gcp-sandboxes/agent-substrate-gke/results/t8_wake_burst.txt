@@ -1,0 +1,27 @@
+# 2026-11-14T18:02:03Z t8_wake_burst.py
+
+[1m== a client the router trusts (see ../google-ax-lifecycle/router-probe.yaml)[0m
+pod/router-probe created
+pod/router-probe condition met
+
+[1m== one task at cpu 50m, woken 5 times[0m
+  wake at cpu 50m: n=5 p50 1133 ms, p95 1396, p99 1396, max 1396
+
+[1m== one task at cpu 250m, woken 5 times[0m
+  wake at cpu 250m: n=5 p50 126 ms, p95 184, p99 184, max 184
+
+[1m== one task at cpu 1, woken 5 times[0m
+  wake at cpu 1: n=5 p50 112 ms, p95 118, p99 118, max 118
+
+[1m== burst of 1[0m
+  wake x1: n=1 p50 188 ms, p95 188, p99 188, max 188
+  status codes: ['200']
+
+[1m== burst of 10[0m
+  wake x10: n=10 p50 413 ms, p95 559, p99 559, max 559
+  status codes: ['200']
+
+[1m== burst of 30[0m
+  wake x30: n=30 p50 1245 ms, p95 1461, p99 1512, max 1512
+  status codes: ['200']
+  (metrics: results/wake.csv)

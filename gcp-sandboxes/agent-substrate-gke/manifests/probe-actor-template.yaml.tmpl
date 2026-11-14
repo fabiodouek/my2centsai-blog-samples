@@ -1,0 +1,50 @@
+# Native Substrate actor that probes its own survival across a suspend (see probe.sh).
+metadata:
+  atespace: native
+  name: probe
+containers:
+- name: probe
+  image: ${TASK_IMAGE}
+  command:
+  - /usr/bin/bash
+  - -c
+  - |
+    # Runs inside the native actor (see probe-actor-template.yaml.tmpl). Everything it learns goes to stdout,
+    # which `kubectl ate logs actor` shows. Each line: seconds since this process started, then what it sees.
+    start=$(date +%s)
+    echo "boot $(date +%T) pid $$ boot_id=$(cat /proc/sys/kernel/random/boot_id | cut -c1-8)" >> /workspace/boots.log
+    echo "tmp-ok" > /tmp/marker
+    [ -f /workspace/blob ] || dd if=/dev/urandom of=/workspace/blob bs=1M count=50 2>/dev/null
+    [ -f /workspace/blob.sha ] || sha256sum /workspace/blob > /workspace/blob.sha
+    setsid sleep 3000 >/dev/null 2>&1 &
+    echo "start: pid $$ boot_lines=$(wc -l < /workspace/boots.log)"
+    # a plain HTTP keep-alive connection to www.google.com (port 80, through the egress gateway), kept open on fd 3
+    exec 3<>/dev/tcp/www.google.com/80 2>/dev/null && echo "tcp: opened fd 3" || echo "tcp: could not open"
+    n=0
+    while true; do
+      n=$((n+1))
+      tcp=none
+      # HEAD keeps the reply to a few header lines; read up to the blank line that ends them
+      if { printf 'HEAD / HTTP/1.1\r\nHost: www.google.com\r\nConnection: keep-alive\r\n\r\n' >&3; } 2>/dev/null; then
+        if IFS= read -r -t 5 -u 3 line 2>/dev/null; then
+          tcp="ok:${line%%$'\r'*}"
+          while IFS= read -r -t 2 -u 3 h 2>/dev/null; do [ "$h" = $'\r' ] && break; done
+        else tcp="no-reply"; fi
+      else tcp="write-failed"; fi
+      printf 't=%ss tick=%s uptime=%s tmp=%s workspace=%s sleep3000=%s tcp=[%s]\n' "$(( $(date +%s)-start ))" "$n" \
+        "$(cut -d. -f1 /proc/uptime)" "$(cat /tmp/marker 2>/dev/null || echo MISSING)" "$(cat /workspace/blob.sha >/dev/null 2>&1 && echo ok || echo MISSING)" \
+        "$(ps -eo args | grep -cx 'sleep 3000')" "$tcp"
+      sleep 5
+    done
+  volumeMounts:
+  - name: data
+    mountPath: /workspace
+resources:
+  limits:
+    cpuMillicores: 500
+    memoryBytes: 536870912
+snapshotConfig:
+  preferredFidelity: SNAPSHOT_FIDELITY_MEMORY
+volumes:
+- durableDir: {}
+  name: data

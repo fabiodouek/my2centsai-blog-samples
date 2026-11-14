@@ -1,0 +1,27 @@
+# 2026-11-14T17:51:09Z t6b_density_ramp.py
+
+[1m== ramp: batches of 10 idle tasks at cpu 50m, memory 64Mi[0m
+    10 running  (+10/10)  resume p50  3787 ms  node memory 2.3 / 1.9 GiB
+    20 running  (+10/10)  resume p50  3911 ms  node memory 2.3 / 2.1 GiB
+    30 running  (+10/10)  resume p50  3724 ms  node memory 2.4 / 2.1 GiB
+    40 running  (+10/10)  resume p50  3763 ms  node memory 2.4 / 2.2 GiB
+    50 running  (+10/10)  resume p50  3970 ms  node memory 2.5 / 2.2 GiB
+    60 running  (+10/10)  resume p50  3912 ms  node memory 2.6 / 2.3 GiB
+    70 running  (+10/10)  resume p50  4108 ms  node memory 2.7 / 2.4 GiB
+    80 running  (+10/10)  resume p50  3702 ms  node memory 2.7 / 2.4 GiB
+    90 running  (+10/10)  resume p50  4097 ms  node memory 2.7 / 2.5 GiB
+   100 running  (+10/10)  resume p50  4061 ms  node memory 2.8 / 2.5 GiB
+   110 running  (+10/10)  resume p50  4049 ms  node memory 2.9 / 2.5 GiB
+   120 running  (+10/10)  resume p50  4001 ms  node memory 3.0 / 2.7 GiB
+   130 running  (+10/10)  resume p50  3994 ms  node memory 3.0 / 2.7 GiB
+   140 running  (+10/10)  resume p50  4168 ms  node memory 3.1 / 2.7 GiB
+   150 running  (+10/10)  resume p50  4049 ms  node memory 3.1 / 2.8 GiB
+   156 running  (+ 6/10)  resume p50  3780 ms  node memory 3.1 / 2.9 GiB
+  refused: no worker has room for the actor
+  (metrics: results/density.csv)
+
+[1m== where they are[0m
+  sampled placement by worker IP: {'10.52.3.15': 6, '10.52.2.24': 17}
+  all resumes: n=156 p50 3910 ms, p95 4324, p99 4585, max 4729
+
+[1m== delete them[0m

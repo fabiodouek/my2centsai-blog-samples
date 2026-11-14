@@ -1,0 +1,25 @@
+# 2026-11-14T17:58:08Z t3a_create.py
+
+[1m== create 5 tasks in atespace 'lifecycle'[0m
+  [    503 ms] ax apply  lc-create-1
+  [    529 ms] ax apply  lc-create-2
+  [    569 ms] ax apply  lc-create-3
+  [    526 ms] ax apply  lc-create-4
+  [    520 ms] ax apply  lc-create-5
+  create: n=5 median 526 ms, min 503, max 569
+
+[1m== ax get tasks[0m
+NAME          ATESPACE    PHASE       ACTOR         WORKER-IP   AGE
+lc-create-5   lifecycle   Suspended   lc-create-5   <none>      0s
+lc-create-4   lifecycle   Suspended   lc-create-4   <none>      1s
+lc-create-3   lifecycle   Suspended   lc-create-3   <none>      1s
+lc-create-2   lifecycle   Suspended   lc-create-2   <none>      2s
+lc-create-1   lifecycle   Suspended   lc-create-1   <none>      2s
+
+[1m== status of a new task[0m
+{'phase': 'Suspended', 'worker': None, 'ready': 'Suspended'}
+
+[1m== worker pods: a created task occupies none of them[0m
+NAME                          READY   STATUS    RESTARTS   AGE   IP           NODE                                NOMINATED NODE   READINESS GATES
+ax-workers-5fc864b77d-f7bn6   1/1     Running   0          59m   10.52.2.24   gke-ate-sbx-pool-hd-54063ea0-7k72   <none>           <none>
+ax-workers-5fc864b77d-ltjwv   1/1     Running   0          59m   10.52.3.15   gke-ate-sbx-pool-hd-54063ea0-t9f4   <none>           <none>

@@ -1,0 +1,58 @@
+# 2026-11-14T18:36:26Z t2b_native_keeps.py
+
+[1m== atespace, template, actor, egress rule[0m
+  [   1340 ms] kubectl ate resume actor (first)
+before the first suspend:
+  t=11s tick=3 uptime=11 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+  t=17s tick=4 uptime=16 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+
+[1m== cycle 1[0m
+  [   1361 ms] suspend
+  [   1336 ms] resume 
+
+[1m== cycle 2[0m
+  [   1416 ms] suspend
+  [   1339 ms] resume 
+
+[1m== cycle 3[0m
+  [   1401 ms] suspend
+  [   1345 ms] resume 
+
+[1m== cycle 4[0m
+  [   1412 ms] suspend
+  [   1378 ms] resume 
+
+[1m== cycle 5[0m
+  [   1444 ms] suspend
+  [   1344 ms] resume 
+
+[1m== what the actor reported (one line per 5 s tick; a gap is a suspend)[0m
+t=1s tick=1 uptime=0 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+t=6s tick=2 uptime=6 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+t=11s tick=3 uptime=11 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+t=17s tick=4 uptime=16 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+t=22s tick=5 uptime=21 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[ok:HTTP/1.1 200 OK]
+t=29s tick=6 uptime=28 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[no-reply]
+t=34s tick=7 uptime=33 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=39s tick=8 uptime=38 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=45s tick=9 uptime=45 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=50s tick=10 uptime=50 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=56s tick=11 uptime=55 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=61s tick=12 uptime=60 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=67s tick=13 uptime=67 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=72s tick=14 uptime=72 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=77s tick=15 uptime=77 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=84s tick=16 uptime=84 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=89s tick=17 uptime=89 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=94s tick=18 uptime=94 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=101s tick=19 uptime=100 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=106s tick=20 uptime=105 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+t=111s tick=21 uptime=111 tmp=tmp-ok workspace=ok sleep3000=1 tcp=[write-failed]
+
+start lines (the script's first line runs once per boot): 1
+
+[1m== results[0m
+  suspend: n=5 median 1412 ms, min 1361, max 1444
+  resume : n=5 median 1344 ms, min 1336, max 1378
+actor "p1" deleted
+actor template "probe" deleted

@@ -1,0 +1,24 @@
+# 2026-11-14T17:42:58Z t5b_large_workspace.py
+
+[1m== lc-big: 2 GB of random data in /workspace[0m
+2.1G	/workspace
+none            8.0E  2.1G  8.0E   1% /workspace
+
+[1m== cycle 1[0m
+  [  17767 ms] ax suspend
+  [    987 ms] ax resume
+all 4 parts intact
+
+[1m== cycle 2[0m
+  [  14342 ms] ax suspend
+  [   1004 ms] ax resume
+all 4 parts intact
+
+[1m== cycle 3[0m
+  [  10391 ms] ax suspend
+  [   1129 ms] ax resume
+all 4 parts intact
+
+[1m== results[0m
+  suspend: n=3 median 14342 ms, min 10391, max 17767
+  resume : n=3 median 1004 ms, min 987, max 1129

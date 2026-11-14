@@ -1,0 +1,34 @@
+# 2026-11-14T18:03:28Z t9_noisy.py
+
+[1m== 6 victims (cpu 250m, memory 256Mi)[0m
+  baseline, nothing else running:
+    cpu_ms    : n=6 p50 518 ms, p95 522, p99 522, max 522
+    io_ms     : n=6 p50 202 ms, p95 620, p99 620, max 620
+    suspend_ms: n=6 p50 693 ms, p95 727, p99 727, max 727
+    resume_ms : n=6 p50 807 ms, p95 937, p99 937, max 937
+
+[1m== add 4 cpu hogs[0m
+  hogs: {'st-hc-0': 'Running', 'st-hc-1': 'Running', 'st-hc-2': 'Running', 'st-hc-3': 'Running'}
+  with cpu hogs:
+    cpu_ms    : n=6 p50 642 ms, p95 674, p99 674, max 674
+    io_ms     : n=6 p50 183 ms, p95 194, p99 194, max 194
+    suspend_ms: n=6 p50 809 ms, p95 900, p99 900, max 900
+    resume_ms : n=6 p50 1047 ms, p95 1129, p99 1129, max 1129
+
+[1m== add 4 disk hogs[0m
+  hogs: {'st-hd-0': 'Running', 'st-hd-1': 'Running', 'st-hd-2': 'Running', 'st-hd-3': 'Running'}
+  with disk hogs:
+    cpu_ms    : n=6 p50 592 ms, p95 595, p99 595, max 595
+    io_ms     : n=6 p50 191 ms, p95 199, p99 199, max 199
+    suspend_ms: n=6 p50 741 ms, p95 1551, p99 1551, max 1551
+    resume_ms : n=6 p50 827 ms, p95 868, p99 868, max 868
+
+[1m== add 4 memory hogs[0m
+  hogs: {'st-hm-0': 'Failed', 'st-hm-1': 'Failed', 'st-hm-2': 'Failed', 'st-hm-3': 'Failed'}
+  with memory hogs:
+    cpu_ms    : n=6 p50 594 ms, p95 673, p99 673, max 673
+    io_ms     : n=6 p50 190 ms, p95 196, p99 196, max 196
+    suspend_ms: n=6 p50 668 ms, p95 712, p99 712, max 712
+    resume_ms : n=6 p50 816 ms, p95 832, p99 832, max 832
+  memory hogs after the round: {'st-hm-0': {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}, 'st-hm-1': {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}, 'st-hm-2': {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}, 'st-hm-3': {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}}
+  (metrics: results/noisy.csv)

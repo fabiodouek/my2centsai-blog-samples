@@ -1,0 +1,82 @@
+# 2026-11-14T19:10:21Z t6a_density_waves.py
+
+[1m== node capacity[0m
+NODE                                CPU     MEMORY
+gke-ate-sbx-pool-hd-54063ea0-7k72   3920m   14073824Ki
+gke-ate-sbx-pool-hd-54063ea0-t9f4   3920m   14073824Ki
+
+[1m== wave 1: 12 tasks at AX's default size (1 CPU, 512 MiB)[0m
+  [    551 ms] resume lc-default-09
+  [    591 ms] resume lc-default-02
+  [    588 ms] resume lc-default-05
+  [    596 ms] resume lc-default-01
+  [   1080 ms] resume lc-default-12
+  [   1098 ms] resume lc-default-11
+  [   2753 ms] resume lc-default-10
+  [   2769 ms] resume lc-default-06
+  [   2778 ms] resume lc-default-03
+  [   2789 ms] resume lc-default-07
+  [   2802 ms] resume lc-default-04
+  [   2796 ms] resume lc-default-08
+  resume (10 at a time): n=6 median 2783 ms, min 2753, max 2802
+  running: 6, refused: 6
+  refused with: no worker has room for the actor
+    3 on ax-workers-5fc864b77d-b4znf on gke-ate-sbx-pool-hd-54063ea0-7k72
+    3 on ax-workers-5fc864b77d-zn79l on gke-ate-sbx-pool-hd-54063ea0-t9f4
+
+[1m== delete them[0m
+
+[1m== wave 2: 40 tasks at cpu 250m, memory 256Mi[0m
+  [   3109 ms] resume lc-small-02
+  [   3444 ms] resume lc-small-05
+  [   3471 ms] resume lc-small-04
+  [   3467 ms] resume lc-small-08
+  [   3577 ms] resume lc-small-03
+  [   3675 ms] resume lc-small-06
+  [   3710 ms] resume lc-small-10
+  [   3768 ms] resume lc-small-09
+  [   3795 ms] resume lc-small-07
+  [   3818 ms] resume lc-small-01
+  [   2677 ms] resume lc-small-11
+  [   2702 ms] resume lc-small-13
+  [   2700 ms] resume lc-small-14
+  [   2655 ms] resume lc-small-17
+  [   2657 ms] resume lc-small-19
+  [   3045 ms] resume lc-small-12
+  [   3288 ms] resume lc-small-15
+  [   3177 ms] resume lc-small-20
+  [   3334 ms] resume lc-small-16
+  [   3365 ms] resume lc-small-18
+  [   2614 ms] resume lc-small-21
+  [   2690 ms] resume lc-small-23
+  [   2695 ms] resume lc-small-22
+  [    514 ms] resume lc-small-31
+  [   2655 ms] resume lc-small-24
+  [   2723 ms] resume lc-small-25
+  [   2692 ms] resume lc-small-26
+  [    534 ms] resume lc-small-33
+  [    535 ms] resume lc-small-32
+  [    504 ms] resume lc-small-34
+  [   2637 ms] resume lc-small-27
+  [    508 ms] resume lc-small-35
+  [    522 ms] resume lc-small-37
+  [    523 ms] resume lc-small-36
+  [   2735 ms] resume lc-small-28
+  [   2721 ms] resume lc-small-29
+  [   2647 ms] resume lc-small-30
+  [    518 ms] resume lc-small-39
+  [    507 ms] resume lc-small-40
+  [    519 ms] resume lc-small-38
+  resume (10 at a time): n=30 median 2890 ms, min 2614, max 3818
+  running: 30, refused: 10
+  refused with: no worker has room for the actor
+   15 on ax-workers-5fc864b77d-b4znf on gke-ate-sbx-pool-hd-54063ea0-7k72
+   15 on ax-workers-5fc864b77d-zn79l on gke-ate-sbx-pool-hd-54063ea0-t9f4
+
+[1m== what 30 running sandboxes use (kubelet stats summary)[0m
+  gke-ate-sbx-pool-hd-54063ea0-7k72: node working set 2.5 GiB
+      ax-workers-5fc864b77d-b4znf: 0.21 GiB for its sandboxes
+  gke-ate-sbx-pool-hd-54063ea0-t9f4: node working set 2.1 GiB
+      ax-workers-5fc864b77d-zn79l: 0.21 GiB for its sandboxes
+
+[1m== delete them[0m
