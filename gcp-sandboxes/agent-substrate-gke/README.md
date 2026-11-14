@@ -4,6 +4,8 @@ Companion code for [Agent Substrate on GKE: Hands-On with Suspend and Resume, De
 
 It repeats the AX-on-EKS measurements ([`google-ax-eks`](../../google-ax-eks), [`google-ax-lifecycle`](../../google-ax-lifecycle), [`google-ax-stress`](../../google-ax-stress)) with the same harness, ported, on two `c3-standard-4` nodes. `eks-baseline/` holds those EKS results and `charts.py` draws both runs on the same axes.
 
+Video walkthrough: [youtu.be/SXeOGYZYICY](https://youtu.be/SXeOGYZYICY)
+
 Versions used: Substrate v1.0.0, installer `substrate-gke` v1.0.0-gke.0, AX main at `eac8313` (its `go.mod` pins Substrate v1.0.0), GKE 1.37.1-gke.2097000 on the Rapid channel.
 
 ## Before you start
