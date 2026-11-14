@@ -1,0 +1,39 @@
+{
+ "identity": {
+  "stdout": "appuser\nuid=999(appuser) gid=999(appuser) groups=999(appuser)\nsudo: /usr/bin/bash: line 1: sudo: command not found\nenv vars: 21, of which named like token/secret/key/cred: 0\nKUBERNETES_* vars: 8\ncurl: none\nPython 3.11.2\n",
+  "stderr": "",
+  "returncode": 0,
+  "duration_ms": 82
+ },
+ "matrix": {
+  "shell-net-off": {
+   "metadata.google.internal (DNS)": "no-dns",
+   "metadata server (169.254.169.254)": "timeout",
+   "www.google.com": "no DNS",
+   "storage.googleapis.com": "no DNS",
+   "8.8.8.8 (raw IP)": "timeout",
+   "10.128.0.2 (RFC 1918)": "timeout",
+   "192.168.0.1 (RFC 1918)": "timeout",
+   "pip install cowsay": "ERROR: Could not find a version that satisfies t"
+  },
+  "shell-net-on": {
+   "metadata.google.internal (DNS)": "no-dns",
+   "metadata server (169.254.169.254)": "timeout",
+   "www.google.com": "HTTP 200",
+   "storage.googleapis.com": "HTTP 400 (reached the server)",
+   "8.8.8.8 (raw IP)": "HTTP 200",
+   "10.128.0.2 (RFC 1918)": "timeout",
+   "192.168.0.1 (RFC 1918)": "timeout",
+   "pip install cowsay": "Successfully installed cowsay-6.1"
+  },
+  "code-execution": {
+   "metadata server (169.254.169.254)": "unreachable",
+   "www.google.com": "no DNS",
+   "storage.googleapis.com": "no DNS",
+   "8.8.8.8 (raw IP)": "unreachable",
+   "10.128.0.2 (RFC 1918)": "unreachable",
+   "192.168.0.1 (RFC 1918)": "unreachable",
+   "metadata.google.internal (DNS)": "no DNS"
+  }
+ }
+}
