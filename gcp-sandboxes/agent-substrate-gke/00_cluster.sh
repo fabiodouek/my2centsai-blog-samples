@@ -24,9 +24,10 @@ gcloud beta container clusters create "$CLUSTER" --zone "$ZONE" --release-channe
   --enable-kubernetes-unstable-apis=certificates.k8s.io/v1beta1/podcertificaterequests,certificates.k8s.io/v1beta1/clustertrustbundles \
   --system-config-from-file "$here/node-sysctls.yaml"
 
-# Reach the control plane through its DNS endpoint only, as setup-gcp does for clusters it creates.
-gcloud container clusters update "$CLUSTER" --zone "$ZONE" --enable-dns-access --enable-k8s-tokens-via-dns --enable-k8s-certs-via-dns
-gcloud container clusters update "$CLUSTER" --zone "$ZONE" --no-enable-ip-access
+# Reach the control plane on its public endpoint, limited to this machine's address. (The installer's own clusters are
+# DNS-endpoint only; through that endpoint the AX CLI's tunnel had 1 to 3 s spikes and kubectl calls failed now and then.)
+gcloud container clusters update "$CLUSTER" --zone "$ZONE" --enable-master-authorized-networks \
+  --master-authorized-networks="$(curl -s https://api.ipify.org)/32"
 gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE"
 kubectl config rename-context "gke_${PROJECT_ID}_${ZONE}_${CLUSTER}" "$CTX"
 kubectl --context "$CTX" get nodes -o custom-columns=NAME:.metadata.name,KERNEL:.status.nodeInfo.kernelVersion,CPU:.status.allocatable.cpu,MEM:.status.allocatable.memory
