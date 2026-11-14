@@ -4,6 +4,8 @@ Companion code for [Cloud Run Sandboxes: Hands-On with the Boundary, Secrets, 1,
 
 Cloud Run sandboxes (Preview) let a Cloud Run container start child sandboxes with the `sandbox` CLI that Cloud Run mounts at `/usr/local/gcp/bin/sandbox`. These scripts deploy one small Cloud Run service and run the tests from the post inside it.
 
+Video walkthrough: https://youtu.be/NjlbuJktrnM
+
 ## What is in here
 
 | File | What it does |
