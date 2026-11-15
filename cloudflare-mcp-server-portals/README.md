@@ -8,6 +8,8 @@ context size and failure modes.
 A portal is one hostname (`https://<host>/mcp`) in front of several remote MCP servers. Cloudflare Access handles who may
 connect, and the portal namespaces the tools as `{server_id}_{tool}`.
 
+Video walkthrough: https://youtu.be/4iPjKWTWAro
+
 ## Requirements
 
 - Python 3.11+, Node 20+
