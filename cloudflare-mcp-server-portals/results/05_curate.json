@@ -1,0 +1,28 @@
+{
+ "before": [
+  "notes_list_notes",
+  "notes_get_note",
+  "notes_search_notes",
+  "tickets_list_tickets",
+  "tickets_create_ticket",
+  "tickets_delete_ticket",
+  "tickets_slow_report"
+ ],
+ "after": [
+  "notes_list_notes",
+  "notes_get_note",
+  "notes_search_notes",
+  "tickets_recent",
+  "tickets_create_ticket",
+  "tickets_slow_report"
+ ],
+ "after_sync": [
+  "notes_list_notes",
+  "notes_get_note",
+  "notes_search_notes",
+  "notes_count_notes",
+  "tickets_recent",
+  "tickets_create_ticket",
+  "tickets_slow_report"
+ ]
+}

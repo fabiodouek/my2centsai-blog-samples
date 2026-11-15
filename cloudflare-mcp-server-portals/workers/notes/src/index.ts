@@ -10,7 +10,7 @@ const NOTES = [
   { id: "n3", title: "Timeouts", body: "Upstream tool calls time out after 60 seconds." },
 ];
 
-function createServer() {
+function createServer(env: { EXTRA_TOOL?: string }) {
   const server = new McpServer({ name: "notes", version: "1.0.0" });
 
   server.registerTool(
@@ -40,11 +40,22 @@ function createServer() {
     },
   );
 
+  // 05_curate.py redeploys with --var EXTRA_TOOL:1 to show the portal picking up a new upstream tool on sync.
+  if (env.EXTRA_TOOL) {
+    server.registerTool(
+      "count_notes",
+      { description: "Count the notes.", inputSchema: z.object({}) },
+      async () => ({ content: [{ type: "text", text: String(NOTES.length) }] }),
+    );
+  }
+
   return server;
 }
 
-const handler = createMcpHandler(createServer);
+type Env = { EXTRA_TOOL?: string };
 
 export default {
-  fetch: (request: Request, env: unknown, ctx: ExecutionContext) => handler(request, env, ctx),
-} satisfies ExportedHandler;
+  // The handler is built per request so the factory can see this deploy's variables.
+  fetch: (request: Request, env: Env, ctx: ExecutionContext) =>
+    createMcpHandler(() => createServer(env))(request, env, ctx),
+} satisfies ExportedHandler<Env>;
