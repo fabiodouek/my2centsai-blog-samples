@@ -1,0 +1,205 @@
+{
+ "cycles": [
+  {
+   "cycle": 1,
+   "snapshot": "571b07d0-57f0-4b51-8b27-0cb0ba082c17",
+   "trigger_s": 1.98841249999532,
+   "snapshot_ready_s": 2.1324792499945033,
+   "suspend_to_gone_s": 1.5390734579996206,
+   "timing": {
+    "pod_created_s": 0.2799317080061883,
+    "running_s": 2.320914666997851,
+    "ready_s": 2.3209250420040917,
+    "reply_s": 2.7401459170068847
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 40,
+    "boot": 1794668821,
+    "uptime_s": 4.0,
+    "pid": 1,
+    "conn": "open",
+    "emptydir": [
+     "pre1@counter=37"
+    ],
+    "pvc": null
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 59,
+    "boot": 1794668821,
+    "uptime_s": 6.6,
+    "pid": 1,
+    "conn": "open",
+    "emptydir": [
+     "pre1@counter=37",
+     "post1@counter=56"
+    ],
+    "pvc": null
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 57,
+    "boot": 1794668821,
+    "uptime_s": 10.9,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37"
+    ],
+    "pvc": null
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 2,
+   "snapshot": "b76caad9-a694-434b-b53b-38d654bb31b7",
+   "trigger_s": 2.2458327910135267,
+   "snapshot_ready_s": 2.391203833001782,
+   "suspend_to_gone_s": 0.8215389580000192,
+   "timing": {
+    "pod_created_s": 0.2740810830000555,
+    "running_s": 1.9418181249930058,
+    "ready_s": 1.9418283330014674,
+    "reply_s": 2.074098541997955
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 93,
+    "boot": 1794668821,
+    "uptime_s": 14.5,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90"
+    ],
+    "pvc": null
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 114,
+    "boot": 1794668821,
+    "uptime_s": 17.3,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90",
+     "post2@counter=111"
+    ],
+    "pvc": null
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 104,
+    "boot": 1794668821,
+    "uptime_s": 20.3,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90"
+    ],
+    "pvc": null
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 3,
+   "snapshot": "e044b62a-d7a7-4f9a-80c2-b695422df05d",
+   "trigger_s": 2.045094708009856,
+   "snapshot_ready_s": 2.201912167001865,
+   "suspend_to_gone_s": 1.7872426670073764,
+   "timing": {
+    "pod_created_s": 0.31027733399241697,
+    "running_s": 2.1738162919937167,
+    "ready_s": 2.1738243749859976,
+    "reply_s": 2.3040457919996697
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 139,
+    "boot": 1794668821,
+    "uptime_s": 23.8,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90",
+     "pre3@counter=137"
+    ],
+    "pvc": null
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 160,
+    "boot": 1794668821,
+    "uptime_s": 26.5,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90",
+     "pre3@counter=137",
+     "post3@counter=157"
+    ],
+    "pvc": null
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 151,
+    "boot": 1794668821,
+    "uptime_s": 30.8,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=37",
+     "pre2@counter=90",
+     "pre3@counter=137"
+    ],
+    "pvc": null
+   },
+   "annotations": {},
+   "labels": {}
+  }
+ ],
+ "baseline": {
+  "before": {
+   "label": "before",
+   "counter": 42,
+   "boot": 1794668813,
+   "uptime_s": 4.3,
+   "pid": 1,
+   "conn": "open",
+   "emptydir": [
+    "base@counter=35"
+   ],
+   "pvc": null
+  },
+  "after": {
+   "label": "after",
+   "counter": 4,
+   "boot": 1794668821,
+   "uptime_s": 0.4,
+   "pid": 1,
+   "conn": "open",
+   "emptydir": null,
+   "pvc": null
+  },
+  "suspend_to_gone_s": 1.7523022079985822,
+  "timing": {
+   "pod_created_s": 0.27055262500653043,
+   "running_s": 1.4996468750032363,
+   "ready_s": 1.499659042005078,
+   "reply_s": 2.121134625005652
+  }
+ },
+ "reply_s": {
+  "min": 2.074098541997955,
+  "median": 2.3040457919996697,
+  "max": 2.7401459170068847
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "defaults": {
+  "code execution": {
+   "ttl_field": null,
+   "create": "2026-11-14T10:24:55.433484Z",
+   "expire": null,
+   "seconds": null
+  },
+  "shell (template)": {
+   "ttl_field": null,
+   "create": "2026-11-14T10:24:58.283607Z",
+   "expire": "2026-11-14T12:24:58.262178Z",
+   "seconds": 7199.978571
+  },
+  "computer use (template)": {
+   "ttl_field": null,
+   "create": "2026-11-14T10:25:00.593068Z",
+   "expire": "2026-11-14T12:25:00.569677Z",
+   "seconds": 7199.976609
+  }
+ },
+ "reset": {
+  "code execution (execute_code)": {
+   "expire_initial_from_create": 299.762537,
+   "expire_after_touch_from_create": 299.762537,
+   "moved_seconds": 0.0,
+   "after_expiry": {
+    "http": 404,
+    "status": "NOT_FOUND"
+   }
+  },
+  "shell (execute_bash)": {
+   "expire_initial_from_create": 299.982026,
+   "expire_after_touch_from_create": 299.982026,
+   "moved_seconds": 0.0,
+   "after_expiry": {
+    "http": 404,
+    "status": "NOT_FOUND"
+   }
+  }
+ }
+}

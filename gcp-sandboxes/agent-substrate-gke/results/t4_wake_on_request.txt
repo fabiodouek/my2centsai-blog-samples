@@ -1,0 +1,35 @@
+# 2026-11-14T18:39:20Z t4_wake_on_request.py
+
+[1m== which ports does the router Service expose? (AX's networking doc shows port 80)[0m
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)            AGE
+atenet-router   ClusterIP   34.118.226.16   <none>        443/TCP,8444/TCP   5m43s
+
+[1m== a client the router trusts: a pod running as ax-server[0m
+pod/router-probe created
+pod/router-probe condition met
+
+[1m== lc-wake: create, resume, suspend[0m
+{'phase': 'Suspended', 'worker': None, 'ready': 'Suspended'}
+
+[1m== request 1 to the suspended task, through the router[0m
+HTTP 200 in 0.119166s
+  [   1000 ms] GET /readyz
+{'phase': 'Running', 'worker': '10.52.2.44', 'ready': 'TaskRunning'}
+
+[1m== request 2 to the suspended task, through the router[0m
+HTTP 200 in 0.119881s
+  [   1022 ms] GET /readyz
+{'phase': 'Running', 'worker': '10.52.2.44', 'ready': 'TaskRunning'}
+
+[1m== without the ate-target-actor header, or without a client certificate[0m
+HTTP 404 in 0.007848s
+no client cert: HTTP 000, curl exit 55
+
+[1m== the same request to a native memory-fidelity actor (Substrate's Counter demo), suspended[0m
+HTTP 200 in 0.314118s
+  [   1139 ms] POST / (native, suspended)
+HTTP 200 in 0.119406s
+  [   1156 ms] POST / (native, suspended)
+HTTP 200 in 0.107156s
+  [    928 ms] POST / (native, suspended)
+actor "my-counter-1" deleted

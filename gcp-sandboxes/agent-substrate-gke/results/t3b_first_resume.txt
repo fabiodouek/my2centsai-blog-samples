@@ -1,0 +1,36 @@
+# 2026-11-14T17:58:13Z t3b_first_resume.py
+
+[1m== first resume of the 5 tasks from 01_create.py[0m
+  [   2615 ms] ax resume lc-create-1
+             -> Running, ax-workers-5fc864b77d-ltjwv on gke-ate-sbx-pool-hd-54063ea0-t9f4
+  [   2614 ms] ax resume lc-create-2
+             -> Running, ax-workers-5fc864b77d-f7bn6 on gke-ate-sbx-pool-hd-54063ea0-7k72
+  [   2617 ms] ax resume lc-create-3
+             -> Running, ax-workers-5fc864b77d-f7bn6 on gke-ate-sbx-pool-hd-54063ea0-7k72
+  [   2618 ms] ax resume lc-create-4
+             -> Running, ax-workers-5fc864b77d-ltjwv on gke-ate-sbx-pool-hd-54063ea0-t9f4
+  [   2624 ms] ax resume lc-create-5
+             -> Running, ax-workers-5fc864b77d-f7bn6 on gke-ate-sbx-pool-hd-54063ea0-7k72
+  first resume: n=5 median 2617 ms, min 2614, max 2624
+
+[1m== inside a sandbox with AX's default size (1 CPU, 512 MiB)[0m
+4.19.0-gvisor
+nproc 2
+MemTotal:         524288 kB
+none            8.0E  4.0K  8.0E   1% /workspace
+uid=0(root) gid=0(root) groups=0(root)
+
+[1m== suspend them again: a suspended task holds no worker capacity[0m
+  [    569 ms] ax suspend lc-create-1
+  [    575 ms] ax suspend lc-create-2
+  [    825 ms] ax suspend lc-create-3
+  [    632 ms] ax suspend lc-create-4
+  [    565 ms] ax suspend lc-create-5
+
+[1m== a task with limits: cpu 2, memory 2Gi[0m
+  [   2615 ms] ax resume lc-limits
+4.19.0-gvisor
+nproc 2
+MemTotal:        2097152 kB
+none            8.0E  4.0K  8.0E   1% /workspace
+uid=0(root) gid=0(root) groups=0(root)

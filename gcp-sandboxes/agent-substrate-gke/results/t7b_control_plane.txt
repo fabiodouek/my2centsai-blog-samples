@@ -1,0 +1,18 @@
+# 2026-11-14T18:00:32Z t7b_control_plane.py
+
+[1m== create 120 tasks, 20 at a time[0m
+  create: n=120 p50 580 ms, p95 625, p99 630, max 640
+  120 ok, 0 failed, 4.0 s wall, 29.7 creates/s
+
+[1m== resume 120 tasks, 20 at a time[0m
+  resume: n=120 p50 4352 ms, p95 5073, p99 5490, max 5713
+  120 ok, 0 failed, 27.4 s wall, 4.4 resumes/s
+
+[1m== suspend 120 tasks, 20 at a time[0m
+  suspend: n=120 p50 1135 ms, p95 1586, p99 1688, max 1960
+  120 ok, 0 failed, 7.8 s wall, 15.4 suspends/s
+
+[1m== delete 120 tasks, 20 at a time[0m
+  delete: n=120 p50 682 ms, p95 781, p99 841, max 855
+  120 ok, 0 failed, 4.3 s wall, 28.1 deletes/s
+  (metrics: results/control_plane.csv)

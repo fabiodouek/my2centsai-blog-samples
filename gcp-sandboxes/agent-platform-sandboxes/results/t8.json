@@ -1,0 +1,23 @@
+{
+ "http-nonroot": {
+  "template_seconds": 11.1,
+  "state": "STATE_RUNNING",
+  "create_seconds": 4.5,
+  "execute": "ServerError: 501 UNIMPLEMENTED. {'error': {'code': 501, 'message': 'Execution Failed. Error: UNIMPLEMENTED on URL `https://df182fdd.a04b52196.us-central1.sandbox.vertexai.goog/`. Error Details: <!DOCTYPE HTML>\\n<html lang=\"en\">\\n    <head>\\n        <meta charset=\"utf-8\">\\n        <title>Error response</title>\\n    </head>\\n    <body>\\n        <h1>Error response</h1>\\n        <p>Error code: 501</p>\\n        <p>Message: Unsupported method (\\'POST\\').</p>\\n        <p>Error code explanation: 501 - Server does not support this operation.</p>\\n    </body>\\n</html>\\n', 'status': 'UNIMPLEMENTED'}}",
+  "send_command": "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Directory listing for /</title>\n</head>\n<body>\n<h1>Directory listing for /</h1>\n<hr>\n<ul>\n<li><a href=\"bin/\">bin@</a></li>\n<li><a "
+ },
+ "no-http": {
+  "template_seconds": 11.1,
+  "state": "STATE_RUNNING",
+  "create_seconds": 4.1,
+  "execute": "ClientError: 400 FAILED_PRECONDITION. {'error': {'code': 400, 'message': 'Execution Failed. Error: INTERNAL on URL `https://df182fdd.a04b52196.us-central1.sandbox.vertexai.goog/`. Error Details: Bad Gateway: Unable to reach the sandbox environment. (Request ID: 1f57d3b6-b9a8-41f9-8182-56a6d20a9dfd)\\n', 'status': 'FAILED_PRECONDITION'}}",
+  "send_command": "Bad Gateway: Unable to reach the sandbox environment. (Request ID: 7af06a1e-2b0b-439e-ac04-f8a989f29989)\n"
+ },
+ "root": {
+  "template_seconds": 11.1,
+  "state": "STATE_RUNNING",
+  "create_seconds": 4.2,
+  "execute": "ServerError: 501 UNIMPLEMENTED. {'error': {'code': 501, 'message': 'Execution Failed. Error: UNIMPLEMENTED on URL `https://df182fdd.a04b52196.us-central1.sandbox.vertexai.goog/`. Error Details: <!DOCTYPE HTML>\\n<html lang=\"en\">\\n    <head>\\n        <meta charset=\"utf-8\">\\n        <title>Error response</title>\\n    </head>\\n    <body>\\n        <h1>Error response</h1>\\n        <p>Error code: 501</p>\\n        <p>Message: Unsupported method (\\'POST\\').</p>\\n        <p>Error code explanation: 501 - Server does not support this operation.</p>\\n    </body>\\n</html>\\n', 'status': 'UNIMPLEMENTED'}}",
+  "send_command": "<!DOCTYPE HTML>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Directory listing for /</title>\n</head>\n<body>\n<h1>Directory listing for /</h1>\n<hr>\n<ul>\n<li><a href=\"bin/\">bin@</a></li>\n<li><a "
+ }
+}

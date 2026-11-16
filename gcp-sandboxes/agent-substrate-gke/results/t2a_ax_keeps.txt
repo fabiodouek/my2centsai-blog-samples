@@ -1,0 +1,90 @@
+# 2026-11-14T18:35:18Z t2a_ax_keeps.py
+
+[1m== create the task, give it an egress rule for www.google.com:80, resume it[0m
+
+[1m== write state: /tmp, /workspace (50 MB), a counter, a background sleep, a keep-alive connection[0m
+tcp.log: 3 lines, last: 18:35:34 HTTP/1.1 200 OK
+boot 18:35:21 pid 9
+
+[1m== cycle 1[0m
+task.ax.io/keeps-ax suspended
+  [    591 ms] ax suspend
+task.ax.io/keeps-ax resumed
+  [    625 ms] ax resume 
+workspace-marker: ws-ok
+blob: /workspace/blob: OK
+tmp-marker: cat: /tmp/marker: No such file or directory
+sleep3000-processes: 0
+keepalive-processes: 0
+tcp.log-grew-in-5s: 0 lines
+uptime: 7 s
+boot-lines: 2
+
+[1m== cycle 2[0m
+task.ax.io/keeps-ax suspended
+  [    583 ms] ax suspend
+task.ax.io/keeps-ax resumed
+  [    641 ms] ax resume 
+workspace-marker: ws-ok
+blob: /workspace/blob: OK
+tmp-marker: cat: /tmp/marker: No such file or directory
+sleep3000-processes: 0
+keepalive-processes: 0
+tcp.log-grew-in-5s: 0 lines
+uptime: 7 s
+boot-lines: 3
+
+[1m== cycle 3[0m
+task.ax.io/keeps-ax suspended
+  [    580 ms] ax suspend
+task.ax.io/keeps-ax resumed
+  [    739 ms] ax resume 
+workspace-marker: ws-ok
+blob: /workspace/blob: OK
+tmp-marker: cat: /tmp/marker: No such file or directory
+sleep3000-processes: 0
+keepalive-processes: 0
+tcp.log-grew-in-5s: 0 lines
+uptime: 8 s
+boot-lines: 4
+
+[1m== cycle 4[0m
+task.ax.io/keeps-ax suspended
+  [    583 ms] ax suspend
+task.ax.io/keeps-ax resumed
+  [    631 ms] ax resume 
+workspace-marker: ws-ok
+blob: /workspace/blob: OK
+tmp-marker: cat: /tmp/marker: No such file or directory
+sleep3000-processes: 0
+keepalive-processes: 0
+tcp.log-grew-in-5s: 0 lines
+uptime: 7 s
+boot-lines: 5
+
+[1m== cycle 5[0m
+task.ax.io/keeps-ax suspended
+  [    585 ms] ax suspend
+task.ax.io/keeps-ax resumed
+  [    631 ms] ax resume 
+workspace-marker: ws-ok
+blob: /workspace/blob: OK
+tmp-marker: cat: /tmp/marker: No such file or directory
+sleep3000-processes: 0
+keepalive-processes: 0
+tcp.log-grew-in-5s: 0 lines
+uptime: 7 s
+boot-lines: 6
+
+[1m== results[0m
+  suspend: n=5 median 583 ms, min 580, max 591
+  resume : n=5 median 631 ms, min 625, max 739
+boot 18:35:21 pid 9
+boot 18:35:36 pid 10
+boot 18:35:45 pid 9
+boot 18:35:54 pid 10
+boot 18:36:03 pid 9
+boot 18:36:12 pid 9
+18:35:29 HTTP/1.1 200 OK
+18:35:32 HTTP/1.1 200 OK
+18:35:34 HTTP/1.1 200 OK

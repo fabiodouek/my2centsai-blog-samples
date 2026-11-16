@@ -1,0 +1,98 @@
+{
+ "entries": [
+  {
+   "method": "ListSandboxEnvironmentTemplates",
+   "log": "data_access",
+   "count": 79
+  },
+  {
+   "method": "CreateSandboxEnvironment",
+   "log": "activity",
+   "count": 6
+  },
+  {
+   "method": "GetSandboxEnvironment",
+   "log": "data_access",
+   "count": 5
+  },
+  {
+   "method": "ExecuteSandboxEnvironment",
+   "log": "data_access",
+   "count": 3
+  },
+  {
+   "method": "DeleteSandboxEnvironment",
+   "log": "activity",
+   "count": 5
+  },
+  {
+   "method": "PauseSandboxEnvironment",
+   "log": "activity",
+   "count": 2
+  },
+  {
+   "method": "ResumeSandboxEnvironment",
+   "log": "activity",
+   "count": 2
+  },
+  {
+   "method": "SnapshotSandboxEnvironment",
+   "log": "activity",
+   "count": 2
+  },
+  {
+   "method": "GetSandboxEnvironmentSnapshot",
+   "log": "data_access",
+   "count": 1
+  },
+  {
+   "method": "DeleteSandboxEnvironmentSnapshot",
+   "log": "activity",
+   "count": 5
+  },
+  {
+   "method": "AuthorizeSandboxEnvironmentAccess",
+   "log": "data_access",
+   "count": 1
+  },
+  {
+   "method": "AutoDeleteSandboxEnvironment",
+   "log": "activity",
+   "count": 3
+  },
+  {
+   "method": "CreateSandboxEnvironmentTemplate",
+   "log": "activity",
+   "count": 1
+  },
+  {
+   "method": "ListSandboxEnvironments",
+   "log": "data_access",
+   "count": 1
+  },
+  {
+   "method": "ListSandboxEnvironmentSnapshots",
+   "log": "data_access",
+   "count": 1
+  },
+  {
+   "method": "DeleteSandboxEnvironmentTemplate",
+   "log": "activity",
+   "count": 5
+  }
+ ],
+ "marker_hits": 0,
+ "execute_entry_keys": [
+  "@type",
+  "authenticationInfo",
+  "authorizationInfo",
+  "methodName",
+  "request",
+  "requestMetadata",
+  "resourceName",
+  "response",
+  "serviceName",
+  "status"
+ ],
+ "execute_request": "{\"@type\": \"type.googleapis.com/google.cloud.aiplatform.v1beta1.ExecuteSandboxEnvironmentRequest\", \"name\": \"projects/PROJECT_NUMBER/locations/us-central1/reasoningEngines/530555317210054656/sandboxEnvironments/4767456304635576320\"}"
+}

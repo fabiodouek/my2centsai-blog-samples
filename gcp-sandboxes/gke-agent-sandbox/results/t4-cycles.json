@@ -1,0 +1,449 @@
+{
+ "cycles": [
+  {
+   "cycle": 1,
+   "snapshot": "125800d1-db82-43d8-85b7-90f1a0c2b551",
+   "trigger_s": 2.337354208008037,
+   "snapshot_ready_s": 2.4951903330074856,
+   "suspend_to_gone_s": 1.492651708991616,
+   "timing": {
+    "pod_created_s": 0.2690713749907445,
+    "running_s": 12.334966832990176,
+    "ready_s": 12.33496949999244,
+    "reply_s": 12.464793291001115
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 36,
+    "boot": 1794668553,
+    "uptime_s": 3.6,
+    "pid": 1,
+    "conn": "open",
+    "emptydir": [
+     "pre1@counter=33"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35"
+    ]
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 56,
+    "boot": 1794668553,
+    "uptime_s": 6.5,
+    "pid": 1,
+    "conn": "open",
+    "emptydir": [
+     "pre1@counter=33",
+     "post1@counter=53"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55"
+    ]
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 46,
+    "boot": 1794668553,
+    "uptime_s": 20.6,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55"
+    ]
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 2,
+   "snapshot": "2f24dabd-2d97-477d-980d-2977c73a94cc",
+   "trigger_s": 2.278628416999709,
+   "snapshot_ready_s": 2.4194491669913987,
+   "suspend_to_gone_s": 1.4474730829970213,
+   "timing": {
+    "pod_created_s": 0.26616787500097416,
+    "running_s": 12.298751082998933,
+    "ready_s": 12.298753583003418,
+    "reply_s": 12.43484937500034
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 86,
+    "boot": 1794668553,
+    "uptime_s": 24.7,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84"
+    ]
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 107,
+    "boot": 1794668553,
+    "uptime_s": 27.5,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "post2@counter=105"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106"
+    ]
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 99,
+    "boot": 1794668553,
+    "uptime_s": 41.5,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106"
+    ]
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 3,
+   "snapshot": "6b8a5bb5-615b-424d-a23a-83e4e2d661f4",
+   "trigger_s": 1.9694989999989048,
+   "snapshot_ready_s": 2.1232999589992687,
+   "suspend_to_gone_s": 1.1616150830086553,
+   "timing": {
+    "pod_created_s": 0.3036371250054799,
+    "running_s": 12.207420457998523,
+    "ready_s": 12.207421792001696,
+    "reply_s": 12.407958208001219
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 134,
+    "boot": 1794668553,
+    "uptime_s": 45.1,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132"
+    ]
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 151,
+    "boot": 1794668553,
+    "uptime_s": 47.6,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "post3@counter=149"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150"
+    ]
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 145,
+    "boot": 1794668553,
+    "uptime_s": 61.3,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150"
+    ]
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 4,
+   "snapshot": "7714780c-d4ce-4a96-849a-002de5be9cac",
+   "trigger_s": 2.0606373750051716,
+   "snapshot_ready_s": 2.204236707999371,
+   "suspend_to_gone_s": 1.8585400839947397,
+   "timing": {
+    "pod_created_s": 0.29334954200021457,
+    "running_s": 12.474839417001931,
+    "ready_s": 12.474841541989008,
+    "reply_s": 12.636517124992679
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 179,
+    "boot": 1794668553,
+    "uptime_s": 64.8,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178"
+    ]
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 199,
+    "boot": 1794668553,
+    "uptime_s": 67.4,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177",
+     "post4@counter=197"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178",
+     "post4@counter=198"
+    ]
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 190,
+    "boot": 1794668553,
+    "uptime_s": 82.0,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178",
+     "post4@counter=198"
+    ]
+   },
+   "annotations": {},
+   "labels": {}
+  },
+  {
+   "cycle": 5,
+   "snapshot": "179773ef-43d8-4da0-ab7d-3455cfd8cac4",
+   "trigger_s": 2.03234550000343,
+   "snapshot_ready_s": 2.1958817500126315,
+   "suspend_to_gone_s": 1.1452164579968667,
+   "timing": {
+    "pod_created_s": 0.27226095799414907,
+    "running_s": 3.196146250003949,
+    "ready_s": 3.196155165991513,
+    "reply_s": 3.387179165991256
+   },
+   "at_snapshot": {
+    "label": "pre-snap",
+    "counter": 225,
+    "boot": 1794668553,
+    "uptime_s": 85.5,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177",
+     "pre5@counter=223"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178",
+     "post4@counter=198",
+     "pre5@counter=224"
+    ]
+   },
+   "before_suspend": {
+    "label": "post-write",
+    "counter": 245,
+    "boot": 1794668553,
+    "uptime_s": 88.1,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177",
+     "pre5@counter=223",
+     "post5@counter=242"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178",
+     "post4@counter=198",
+     "pre5@counter=224",
+     "post5@counter=243"
+    ]
+   },
+   "after_resume": {
+    "label": "resumed",
+    "counter": 238,
+    "boot": 1794668553,
+    "uptime_s": 92.8,
+    "pid": 1,
+    "conn": "BrokenPipeError",
+    "emptydir": [
+     "pre1@counter=33",
+     "pre2@counter=79",
+     "pre3@counter=131",
+     "pre4@counter=177",
+     "pre5@counter=223"
+    ],
+    "pvc": [
+     "base@counter=39",
+     "pre1@counter=35",
+     "post1@counter=55",
+     "pre2@counter=84",
+     "post2@counter=106",
+     "pre3@counter=132",
+     "post3@counter=150",
+     "pre4@counter=178",
+     "post4@counter=198",
+     "pre5@counter=224",
+     "post5@counter=243"
+    ]
+   },
+   "annotations": {},
+   "labels": {}
+  }
+ ],
+ "baseline": {
+  "before": {
+   "label": "before",
+   "counter": 40,
+   "boot": 1794668536,
+   "uptime_s": 4.0,
+   "pid": 1,
+   "conn": "open",
+   "emptydir": [
+    "base@counter=37"
+   ],
+   "pvc": [
+    "base@counter=39"
+   ]
+  },
+  "after": {
+   "label": "after",
+   "counter": 1,
+   "boot": 1794668553,
+   "uptime_s": 0.0,
+   "pid": 1,
+   "conn": "open",
+   "emptydir": null,
+   "pvc": [
+    "base@counter=39"
+   ]
+  },
+  "suspend_to_gone_s": 1.066325167004834,
+  "timing": {
+   "pod_created_s": 0.27045779199397657,
+   "running_s": 11.552715416997671,
+   "ready_s": 11.552725999994436,
+   "reply_s": 12.015169833000982
+  }
+ },
+ "reply_s": {
+  "min": 3.387179165991256,
+  "median": 12.43484937500034,
+  "max": 12.636517124992679
+ }
+}

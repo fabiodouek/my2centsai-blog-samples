@@ -1,0 +1,7 @@
+# 2026-11-14T18:28:13Z t0_rtt.py
+
+[1m== 10 x ax get tasks on an empty atespace[0m
+  ax get tasks: n=10 median 490 ms, min 484, max 521
+
+[1m== 10 x kubectl ate get atespace (the native path, through the steady port-forward)[0m
+  kubectl ate get atespace: n=10 median 1242 ms, min 1217, max 1517

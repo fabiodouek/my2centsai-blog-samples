@@ -1,0 +1,189 @@
+### nodes
+NAME                                     STATUS   ROLES    AGE     VERSION               GKE-NODEPOOL   RUNTIME   INSTANCE-TYPE
+gke-sbx-gke-default-pool-72621258-dfpq   Ready    <none>   2m30s   v1.37.1-gke.2097000   default-pool             e2-standard-2
+gke-sbx-gke-gvisor-3df7f6c5-5jnk         Ready    <none>   14s     v1.37.1-gke.2097000   gvisor         gvisor    c3-standard-4
+### CRDs before
+podsnapshotmanualtriggers.podsnapshot.gke.io           Namespaced   v1(storage)                   2026-11-14T13:48:09Z
+podsnapshotpolicies.podsnapshot.gke.io                 Namespaced   v1(storage)                   2026-11-14T13:48:09Z
+podsnapshots.podsnapshot.gke.io                        Namespaced   v1(storage)                   2026-11-14T13:48:10Z
+podsnapshotstorageconfigs.podsnapshot.gke.io           Cluster      v1(storage)                   2026-11-14T13:48:10Z
+podsnapshottokenrequests.podsnapshot.gke.io            Namespaced   v1(storage)                   2026-11-14T13:48:10Z
+volumesnapshotclasses.snapshot.storage.k8s.io          Cluster      v1(storage),v1beta1           2026-11-14T13:48:19Z
+volumesnapshotcontents.snapshot.storage.k8s.io         Cluster      v1(storage),v1beta1           2026-11-14T13:48:19Z
+volumesnapshots.snapshot.storage.k8s.io                Namespaced   v1(storage),v1beta1           2026-11-14T13:48:19Z
+### runtimeclass
+NAME                         HANDLER                      AGE
+confidential-linked-runner   confidential-linked-runner   4m7s
+gvisor                       gvisor                       4m36s
+linked-runner                linked-runner                4m7s
+microvm                      kata-clh                     2m16s
+### describe addonsConfig before
+
+  null
+### namespaces before
+NAME                                STATUS   AGE
+default                             Active   5m3s
+gke-managed-cim                     Active   4m21s
+gke-managed-filestorecsi            Active   4m2s
+gke-managed-networking-dra-driver   Active   2m54s
+gke-managed-pod-snapshots           Active   2m24s
+gke-managed-system                  Active   3m47s
+gke-managed-volumepopulator         Active   3m34s
+gmp-public                          Active   3m12s
+gmp-system                          Active   3m13s
+kube-node-lease                     Active   5m3s
+kube-public                         Active   5m3s
+kube-system                         Active   5m3s
+### gcloud beta container clusters update --enable-agent-sandbox
+Updating sbx-gke...
+..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done.
+Updated [https://container.googleapis.com/v1beta1/projects/<project>/zones/us-central1-a/clusters/sbx-gke].
+To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-a/sbx-gke?project=<project>
+gcloud beta container clusters update $CLUSTER --zone $ZONE  2>&1  0.64s user 0.10s system 0% cpu 6:01.96 total
+### describe after
+addonsConfig:
+  agentSandboxConfig:
+    enabled: true
+currentMasterVersion: 1.37.1-gke.2097000
+### CRDs after
+sandboxclaims.extensions.agents.x-k8s.io               Namespaced   v1alpha1,v1beta1(storage)     2026-11-14T13:54:55Z
+sandboxes.agents.x-k8s.io                              Namespaced   v1alpha1,v1beta1(storage)     2026-11-14T13:54:54Z
+sandboxtemplates.extensions.agents.x-k8s.io            Namespaced   v1alpha1,v1beta1(storage)     2026-11-14T13:54:55Z
+sandboxwarmpools.extensions.agents.x-k8s.io            Namespaced   v1alpha1,v1beta1(storage)     2026-11-14T13:54:50Z
+### namespaces
+gke-managed-agentsandbox            Active   111s
+### pods agent-sandbox-system
+gke-managed-pod-snapshots   pod-snapshot-agent-fg5qt                                   1/1     Running   0          6m27s
+kube-system                 gke-metrics-agent-mzfsb                                    3/3     Running   0          6m27s
+kube-system                 gke-metrics-agent-s6vkb                                    3/3     Running   0          8m43s
+kube-system                 konnectivity-agent-84bd959b69-bb2bz                        2/2     Running   0          6m13s
+kube-system                 konnectivity-agent-84bd959b69-slqxx                        2/2     Running   0          9m35s
+kube-system                 konnectivity-agent-autoscaler-64dbdbf4cc-qjdr6             1/1     Running   0          9m33s
+### deployments
+NAMESPACE     NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
+NAME                                               VALIDATIONS   PARAMKIND   AGE
+block-privileged-node-label-modifications-policy   2             <unset>     9m55s
+capacitybuffer-refresh-frequency-warning.gke.io    1             <unset>     10m
+capacitybuffer-unknown-strategy.gke.io             1             <unset>     10m
+capacitybuffer-validations.gke.io                  2             <unset>     10m
+capacityquota-blocklisted-selectors.gke.io         1             <unset>     10m
+gke-pod-snapshot-validating-admission-policy       4             <unset>     8m35s
+gpu-device-plugin-sa-node-validation               1             <unset>     9m42s
+microvm-hostnetwork-validation                     1             <unset>     9m10s
+operatorconfigs.monitoring.googleapis.com          2             <unset>     9m19s
+pdcsi-node-sa-restrict-node-status-patch           2             <unset>     8m41s
+protected-labels.monitoring.googleapis.com         8             <unset>     9m19s
+sandbox-core-policy                                13            <unset>     114s
+sandbox-hardening-policy                           4             <unset>     114s
+tpu-device-plugin-node-status-validation           3             <unset>     8m25s
+tpu-device-plugin-node-validation                  2             <unset>     8m25s
+unique-ports.monitoring.googleapis.com             1             <unset>     9m19s
+validate-node-providerid                           1             <unset>     8m48s
+validating-node-p4sa-audience                      1             <unset>     8m31s
+warden-scheduling.warden-policies.gke.io           1             <unset>     10m
+### managed ns contents
+No resources found in gke-managed-agentsandbox namespace.
+### managed policies
+sandbox-core-binding                                      sandbox-core-policy                                <unset>    2m1s
+sandbox-hardening-binding                                 sandbox-hardening-policy                           <unset>    2m1s
+Security Violation: All Sandboxes must use 'runtimeClassName: gvisor' or 'runtimeClassName: microvm'
+Security Violation: 'hostNetwork: true' is strictly prohibited. Sandboxes must be isolated from the node network.
+Security Violation: 'automountServiceAccountToken' must be explicitly set to 'false'. Sandbox workloads are not permitted to access the K8s API.
+Security Violation: Privileged containers are not allowed (checked in containers, initContainers, and ephemeralContainers).
+Security Violation: Projected Service Account Tokens, ClusterTrustBundles, and PodCertificates are prohibited.
+Security Violation: HostPath volumes are strictly prohibited. You cannot mount host directories.
+Security Violation: 'hostPID' and 'hostIPC' must be false.
+Security Violation: 'hostPort' usage is prohibited.
+Security Violation: Custom 'sysctls' are prohibited.
+Security Violation: 'procMount' must be 'Default' (Unmasked is prohibited).
+Scheduling Violation: Sandboxes must be scheduled on sandbox nodes (nodeSelector 'sandbox.gke.io/runtime: gvisor' or 'microvm').
+Scheduling Violation: Sandboxes must tolerate the sandbox taint ('sandbox.gke.io/runtime=gvisor:NoSchedule' or 'microvm').
+Resource Violation: Container memory request must be at least 1 GiB per 1 vCPU for GKE Autopilot compatibility (e.g., 500m CPU requires >= 512Mi memory).
+HARDENING Violation: All containers should explicitly drop 'ALL' capabilities.
+HARDENING Violation: Capabilities.add should be empty.
+HARDENING Violation: Pods or Containers should set 'runAsNonRoot: true'.
+HARDENING Violation: All containers should define resource limits (cpu and memory).
+### crd labels/annotations
+{"addonmanager.kubernetes.io/mode":"Reconcile"}
+{"components.gke.io/component-name":"agentsandbox","components.gke.io/component-version":"1.37.5","components.gke.io/layer":"addon","controller-gen.kubebuilder.io/version":"v0.19.0"}
+### disable flag
+Updating sbx-gke...
+..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done.
+Updated [https://container.googleapis.com/v1beta1/projects/<project>/zones/us-central1-a/clusters/sbx-gke].
+To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-a/sbx-gke?project=<project>
+gcloud beta container clusters update $CLUSTER --zone $ZONE  2>&1  0.82s user 0.14s system 0% cpu 7:53.48 total
+addonsConfig:
+  agentSandboxConfig: {}
+NAME                                                                 READY   AGE
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool   2       9m51s
+
+NAME                                                                 AGE
+sandboxtemplate.extensions.agents.x-k8s.io/python-sandbox-template   9m52s
+
+NAME                                                    AGE
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-nvvsh   9m32s
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-vwzzq   9m51s
+
+NAME                                READY   STATUS    RESTARTS   AGE
+pod/python-sandbox-warmpool-nvvsh   1/1     Running   0          9m33s
+pod/python-sandbox-warmpool-vwzzq   1/1     Running   0          9m52s
+sandbox-core-binding                                      sandbox-core-policy                                <unset>    12m
+sandbox-hardening-binding                                 sandbox-hardening-policy                           <unset>    12m
+### leftovers after --no-enable-agent-sandbox: CRDs (4), policies sandbox-core-policy/sandbox-hardening-policy + bindings, existing Sandbox/Pod objects; controller lease gone
+### kubectl apply v1.0.11 sandbox-with-extensions.yaml
+namespace/agent-sandbox-system created
+customresourcedefinition.apiextensions.k8s.io/sandboxclaims.extensions.agents.x-k8s.io created
+customresourcedefinition.apiextensions.k8s.io/sandboxes.agents.x-k8s.io created
+customresourcedefinition.apiextensions.k8s.io/sandboxtemplates.extensions.agents.x-k8s.io created
+customresourcedefinition.apiextensions.k8s.io/sandboxwarmpools.extensions.agents.x-k8s.io created
+serviceaccount/agent-sandbox-controller created
+clusterrole.rbac.authorization.k8s.io/agent-sandbox-controller created
+clusterrole.rbac.authorization.k8s.io/agent-sandbox-controller-extensions created
+clusterrolebinding.rbac.authorization.k8s.io/agent-sandbox-controller created
+clusterrolebinding.rbac.authorization.k8s.io/agent-sandbox-controller-extensions created
+service/agent-sandbox-controller created
+deployment.apps/agent-sandbox-controller created
+Waiting for deployment "agent-sandbox-controller" rollout to finish: 0 of 1 updated replicas are available...
+deployment "agent-sandbox-controller" successfully rolled out
+apply: 8.339154000 s; rollout ready at: 13.546209000 s
+sandboxclaims.extensions.agents.x-k8s.io               Namespaced   v1beta1(storage)              2026-11-14T14:07:34Z
+sandboxes.agents.x-k8s.io                              Namespaced   v1beta1(storage)              2026-11-14T14:07:35Z
+sandboxtemplates.extensions.agents.x-k8s.io            Namespaced   v1beta1(storage)              2026-11-14T14:07:36Z
+sandboxwarmpools.extensions.agents.x-k8s.io            Namespaced   v1beta1(storage)              2026-11-14T14:07:37Z
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS                 IMAGES                                                           SELECTOR
+agent-sandbox-controller   1/1     1            1           6s    agent-sandbox-controller   registry.k8s.io/agent-sandbox/agent-sandbox-controller:v1.0.11   app=agent-sandbox-controller
+["--leader-elect=true","--extensions"]
+### secure-sandbox-policy v1.0.11
+validatingadmissionpolicy.admissionregistration.k8s.io/secure-sandbox-policy created
+validatingadmissionpolicybinding.admissionregistration.k8s.io/secure-sandbox-binding created
+Security Violation: All Sandboxes must use 'runtimeClassName: gvisor'
+Security Violation: 'hostNetwork: true' is strictly prohibited. Sandboxes must be isolated from the node network.
+Security Violation: 'automountServiceAccountToken' must be explicitly set to 'false'. Sandbox workloads are not permitted to access the K8s API.
+Security Violation: Privileged containers are not allowed (checked in containers, initContainers, and ephemeralContainers).
+Security Violation: All containers must explicitly drop 'ALL' capabilities in securityContext.
+Security Violation: All containers must define resource limits (cpu and memory) to prevent DoS.
+Security Violation: Pods or Containers must set 'runAsNonRoot: true', and containers cannot override it to false.
+Security Violation: Projected Service Account Tokens, ClusterTrustBundles, and PodCertificates are prohibited.
+Security Violation: HostPath volumes are strictly prohibited. You cannot mount host directories.
+Security Violation: Capabilities.add must be empty. You cannot add capabilities.
+Security Violation: 'hostPID' and 'hostIPC' must be false.
+Security Violation: 'hostPort' usage is prohibited.
+Security Violation: Custom 'sysctls' are prohibited.
+Security Violation: 'procMount' must be 'Default' (Unmasked is prohibited).
+Scheduling Violation: Sandboxes must be scheduled on gVisor nodes (nodeSelector 'sandbox.gke.io/runtime: gvisor').
+Scheduling Violation: Sandboxes must tolerate the gVisor taint ('sandbox.gke.io/runtime=gvisor:NoSchedule').
+The sandboxes "reject-root" is invalid: : ValidatingAdmissionPolicy 'secure-sandbox-policy' with binding 'secure-sandbox-binding' denied request: Security Violation: Pods or Containers must set 'runAsNonRoot: true', and containers cannot override it to false.
+The sandboxes "reject-microvm" is invalid: : ValidatingAdmissionPolicy 'secure-sandbox-policy' with binding 'secure-sandbox-binding' denied request: Security Violation: All Sandboxes must use 'runtimeClassName: gvisor'
+### router v1.0.11
+serviceaccount/sandbox-router created
+clusterrole.rbac.authorization.k8s.io/sandbox-router created
+clusterrolebinding.rbac.authorization.k8s.io/sandbox-router created
+deployment.apps/sandbox-router created
+service/sandbox-router-svc created
+Waiting for deployment "sandbox-router" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "sandbox-router" rollout to finish: 1 of 2 updated replicas are available...
+deployment "sandbox-router" successfully rolled out
+NAME                                        READY   STATUS    RESTARTS   AGE   IP           NODE                                     NOMINATED NODE   READINESS GATES
+agent-sandbox-controller-576865c4cf-mxjww   1/1     Running   0          35s   10.72.0.19   gke-sbx-gke-default-pool-72621258-dfpq   <none>           <none>
+sandbox-router-b7d799449-24jpv              1/1     Running   0          11s   10.72.0.20   gke-sbx-gke-default-pool-72621258-dfpq   <none>           <none>
+sandbox-router-b7d799449-g7g7x              1/1     Running   0          11s   10.72.0.21   gke-sbx-gke-default-pool-72621258-dfpq   <none>           <none>

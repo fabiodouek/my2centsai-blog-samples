@@ -1,0 +1,5 @@
+Forwarding from 127.0.0.1:18888 -> 8888
+Forwarding from [::1]:18888 -> 8888
+Handling connection for 18888
+E1114 14:36:24.090376   99501 portforward.go:549] "An error occurred forwarding" err="error forwarding port 8888 to pod 209efa986d1abdc2f47ec5a1d8918d4448080a39e7ebf4c998b5342eae57bd1a, uid : failed to execute portforward in network namespace \"/var/run/netns/cni-0ba73997-ae31-9080-bcec-1157d61e2ddb\": failed to connect to localhost:8888 inside namespace \"209efa986d1abdc2f47ec5a1d8918d4448080a39e7ebf4c998b5342eae57bd1a\", IPv4: dial tcp4 127.0.0.1:8888: connect: connection refused IPv6 dial tcp6 [::1]:8888: connect: connection refused " localPort=18888 remotePort=8888
+error: lost connection to pod

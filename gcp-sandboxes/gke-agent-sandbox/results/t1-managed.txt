@@ -1,0 +1,52 @@
+### reject root
+The sandboxes "reject-root" is invalid: : ValidatingAdmissionPolicy 'sandbox-hardening-policy' with binding 'sandbox-hardening-binding' denied request: HARDENING Violation: Pods or Containers should set 'runAsNonRoot: true'.
+### reject microvm
+The sandboxes "reject-microvm" is invalid: : ValidatingAdmissionPolicy 'sandbox-core-policy' with binding 'sandbox-core-binding' denied request: Scheduling Violation: Sandboxes must be scheduled on sandbox nodes (nodeSelector 'sandbox.gke.io/runtime: gvisor' or 'microvm').
+### template + warmpool
+sandboxtemplate.extensions.agents.x-k8s.io/python-sandbox-template created
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool created
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool condition met
+warmpool ready after 8 s
+NAME                                                                 READY   AGE
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool   2       8s
+
+NAME                                                    AGE
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-m7btl   8s
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-vwzzq   8s
+
+NAME                                READY   STATUS    RESTARTS   AGE   IP          NODE                               NOMINATED NODE   READINESS GATES
+pod/python-sandbox-warmpool-m7btl   1/1     Running   0          9s    10.72.1.5   gke-sbx-gke-gvisor-3df7f6c5-5jnk   <none>           <none>
+pod/python-sandbox-warmpool-vwzzq   1/1     Running   0          9s    10.72.1.6   gke-sbx-gke-gvisor-3df7f6c5-5jnk   <none>           <none>
+
+NAME                                                                 AGE
+sandboxtemplate.extensions.agents.x-k8s.io/python-sandbox-template   10s
+gke-managed-agentsandbox      a3317529.agent-sandbox.x-k8s.io                                  gke-572dce1dec8e401097cf-d3c6-097c-vm_ce854ba3-1260-4f6c-9b54-4bd1e371cf4e                80s
+### networkpolicy
+NAMESPACE   NAME                                     POD-SELECTOR                                         AGE
+default     python-sandbox-template-network-policy   agents.x-k8s.io/sandbox-template-ref-hash=d274c066   19s
+claim ready after .760388000 s (incl kubectl overhead)
+{
+    "conditions": [
+        {
+            "lastTransitionTime": "2026-11-14T13:57:18Z",
+            "message": "Pod is Ready",
+            "observedGeneration": 2,
+            "reason": "DependenciesReady",
+            "status": "True",
+            "type": "Ready"
+        }
+    ],
+    "sandbox": {
+        "name": "python-sandbox-warmpool-m7btl",
+        "podIPs": [
+            "10.72.1.5"
+        ]
+    }
+}
+NAME                                                                 READY   AGE
+sandboxwarmpool.extensions.agents.x-k8s.io/python-sandbox-warmpool   1       21s
+
+NAME                                                    AGE
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-m7btl   21s
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-nvvsh   2s
+sandbox.agents.x-k8s.io/python-sandbox-warmpool-vwzzq   21s

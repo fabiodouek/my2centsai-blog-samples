@@ -1,0 +1,26 @@
+# 2026-11-14T18:14:03Z t10a_snapshot_storm.py
+
+[1m== 20 tasks, 100 MB of random data each[0m
+
+[1m== suspend all 20 at once[0m
+  suspend: n=20 p50 1951 ms, p95 2890, p99 2890, max 2890
+
+[1m== wait for every snapshot to be durable in GCS[0m
+  +   4s   0/20 durable
+  +  29s   0/20 durable
+  +  54s   0/20 durable
+  +  78s   0/20 durable
+  + 103s   0/20 durable
+  + 128s   0/20 durable
+  + 152s   0/20 durable
+  + 177s   0/20 durable
+  + 201s   0/20 durable
+  + 226s   0/20 durable
+  + 251s   0/20 durable
+  + 275s   0/20 durable
+  + 300s   0/20 durable
+  + 324s  20/20 durable
+  (metrics: results/snapshot_storm.csv)
+
+[1m== what is in the bucket for these 20 snapshots[0m
+   1.95GiB      gs://<bucket>/atespaces/stress/

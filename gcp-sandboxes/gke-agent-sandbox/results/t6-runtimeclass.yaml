@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: node.k8s.io/v1
+  handler: kata-clh
+  kind: RuntimeClass
+  metadata:
+    annotations:
+      components.gke.io/component-name: sandbox-runtime-class
+      components.gke.io/component-version: 1.37.0
+      components.gke.io/layer: addon
+    labels:
+      addonmanager.kubernetes.io/mode: Reconcile
+      kubernetes.io/cluster-service: "true"
+    name: microvm
+  overhead:
+    podFixed:
+      cpu: 250m
+      memory: 130Mi
+  scheduling:
+    nodeSelector:
+      sandbox.gke.io/runtime: microvm
+    tolerations:
+    - effect: NoSchedule
+      key: sandbox.gke.io/runtime
+      operator: Equal
+      value: microvm
+- apiVersion: node.k8s.io/v1
+  handler: gvisor
+  kind: RuntimeClass
+  metadata:
+    labels:
+      addonmanager.kubernetes.io/mode: Reconcile
+      kubernetes.io/cluster-service: "true"
+    name: gvisor
+  scheduling:
+    nodeSelector:
+      sandbox.gke.io/runtime: gvisor
+    tolerations:
+    - effect: NoSchedule
+      key: sandbox.gke.io/runtime
+      operator: Equal
+      value: gvisor
+kind: List
+metadata:

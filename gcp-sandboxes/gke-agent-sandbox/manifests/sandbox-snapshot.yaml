@@ -1,0 +1,44 @@
+# A directly created Sandbox that satisfies secure-sandbox-policy AND can be snapshotted:
+# it runs as the Kubernetes service account that has the bucket roles, carries the label the PodSnapshotPolicy selects,
+# and has an emptyDir and a PVC next to the process state. Replace APPCM with the ConfigMap holding state_app.py.
+apiVersion: agents.x-k8s.io/v1beta1
+kind: Sandbox
+metadata:
+  name: snap-sandbox
+  namespace: pod-snapshots-ns
+spec:
+  volumeClaimTemplates:
+  - metadata: {name: data}
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources: {requests: {storage: 1Gi}}
+  podTemplate:
+    metadata:
+      labels:
+        app: agent-sandbox-workload
+    spec:
+      serviceAccountName: pod-snapshot-sa
+      runtimeClassName: gvisor
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      nodeSelector:
+        sandbox.gke.io/runtime: gvisor
+      tolerations:
+      - {key: "sandbox.gke.io/runtime", value: "gvisor", effect: "NoSchedule"}
+      containers:
+      - name: app
+        image: python:3.12-slim
+        command: ["python3", "/app/state_app.py"]
+        securityContext:
+          capabilities: {drop: ["ALL"]}
+          allowPrivilegeEscalation: false
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {cpu: 500m, memory: 512Mi}
+        volumeMounts:
+        - {name: app, mountPath: /app}
+        - {name: scratch, mountPath: /scratch}
+        - {name: data, mountPath: /data}
+      volumes:
+      - {name: app, configMap: {name: state-app}}
+      - {name: scratch, emptyDir: {}}

@@ -1,0 +1,21 @@
+{
+ "javascript": "v18.20.1 function [ 2, 4, 6 ]\n",
+ "python": "  numpy       2.1.3\n  pandas      2.2.3\n  matplotlib  3.10.1\n  openpyxl    3.1.5\n  scipy       1.15.2\n  PIL         11.1.0\n  requests    2.33.1\npython 3.12.5\npip install cowsay -> exit 1 | ERROR: No matching distribution found for cowsay\n",
+ "outputs": [
+  {
+   "mime": "application/json",
+   "file": null,
+   "bytes": 54
+  },
+  {
+   "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "file": "book.xlsx",
+   "bytes": 4850
+  },
+  {
+   "mime": "image/png",
+   "file": "chart.png",
+   "bytes": 16656
+  }
+ ]
+}

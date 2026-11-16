@@ -1,0 +1,23 @@
+== (a) certificates.k8s.io versions served
+v1 v1beta1
+NAME                         SHORTNAMES   APIVERSION               NAMESPACED   KIND
+certificatesigningrequests   csr          certificates.k8s.io/v1   false        CertificateSigningRequest
+clustertrustbundles                       certificates.k8s.io/v1   false        ClusterTrustBundle
+podcertificaterequests                    certificates.k8s.io/v1   true         PodCertificateRequest
+== (b) server-side dry run of a pod with a projected podCertificate volume
+podidentity.podcert.ate.dev/identity
+== (c) node kernel, OS, allocatable
+NAME                                KERNEL     OS                                   RUNTIME              CPU     MEMORY
+gke-ate-sbx-pool-hd-54063ea0-7k72   6.18.53+   Container-Optimized OS from Google   containerd://2.4.1   3920m   14073824Ki
+gke-ate-sbx-pool-hd-54063ea0-t9f4   6.18.53+   Container-Optimized OS from Google   containerd://2.4.1   3920m   14073824Ki
+readiness checks took 3 s
+== versions
+Google Cloud SDK 593.0.0
+beta 2026.11.06
+Client Version: v1.37.2
+go version go1.26.1 darwin/arm64
+Docker version 29.2.1, build a5c7197
+server v1.37.1-gke.2097000
+v1.0.0-gke.0
+v1.0.0
+eac831339211

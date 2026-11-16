@@ -1,0 +1,128 @@
+# 2026-11-14T18:24:42Z t10c_monitoring.py
+  window 18:09 to 18:24 UTC
+
+[1m== node_cpu[0m
+  gke-ate-sbx-pool-hd-54063ea0-7k72                            n= 14 max 0.0923 sum 0.9865
+  gke-ate-sbx-pool-hd-54063ea0-t9f4                            n= 14 max 0.0856 sum 0.9413
+
+[1m== node_mem[0m
+  gke-ate-sbx-pool-hd-54063ea0-7k72                            n= 16 max 0.155 sum 1.937
+  gke-ate-sbx-pool-hd-54063ea0-7k72                            n= 16 max 0.175 sum 2.267
+  gke-ate-sbx-pool-hd-54063ea0-t9f4                            n= 16 max 0.141 sum 1.772
+  gke-ate-sbx-pool-hd-54063ea0-t9f4                            n= 16 max 0.166 sum 2.145
+
+[1m== restarts[0m
+  ate-api-server-94b47d44f-jhhxq                               n= 16 max 0 sum 0
+  ate-api-server-94b47d44f-jhhxq                               n= 16 max 0 sum 0
+  ate-api-server-94b47d44f-z6r9h                               n= 16 max 0 sum 0
+  ate-api-server-94b47d44f-z6r9h                               n= 16 max 0 sum 0
+  ate-controller-7984566f8d-hwwqh                              n= 16 max 0 sum 0
+  ate-idp-server-dcd5f565f-282np                               n= 16 max 0 sum 0
+  ate-idp-server-dcd5f565f-4zrtv                               n= 16 max 0 sum 0
+  atelet-56vvp                                                 n= 16 max 0 sum 0
+  atelet-56vvp                                                 n= 16 max 0 sum 0
+  atelet-rrgb6                                                 n= 16 max 0 sum 0
+  atelet-rrgb6                                                 n= 16 max 0 sum 0
+  atenet-egress-5f7fb747d8-6k2mb                               n= 16 max 0 sum 0
+  atenet-egress-5f7fb747d8-6k2mb                               n= 16 max 0 sum 0
+  atenet-egress-5f7fb747d8-6k2mb                               n= 16 max 0 sum 0
+  atenet-router-6b8498bb48-4g8vj                               n= 16 max 0 sum 0
+  atenet-router-6b8498bb48-4g8vj                               n= 16 max 0 sum 0
+  k8s-credential-provider-5bb6b77b65-w7bck                     n= 16 max 0 sum 0
+  postgres-0                                                   n= 16 max 0 sum 0
+  postgres-0                                                   n= 16 max 0 sum 0
+  ax-postgres-0                                                n= 16 max 0 sum 0
+  ax-server-749c4f665d-f26hq                                   n= 16 max 0 sum 0
+  ax-workers-5fc864b77d-2jr47                                  n= 12 max 0 sum 0
+  ax-workers-5fc864b77d-f7bn6                                  n=  4 max 0 sum 0
+  ax-workers-5fc864b77d-ltjwv                                  n=  3 max 0 sum 0
+  ax-workers-5fc864b77d-wxl5g                                  n= 12 max 0 sum 0
+  kube-state-metrics-0                                         n= 16 max 0 sum 0
+  kube-state-metrics-0                                         n= 16 max 0 sum 0
+  opentelemetry-collector-6664fd64d4-fbj6r                     n= 16 max 0 sum 0
+  collector-4f58w                                              n= 16 max 0 sum 0
+  collector-4f58w                                              n= 16 max 0 sum 0
+  collector-rkjcj                                              n= 16 max 0 sum 0
+  collector-rkjcj                                              n= 16 max 0 sum 0
+  gmp-operator-5849fdcfd4-24gck                                n= 16 max 0 sum 0
+  anetd-9tkds                                                  n= 16 max 0 sum 0
+  anetd-9tkds                                                  n= 16 max 0 sum 0
+  anetd-9tkds                                                  n= 16 max 0 sum 0
+  anetd-hz9n5                                                  n= 16 max 0 sum 0
+  anetd-hz9n5                                                  n= 16 max 0 sum 0
+  anetd-hz9n5                                                  n= 16 max 0 sum 0
+  antrea-controller-horizontal-autoscaler-75cb5c7d4d-vpgbq     n= 16 max 0 sum 0
+  event-exporter-gke-74dcd464cd-kvvzw                          n= 16 max 0 sum 0
+  event-exporter-gke-74dcd464cd-kvvzw                          n= 16 max 0 sum 0
+  filestore-lock-release-controller-7cf566c7c8-6jmtf           n= 16 max 0 sum 0
+  filestore-lock-release-controller-7cf566c7c8-6jmtf           n= 16 max 0 sum 0
+  filestore-node-mdngc                                         n= 16 max 0 sum 0
+  filestore-node-mdngc                                         n= 16 max 0 sum 0
+  filestore-node-mdngc                                         n= 16 max 0 sum 0
+  filestore-node-mdngc                                         n= 16 max 0 sum 0
+  filestore-node-xsc54                                         n= 16 max 0 sum 0
+  filestore-node-xsc54                                         n= 16 max 0 sum 0
+  filestore-node-xsc54                                         n= 16 max 0 sum 0
+  filestore-node-xsc54                                         n= 16 max 0 sum 0
+  fluentbit-gke-22d4w                                          n= 16 max 0 sum 0
+  fluentbit-gke-22d4w                                          n= 16 max 0 sum 0
+  fluentbit-gke-22d4w                                          n= 16 max 0 sum 0
+  fluentbit-gke-jztpp                                          n= 16 max 0 sum 0
+  fluentbit-gke-jztpp                                          n= 16 max 0 sum 0
+  fluentbit-gke-jztpp                                          n= 16 max 0 sum 0
+  gke-metadata-server-gbcn6                                    n= 16 max 0 sum 0
+  gke-metadata-server-ljqlh                                    n= 16 max 0 sum 0
+  gke-metrics-agent-qptns                                      n= 16 max 0 sum 0
+  gke-metrics-agent-qptns                                      n= 16 max 0 sum 0
+  gke-metrics-agent-qptns                                      n= 16 max 0 sum 0
+  gke-metrics-agent-zr2bw                                      n= 16 max 0 sum 0
+  gke-metrics-agent-zr2bw                                      n= 16 max 0 sum 0
+  gke-metrics-agent-zr2bw                                      n= 16 max 0 sum 0
+  konnectivity-agent-autoscaler-64dbdbf4cc-nk6rj               n= 16 max 0 sum 0
+  konnectivity-agent-d66d8589d-fd569                           n= 16 max 0 sum 0
+  konnectivity-agent-d66d8589d-fd569                           n= 16 max 0 sum 0
+  konnectivity-agent-d66d8589d-gfffk                           n= 16 max 0 sum 0
+  konnectivity-agent-d66d8589d-gfffk                           n= 16 max 0 sum 0
+  kube-dns-7cf7b99b4f-8jd86                                    n= 16 max 0 sum 0
+  kube-dns-7cf7b99b4f-8jd86                                    n= 16 max 0 sum 0
+  kube-dns-7cf7b99b4f-tmpgj                                    n= 16 max 0 sum 0
+  kube-dns-7cf7b99b4f-tmpgj                                    n= 16 max 0 sum 0
+  kube-dns-autoscaler-7b58ff799d-dzh6z                         n= 16 max 0 sum 0
+  l7-default-backend-7c447dc6b-x8tdv                           n= 16 max 0 sum 0
+  metrics-server-v1.36.0-66d899988-445ns                       n= 16 max 0 sum 0
+  netd-kfctc                                                   n= 16 max 0 sum 0
+  netd-kfctc                                                   n= 16 max 0 sum 0
+  netd-kfctc                                                   n= 16 max 0 sum 0
+  netd-n6p55                                                   n= 16 max 0 sum 0
+  netd-n6p55                                                   n= 16 max 0 sum 0
+  netd-n6p55                                                   n= 16 max 0 sum 0
+  node-local-dns-jqcpd                                         n= 16 max 0 sum 0
+  node-local-dns-jqcpd                                         n= 16 max 0 sum 0
+  node-local-dns-qfjq2                                         n= 16 max 0 sum 0
+  node-local-dns-qfjq2                                         n= 16 max 0 sum 0
+  pdcsi-node-9hnph                                             n= 16 max 0 sum 0
+  pdcsi-node-9hnph                                             n= 16 max 0 sum 0
+  pdcsi-node-9hnph                                             n= 16 max 0 sum 0
+  pdcsi-node-fkf6q                                             n= 16 max 0 sum 0
+  pdcsi-node-fkf6q                                             n= 16 max 0 sum 0
+  pdcsi-node-fkf6q                                             n= 16 max 0 sum 0
+  podcertificate-controller-57c94fb5b-46stp                    n= 16 max 0 sum 0
+
+[1m== nat_sent[0m
+  ate-nat                                                      n= 14 max 0 sum 0
+  ate-nat                                                      n= 14 max 0 sum 0
+  ate-nat                                                      n= 14 max 0 sum 0
+
+[1m== nat_received[0m
+  ate-nat                                                      n= 14 max 0 sum 0
+  ate-nat                                                      n= 14 max 0 sum 0
+  ate-nat                                                      n= 14 max 0 sum 0
+
+[1m== gcs_received[0m
+  <bucket>                                        n=  6 max 0 sum 0
+  <bucket>                                        n=  6 max 1.45e+04 sum 2.9e+04
+  <bucket>                                        n= 11 max 0 sum 0
+  <bucket>                                        n= 10 max 0 sum 0
+  <bucket>                                        n=  6 max 300 sum 345
+  <bucket>                                        n=  6 max 300 sum 345
+  <bucket>                                        n= 11 max 2.1e+09 sum 4.195e+09

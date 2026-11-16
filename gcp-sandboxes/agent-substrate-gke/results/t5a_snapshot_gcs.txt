@@ -1,0 +1,27 @@
+# 2026-11-14T18:39:49Z t5a_snapshot_gcs.py
+
+== lc-gcs: 100 MB random + 100 MB zeros in /workspace
+d0b2a6a89a929e55ce319a447a62c1d297cb2dca147f67caaaacb98457b7c058  /workspace/random
+20492a4d0d84f8beb1767f6616229f85d44c2827b64bdbfb260ee12fa1109e0e  /workspace/zeros
+201M	/workspace
+  running on ax-workers-5fc864b77d-zn79l on gke-ate-sbx-pool-hd-54063ea0-t9f4
+
+== suspend, then watch the actor's snapshot status every 30 s
+  [    588 ms] ax suspend
+  +    2s  durable copy: PENDING    local copy on: gke-ate-sbx-pool-hd-54063ea0-t9f4
+  +  324s  durable copy: COMPLETED  local copy on: gke-ate-sbx-pool-hd-54063ea0-t9f4
+  + 1807s  durable copy: COMPLETED  local copy on: none (detached)
+
+== the snapshot in Cloud Storage
+       0.0 MB  9548b1cf-cc9b-47e9-b22e-3ca6274d0383/manifest.json
+       0.0 MB  9548b1cf-cc9b-47e9-b22e-3ca6274d0383/fs/fscheckpoint.pb.zstd
+       0.0 MB  9548b1cf-cc9b-47e9-b22e-3ca6274d0383/fs/multitar.img.zstd
+     104.9 MB  9548b1cf-cc9b-47e9-b22e-3ca6274d0383/fs/pages.img.zstd
+       0.0 MB  9548b1cf-cc9b-47e9-b22e-3ca6274d0383/fs/pages_meta.img.zstd
+     104.9 MB  in GCS for 200 MB of files (100 MB random, 100 MB zeros), zstd-compressed
+
+== resume, now that the only copy is in GCS
+  [   1724 ms] ax resume
+  now on ax-workers-5fc864b77d-zn79l on gke-ate-sbx-pool-hd-54063ea0-t9f4
+/workspace/random: OK
+/workspace/zeros: OK

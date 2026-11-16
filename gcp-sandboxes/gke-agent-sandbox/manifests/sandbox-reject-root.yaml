@@ -1,0 +1,23 @@
+# Should be rejected by secure-sandbox-policy: no runAsNonRoot.
+apiVersion: agents.x-k8s.io/v1beta1
+kind: Sandbox
+metadata:
+  name: reject-root
+  namespace: default
+spec:
+  podTemplate:
+    spec:
+      runtimeClassName: gvisor
+      automountServiceAccountToken: false
+      nodeSelector:
+        sandbox.gke.io/runtime: gvisor
+      tolerations:
+      - {key: "sandbox.gke.io/runtime", value: "gvisor", effect: "NoSchedule"}
+      containers:
+      - name: c
+        image: busybox
+        command: ["sleep", "3600"]
+        securityContext:
+          capabilities: {drop: ["ALL"]}
+        resources:
+          limits: {cpu: "100m", memory: "64Mi"}

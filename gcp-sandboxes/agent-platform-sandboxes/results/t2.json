@@ -1,0 +1,38 @@
+{
+ "code_execution_default": {
+  "output": "uname       4.19.0-gvisor x86_64\nproc/version Linux version 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2\ncpu_count   8  sched_getaffinity 8\nMemTotal    MemTotal:        2097152 kB\ndmesg       [    0.000000] Starting gVisor... | [    0.392154] Deleting VFS and re\npython      3.12.5\nuser        0 None\n",
+  "token_claims": null
+ },
+ "code_execution_4vcpu_4gib": {
+  "output": "uname       4.19.0-gvisor x86_64\nproc/version Linux version 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2\ncpu_count   8  sched_getaffinity 8\nMemTotal    MemTotal:        4194304 kB\ndmesg       [    0.000000] Starting gVisor... | [    0.255356] Consulting tar man \npython      3.12.5\nuser        0 None\n",
+  "token_claims": null
+ },
+ "shell": {
+  "output": "4.19.0-gvisor\n[    0.000000] Starting gVisor...\n[    0.250903] Granting licence to kill(2)...\nuid=999(appuser) gid=999(appuser) groups=999(appuser)\ncpus: 2\n               total        used        free      shared  buff/cache   available\nMem:             512          53         458           0          23         458\nPRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nPython 3.11.2\n/usr/bin/bash: line 1: node: command not found\n",
+  "token_claims": {
+   "sandbox_type": "SHELL_ENVIRONMENT",
+   "machine_vcpu": 0.5,
+   "machine_memory_gib": 0.5,
+   "container_ports": [
+    5091,
+    8080,
+    9222
+   ],
+   "authz_mode": "enforce"
+  }
+ },
+ "computer_use": {
+  "navigator": "{\"cores\":2,\"ua\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36\",\"platform\":\"Linux x86_64\"}",
+  "token_claims": {
+   "sandbox_type": "COMPUTER_USE_ENVIRONMENT",
+   "machine_vcpu": 2.0,
+   "machine_memory_gib": 4.0,
+   "container_ports": [
+    5091,
+    8080,
+    9222
+   ],
+   "authz_mode": "enforce"
+  }
+ }
+}

@@ -1,0 +1,99 @@
+{
+ "runtimeclass": {
+  "podFixed": {
+   "cpu": "250m",
+   "memory": "130Mi"
+  }
+ },
+ "startup_first": {
+  "gvisor": 0.8486215409939177,
+  "microvm": 3.7252356249955483
+ },
+ "probe": {
+  "gvisor": "kernel:     4.19.0-gvisor\ndmesg:      [    0.000000] Starting gVisor... | [    0.197819] Checking naughty and nice process list...\ncpus:       2   memory MiB: 512\nhypervisor: 1 (1 = the CPU reports it runs under a hypervisor)\nmetadata:   node name -> gke-...\nmetadata:   token -> token returned (1277 bytes)",
+  "microvm": "kernel:     6.6.94-g7b99f7ef5fbf\ndmesg:      [    0.000000] Linux version 6.6.94-g7b99f7ef5fbf (root@9ed82a6cf38b)  | [    0.000000] Command line: root=/dev/vda1 rootflags=data=ordered,err\ncpus:       2   memory MiB: 2467\nhypervisor: 1 (1 = the CPU reports it runs under a hypervisor)\nmetadata:   node name -> gke-...\nmetadata:   token -> token returned (1279 bytes)"
+ },
+ "latency_s": {
+  "gvisor": {
+   "all": [
+    0.7516304999880958,
+    1.157663166988641,
+    1.034660667006392,
+    1.0632183749985415,
+    0.7554056250082795,
+    0.981025207991479,
+    0.7657885000080569,
+    0.9854738330031978,
+    0.7614324169990141,
+    1.3307082079991233
+   ],
+   "min": 0.7516304999880958,
+   "median": 0.9832495204973384,
+   "max": 1.3307082079991233
+  },
+  "microvm": {
+   "all": [
+    4.354313415999059,
+    3.9418387499899836,
+    4.014578250003979,
+    3.8231017500074813,
+    4.227141665993258,
+    4.013411791995168,
+    3.7524719170032768,
+    3.785313458996825,
+    3.7515067079948494,
+    4.009845749998931
+   ],
+   "min": 3.7515067079948494,
+   "median": 3.9758422499944572,
+   "max": 4.354313415999059
+  }
+ },
+ "allocated": {
+  "gvisor": {
+   "before": {
+    "cpu": "832m (21%)",
+    "memory": "1535463680 (10%)"
+   },
+   "after_5_pods": {
+    "cpu": "1332m (33%)",
+    "memory": "2206552320 (15%)"
+   }
+  },
+  "microvm": {
+   "before": {
+    "cpu": "879m (22%)",
+    "memory": "1449480448 (10%)"
+   },
+   "after_5_pods": {
+    "cpu": "2629m (67%)",
+    "memory": "2802143488 (19%)"
+   }
+  }
+ },
+ "snapshot_attempt": {
+  "trigger_status": {
+   "conditions": [
+    {
+     "lastTransitionTime": "2026-11-14T15:17:14Z",
+     "message": "cannot trigger a manual checkpoint because the target pod is not using the gvisor runtime class",
+     "reason": "Failed",
+     "status": "False",
+     "type": "Triggered"
+    }
+   ],
+   "observedGeneration": 1
+  },
+  "events": [
+   "Normal   Pulled                   snap-microvm        Container image \"python:3.12-slim\" already present on machine and can be accessed by the pod",
+   "Normal   Created                  snap-microvm        Container created",
+   "Normal   Started                  snap-microvm        Container started",
+   "Normal   Killing                  snap-microvm        Stopping container probe",
+   "Normal   Scheduled                snap-microvm        Successfully assigned pod-snapshots-ns/snap-microvm to gke-sbx-gke-microvm-ceb1f49c-2tzq",
+   "Normal   Started                  snap-microvm        Container started",
+   "Normal   Pulled                   snap-microvm        Container image \"python:3.12-slim\" already present on machine and can be accessed by the pod",
+   "Normal   Created                  snap-microvm        Container created"
+  ],
+  "podsnapshots": []
+ }
+}

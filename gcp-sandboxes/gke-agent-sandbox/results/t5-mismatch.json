@@ -1,0 +1,94 @@
+{
+ "landed_on_n2": true,
+ "timing": {
+  "pod_created_s": 0.32637024999712594,
+  "running_s": 4.267700791999232,
+  "ready_s": 4.2677111249940936,
+  "reply_s": 5.335308207999333
+ },
+ "before": {
+  "label": "before",
+  "counter": 207,
+  "boot": 1794668821,
+  "uptime_s": 36.4,
+  "pid": 1,
+  "conn": "BrokenPipeError",
+  "emptydir": [
+   "pre1@counter=37",
+   "pre2@counter=90",
+   "pre3@counter=137"
+  ],
+  "pvc": null
+ },
+ "after": {
+  "label": "resumed",
+  "counter": 5,
+  "boot": 1794668868,
+  "uptime_s": 0.5,
+  "pid": 1,
+  "conn": "open",
+  "emptydir": null,
+  "pvc": null
+ },
+ "events": [
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully restored the pod from PodSnapshot pod-snapshots-ns/571b07d0-57f0-4b51-8b27-0cb0ba082c17",
+  "Normal   Started                  snap-sandbox        Container started",
+  "Normal   Created                  snap-sandbox        Container created",
+  "Normal   Pulled                   snap-sandbox        Container image \"python:3.12-slim\" already present on machine and can be accessed by the pod",
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully checkpointed the pod to PodSnapshot pod-snapshots-ns/b76caad9-a694-434b-b53b-38d654bb31b7",
+  "Normal   Killing                  snap-sandbox        Stopping container app",
+  "Normal   Scheduled                snap-sandbox        Successfully assigned pod-snapshots-ns/snap-sandbox to gke-sbx-gke-gvisor-3df7f6c5-5jnk",
+  "Normal   Started                  snap-sandbox        Container started",
+  "Normal   Created                  snap-sandbox        Container created",
+  "Normal   Pulled                   snap-sandbox        Container image \"python:3.12-slim\" already present on machine and can be accessed by the pod",
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully restored the pod from PodSnapshot pod-snapshots-ns/b76caad9-a694-434b-b53b-38d654bb31b7",
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully checkpointed the pod to PodSnapshot pod-snapshots-ns/e044b62a-d7a7-4f9a-80c2-b695422df05d",
+  "Normal   Killing                  snap-sandbox        Stopping container app",
+  "Normal   Scheduled                snap-sandbox        Successfully assigned pod-snapshots-ns/snap-sandbox to gke-sbx-gke-gvisor-3df7f6c5-5jnk",
+  "Normal   Pulled                   snap-sandbox        Container image \"python:3.12-slim\" already present on machine and can be accessed by the pod",
+  "Normal   Created                  snap-sandbox        Container created",
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully restored the pod from PodSnapshot pod-snapshots-ns/e044b62a-d7a7-4f9a-80c2-b695422df05d",
+  "Normal   Started                  snap-sandbox        Container started",
+  "Normal   GKEPodSnapshotting       snap-sandbox        Successfully checkpointed the pod to PodSnapshot pod-snapshots-ns/0a8927af-bcf9-45ab-bcfa-7f7c6f8c382c",
+  "Normal   Killing                  snap-sandbox        Stopping container app",
+  "Normal   Scheduled                snap-sandbox        Successfully assigned pod-snapshots-ns/snap-sandbox to gke-sbx-gke-mismatch-68c0190e-bn6m",
+  "Normal   Pulling                  snap-sandbox        Pulling image \"python:3.12-slim\"",
+  "Normal   Pulled                   snap-sandbox        Successfully pulled image \"python:3.12-slim\" in 2.585s (2.585s including waiting). Image size: 43286505 bytes.",
+  "Normal   Created                  snap-sandbox        Container created",
+  "Normal   Started                  snap-sandbox        Container started"
+ ],
+ "sandbox_conditions": [
+  {
+   "lastTransitionTime": "2026-11-14T15:07:43Z",
+   "message": "Sandbox is not suspended",
+   "observedGeneration": 11,
+   "reason": "NotSuspended",
+   "status": "False",
+   "type": "Suspended"
+  },
+  {
+   "lastTransitionTime": "2026-11-14T15:07:47Z",
+   "message": "Pod is Ready",
+   "observedGeneration": 11,
+   "reason": "DependenciesReady",
+   "status": "True",
+   "type": "Ready"
+  },
+  {
+   "lastTransitionTime": "2026-11-14T15:07:43Z",
+   "message": "",
+   "observedGeneration": 11,
+   "reason": "PodScheduled",
+   "status": "True",
+   "type": "PodScheduled"
+  }
+ ],
+ "snapshots": [
+  "NAME                                   STATUS                  POLICY    LABELS                                                                                                                                                                                                                                                                                                                    AGE",
+  "0a8927af-bcf9-45ab-bcfa-7f7c6f8c382c   AllSnapshotsAvailable   cpu-psp   {\"agents.x-k8s.io/sandbox-name-hash\":\"5948aa9f\",\"gke-pod-snapshot-triggered-by\":\"trigger-1794668858-99\",\"podsnapshot.gke.io/node-machine-family\":\"c3\",\"podsnapshot.gke.io/node-version\":\"v1.37.1-gke.2097000\",\"podsnapshot.gke.io/pod-template-hash\":\"e7c3aec8bccba82fa192fcebd675981b6d26db1882cfb8803c31bff6569a5fd\"}   12s",
+  "571b07d0-57f0-4b51-8b27-0cb0ba082c17   AllSnapshotsAvailable   cpu-psp   {\"agents.x-k8s.io/sandbox-name-hash\":\"5948aa9f\",\"gke-pod-snapshot-triggered-by\":\"trigger-1794668825-1\",\"podsnapshot.gke.io/node-machine-family\":\"c3\",\"podsnapshot.gke.io/node-version\":\"v1.37.1-gke.2097000\",\"podsnapshot.gke.io/pod-template-hash\":\"e7c3aec8bccba82fa192fcebd675981b6d26db1882cfb8803c31bff6569a5fd\"}    44s",
+  "b76caad9-a694-434b-b53b-38d654bb31b7   AllSnapshotsAvailable   cpu-psp   {\"agents.x-k8s.io/sandbox-name-hash\":\"5948aa9f\",\"gke-pod-snapshot-triggered-by\":\"trigger-1794668836-2\",\"podsnapshot.gke.io/node-machine-family\":\"c3\",\"podsnapshot.gke.io/node-version\":\"v1.37.1-gke.2097000\",\"podsnapshot.gke.io/pod-template-hash\":\"e7c3aec8bccba82fa192fcebd675981b6d26db1882cfb8803c31bff6569a5fd\"}    34s",
+  "e044b62a-d7a7-4f9a-80c2-b695422df05d   AllSnapshotsAvailable   cpu-psp   {\"agents.x-k8s.io/sandbox-name-hash\":\"5948aa9f\",\"gke-pod-snapshot-triggered-by\":\"trigger-1794668845-3\",\"podsnapshot.gke.io/node-machine-family\":\"c3\",\"podsnapshot.gke.io/node-version\":\"v1.37.1-gke.2097000\",\"podsnapshot.gke.io/pod-template-hash\":\"e7c3aec8bccba82fa192fcebd675981b6d26db1882cfb8803c31bff6569a5fd\"}    25s"
+ ],
+ "pod_annotations": {}
+}

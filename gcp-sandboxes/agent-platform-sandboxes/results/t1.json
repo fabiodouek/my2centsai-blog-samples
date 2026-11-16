@@ -1,0 +1,84 @@
+{
+ "templates": {
+  "computer-use": {
+   "name": "5789271767868506112",
+   "seconds_to_active": 17.8
+  },
+  "shell-net-off": {
+   "name": "3483428758654812160",
+   "seconds_to_active": 17.8
+  },
+  "shell-net-on": {
+   "name": "7708931109035180032",
+   "seconds_to_active": 18.0
+  }
+ },
+ "code_execution": [
+  {
+   "create": 2.442,
+   "first_execute": 1.07
+  },
+  {
+   "create": 1.953,
+   "first_execute": 0.529
+  },
+  {
+   "create": 1.455,
+   "first_execute": 0.509
+  },
+  {
+   "create": 1.019,
+   "first_execute": 0.524
+  },
+  {
+   "create": 1.59,
+   "first_execute": 0.45
+  }
+ ],
+ "shell_template": [
+  {
+   "create": 2.966,
+   "first_execute": 0.238
+  },
+  {
+   "create": 1.58,
+   "first_execute": 0.214
+  },
+  {
+   "create": 1.724,
+   "first_execute": 0.228
+  },
+  {
+   "create": 1.673,
+   "first_execute": 0.209
+  },
+  {
+   "create": 2.225,
+   "first_execute": 0.736
+  }
+ ],
+ "shell_inline": [
+  {
+   "create": 18.497
+  },
+  {
+   "create": 19.281
+  }
+ ],
+ "computer_use": [
+  {
+   "create": 2.072,
+   "first_execute": null
+  },
+  {
+   "create": 1.689,
+   "first_execute": null
+  },
+  {
+   "create": 1.638,
+   "first_execute": null
+  }
+ ],
+ "templates_before_inline": 3,
+ "templates_after_inline": 5
+}

@@ -1,0 +1,27 @@
+== runc-probe
+project/project-id -> <project>
+instance/zone -> projects/<project-number>/zones/us-central1-a
+instance/name -> gke-sbx-gke-default-pool-72621258-dfpq
+instance/hostname -> gke-sbx-gke-default-pool-72621258-dfpq.us-central1-a.c.<project>.internal
+instance/service-accounts/ -> default/ | <project>.svc.id.goog/ | 
+instance/service-accounts/default/email -> <project>.svc.id.goog
+instance/attributes/cluster-name -> sbx-gke
+instance/service-accounts/default/token -> token ok, type=Bearer, expires_in=3503, len=1273
+== direct-sandbox
+project/project-id -> <project>
+instance/zone -> projects/<project-number>/zones/us-central1-a
+instance/name -> gke-sbx-gke-gvisor-3df7f6c5-5jnk
+instance/hostname -> gke-sbx-gke-gvisor-3df7f6c5-5jnk.us-central1-a.c.<project>.internal
+instance/service-accounts/ -> default/ | <project>.svc.id.goog/ | 
+instance/service-accounts/default/email -> <project>.svc.id.goog
+instance/attributes/cluster-name -> sbx-gke
+instance/service-accounts/default/token -> token ok, type=Bearer, expires_in=3505, len=1276
+== templated
+project/project-id -> ERR <urlopen error timed out>
+instance/zone -> ERR <urlopen error timed out>
+instance/name -> ERR <urlopen error timed out>
+instance/hostname -> ERR <urlopen error timed out>
+instance/service-accounts/ -> ERR <urlopen error timed out>
+instance/service-accounts/default/email -> ERR <urlopen error timed out>
+instance/attributes/cluster-name -> ERR <urlopen error timed out>
+instance/service-accounts/default/token -> ERR <urlopen error timed out>

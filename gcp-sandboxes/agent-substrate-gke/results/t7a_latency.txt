@@ -1,0 +1,27 @@
+# 2026-11-14T17:59:27Z t7a_latency.py
+
+[1m== concurrency 1[0m
+  create : n=1 p50 519 ms, p95 519, p99 519, max 519
+  resume : n=3 p50 738 ms, p95 2867, p99 2867, max 2867
+  suspend: n=3 p50 568 ms, p95 571, p99 571, max 571
+
+[1m== concurrency 5[0m
+  create : n=5 p50 536 ms, p95 536, p99 536, max 536
+  resume : n=15 p50 858 ms, p95 2880, p99 2880, max 2880
+  suspend: n=15 p50 614 ms, p95 699, p99 699, max 699
+
+[1m== concurrency 10[0m
+  create : n=10 p50 552 ms, p95 563, p99 563, max 563
+  resume : n=30 p50 1045 ms, p95 3155, p99 3162, max 3162
+  suspend: n=30 p50 677 ms, p95 784, p99 788, max 788
+
+[1m== concurrency 20[0m
+  create : n=20 p50 652 ms, p95 666, p99 666, max 666
+  resume : n=60 p50 1422 ms, p95 3652, p99 3720, max 3720
+  suspend: n=60 p50 804 ms, p95 958, p99 989, max 989
+
+[1m== concurrency 40[0m
+  create : n=40 p50 889 ms, p95 928, p99 944, max 944
+  resume : n=120 p50 3072 ms, p95 4635, p99 4931, max 4945
+  suspend: n=120 p50 1175 ms, p95 1670, p99 1758, max 1779
+  (metrics: results/latency.csv)

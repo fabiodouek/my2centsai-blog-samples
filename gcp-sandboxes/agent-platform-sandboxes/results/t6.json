@@ -1,0 +1,70 @@
+{
+ "before": {
+  "proc": "alive",
+  "port9000": "200",
+  "file": "hi",
+  "tmpfile": "tmp",
+  "pkg": "present",
+  "boot_id": "bb074b95-dfd7-43bc-b519-b19bde423a57",
+  "uptime": "105.40",
+  "data_plane_wait_s": 0.4
+ },
+ "pause_seconds": 9.836,
+ "paused_execute_error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'Sandbox environment is paused; resume has been initiated. Please retry the request.', 'status': 'UNAVAILABLE', 'details': [{'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '10s'}]}}",
+ "auto_resume_seconds": 4.2,
+ "after_auto_resume": {
+  "proc": "alive",
+  "port9000": "200",
+  "file": "hi",
+  "tmpfile": "tmp",
+  "pkg": "present",
+  "boot_id": "bb074b95-dfd7-43bc-b519-b19bde423a57",
+  "uptime": "120.65",
+  "data_plane_wait_s": 0.4
+ },
+ "resume_seconds": 4.638,
+ "after_pause": {
+  "proc": "alive",
+  "port9000": "200",
+  "file": "hi",
+  "tmpfile": "tmp",
+  "pkg": "present",
+  "boot_id": "bb074b95-dfd7-43bc-b519-b19bde423a57",
+  "uptime": "165.12",
+  "data_plane_wait_s": 34.3
+ },
+ "double_resume_error": "no error",
+ "snapshot_seconds": 5.243,
+ "snapshot": {
+  "sizeBytes": null,
+  "expire": "2026-11-14 03:25:19.241702+00:00",
+  "parent": null,
+  "post_action": "None"
+ },
+ "snapshot_rest_fields": [
+  "createTime",
+  "displayName",
+  "expireTime",
+  "name",
+  "owner",
+  "sourceSandboxEnvironment",
+  "updateTime"
+ ],
+ "restore_seconds": 8.094,
+ "restored": {
+  "proc": "alive",
+  "port9000": "200",
+  "file": "hi",
+  "tmpfile": "tmp",
+  "pkg": "present",
+  "boot_id": "bb074b95-dfd7-43bc-b519-b19bde423a57",
+  "uptime": "180.58",
+  "data_plane_wait_s": 0.4
+ },
+ "child_snapshot": {
+  "parent": null,
+  "sizeBytes": null
+ },
+ "ce_snapshot": "ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'Failed to get OSS Agent Sandbox CR', 'status': 'NOT_FOUND'}}",
+ "ce_pause": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+}

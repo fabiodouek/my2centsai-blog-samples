@@ -4,6 +4,10 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [gcp-sandboxes](./gcp-sandboxes)
+
+The Google Cloud Sandboxes series: hands-on tests of Google Cloud's sandboxes for untrusted and agent code, starting with Managed Agents in the Gemini API (`managed-agents/`): the sandbox, its egress proxy, credential injection and hooks, driven with `curl` and `jq`.
+
 ### [aws-nitro-sandboxes](./aws-nitro-sandboxes)
 
 The AWS Nitro Sandboxes series, in three folders: one `m8g.xlarge` driving sandboxes directly with Firecracker 1.18.0, in direct and confidential mode, with attestation checked by AWS KMS (`ec2/`); Amazon ECS Managed Instances tasks in isolated, shared and confidential mode, with Terraform for the dependencies and a policy generated on the cluster (`ecs/`); and EKS Auto Mode pods in isolated and confidential mode on a Graviton NodePool, with Terraform for the cluster (`eks/`). `nsm/nsm.py` is a standard-library Python client for the Nitro Secure Module.

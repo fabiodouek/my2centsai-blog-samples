@@ -1,0 +1,35 @@
+# 2026-11-14T18:11:32Z t10b_failures.py
+
+[1m== the command exits with code 3[0m
+{'phase': 'Running', 'worker': '10.52.2.24', 'ready': 'TaskRunning'}
+  PID COMMAND
+    1 /usr/local/bin/ax-task-runner
+   11 sh -c ps -eo pid,args
+   13 ps -eo pid,args
+
+[1m== a worker pod dies: one task running on it, one suspended from it[0m
+  both on ax-workers-5fc864b77d-ltjwv on gke-ate-sbx-pool-hd-54063ea0-t9f4
+  [   1194 ms] kubectl delete pod ax-workers-5fc864b77d-ltjwv
+  running task:   {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}
+  suspended task: {'phase': 'Suspended', 'worker': None, 'ready': 'Suspended'}
+
+[1m== can either come back?[0m
+task.ax.io/lc-victim-suspended resumed
+  [    614 ms] resume the suspended one
+still-here
+task.ax.io/lc-victim-running resumed
+  [    634 ms] resume the failed one
+  failed task now: {'phase': 'Running', 'worker': '10.52.3.19', 'ready': 'TaskRunning'}
+ 18:12:27 up 0 min,  0 users,  load average: 0.00, 0.00, 0.00
+cat: /workspace/unsaved: No such file or directory
+
+[1m== change the WorkerPool while tasks run: declare capacity[0m
+  running before: ['lc-exit', 'lc-victim-running', 'lc-victim-suspended']
+workerpool.ate.dev/ax-workers patched
+  [  14187 ms] worker rollout
+  lc-exit: {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}
+  lc-victim-running: {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}
+  lc-victim-suspended: {'phase': 'Failed', 'worker': None, 'ready': 'Failed'}
+
+[1m== put the pool back as installed[0m
+workerpool.ate.dev/ax-workers patched

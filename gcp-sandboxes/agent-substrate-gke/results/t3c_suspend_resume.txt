@@ -1,0 +1,54 @@
+# 2026-11-14T17:58:48Z t3c_suspend_resume.py
+
+[1m== create, resume, and write 50 MB plus a counter into /workspace[0m
+boot 17:58:49 pid 9
+
+[1m== cycle 1[0m
+  [    595 ms] ax suspend
+             -> Suspended
+  [    634 ms] ax resume
+counter=1
+blob: /workspace/blob: OK
+tmp: ls: cannot access '/tmp/marker': No such file or directory
+
+[1m== cycle 2[0m
+  [    602 ms] ax suspend
+             -> Suspended
+  [    622 ms] ax resume
+counter=2
+blob: /workspace/blob: OK
+tmp: ls: cannot access '/tmp/marker': No such file or directory
+
+[1m== cycle 3[0m
+  [    604 ms] ax suspend
+             -> Suspended
+  [    637 ms] ax resume
+counter=3
+blob: /workspace/blob: OK
+tmp: ls: cannot access '/tmp/marker': No such file or directory
+
+[1m== cycle 4[0m
+  [    583 ms] ax suspend
+             -> Suspended
+  [    674 ms] ax resume
+counter=4
+blob: /workspace/blob: OK
+tmp: ls: cannot access '/tmp/marker': No such file or directory
+
+[1m== cycle 5[0m
+  [    588 ms] ax suspend
+             -> Suspended
+  [    626 ms] ax resume
+counter=5
+blob: /workspace/blob: OK
+tmp: ls: cannot access '/tmp/marker': No such file or directory
+
+[1m== results[0m
+  suspend: n=5 median 595 ms, min 583, max 604
+  resume : n=5 median 634 ms, min 622, max 674
+boot 17:58:49 pid 9
+boot 17:58:56 pid 9
+boot 17:59:01 pid 9
+boot 17:59:05 pid 9
+boot 17:59:10 pid 9
+boot 17:59:14 pid 9
