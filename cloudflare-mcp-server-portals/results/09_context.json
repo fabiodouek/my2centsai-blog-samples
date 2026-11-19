@@ -1,0 +1,57 @@
+[
+ {
+  "query": "",
+  "tools": 49,
+  "chars": 13306,
+  "approx_tokens": 3326,
+  "names": [
+   "portal_toggle_servers",
+   "portal_toggle_single_server",
+   "portal_list_servers"
+  ]
+ },
+ {
+  "query": "?optimize_context=minimize_tools",
+  "tools": 50,
+  "chars": 8387,
+  "approx_tokens": 2096,
+  "names": [
+   "portal_toggle_servers",
+   "portal_toggle_single_server",
+   "portal_list_servers",
+   "portal_query_tools"
+  ]
+ },
+ {
+  "query": "?optimize_context=search_and_execute",
+  "tools": 5,
+  "chars": 2058,
+  "approx_tokens": 514,
+  "names": [
+   "portal_toggle_servers",
+   "portal_toggle_single_server",
+   "portal_list_servers",
+   "portal_query_tools",
+   "portal_execute"
+  ]
+ },
+ {
+  "query": "?codemode=search_and_execute",
+  "tools": 5,
+  "chars": 4784,
+  "approx_tokens": 1196,
+  "names": [
+   "portal_toggle_servers",
+   "portal_toggle_single_server",
+   "portal_list_servers",
+   "portal_codemode_search",
+   "portal_codemode_execute"
+  ]
+ },
+ {
+  "query_tools_http": 200
+ },
+ {
+  "execute_http": 200
+ }
+]

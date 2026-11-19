@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.venv/
+__pycache__/
+workers/tickets/wrangler.protected.jsonc
+.state.json

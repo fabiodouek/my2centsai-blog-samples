@@ -1,0 +1,16 @@
+{
+ "slow_5": {
+  "http": 200,
+  "seconds": 5.2,
+  "body": "report ready after 5s"
+ },
+ "slow_65": {
+  "http": 200,
+  "seconds": 60.1,
+  "body": "{'jsonrpc': '2.0', 'id': 3, 'error': {'code': -32001, 'message': 'Request timed out - server is slow or unresponsive', 'data': {'timeout': 60000}}}"
+ },
+ "broken": {
+  "status": "error",
+  "error": "Server error: HTTP 404 | error code: 1042"
+ }
+}

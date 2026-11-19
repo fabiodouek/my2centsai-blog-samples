@@ -1,0 +1,13 @@
+{
+ "hide_applied_after_s": 1,
+ "direct_delete": {
+  "http": 200,
+  "text": "deleted 2"
+ },
+ "server_ready_after_s": 19,
+ "old workers.dev URL, no credentials": 404,
+ "custom domain, no credentials": 403,
+ "custom domain, intruder token": 403,
+ "custom domain, origin token": 200,
+ "portal_after_fix": 200
+}

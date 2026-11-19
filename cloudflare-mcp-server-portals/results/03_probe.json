@@ -1,0 +1,21 @@
+{
+ "no_credentials": {
+  "status": 401,
+  "www_authenticate": "Bearer realm=\"OAuth\", error=\"invalid_token\", resource_metadata=\"https://mcp-portal-demo.my2centsai-experiments.co.uk/.well-known/oauth-protected-resource/mcp\"",
+  "body": "{\"error\":\"invalid_token\",\"error_description\":\"Missing or invalid access token\"}"
+ },
+ "resource_metadata": {
+  "resource": "https://mcp-portal-demo.my2centsai-experiments.co.uk/mcp",
+  "authorization_servers": [
+   "https://mcp-portal-demo.my2centsai-experiments.co.uk"
+  ]
+ },
+ "intruder": {
+  "status": 403
+ },
+ "agent": {
+  "status": 200,
+  "ms": 677,
+  "session": true
+ }
+}

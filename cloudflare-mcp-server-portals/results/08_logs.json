@@ -1,0 +1,65 @@
+{
+ "sample": [
+  {
+   "server_id": "notes",
+   "capability_name": "tools/call",
+   "tool_name": "get_note",
+   "duration": 16,
+   "response_status": "error"
+  },
+  {
+   "server_id": "tickets",
+   "capability_name": "tools/call",
+   "tool_name": "tickets_delete_ticket",
+   "duration": 0,
+   "response_status": "error"
+  },
+  {
+   "server_id": "notes",
+   "capability_name": "tools/call",
+   "tool_name": "get_note",
+   "duration": 323,
+   "response_status": "success"
+  },
+  {
+   "server_id": "tickets",
+   "capability_name": "tools/call",
+   "tool_name": "slow_report",
+   "duration": 60008,
+   "response_status": "error"
+  },
+  {
+   "server_id": "tickets",
+   "capability_name": "tools/call",
+   "tool_name": "slow_report",
+   "duration": 5187,
+   "response_status": "success"
+  },
+  {
+   "server_id": "catalog",
+   "capability_name": "tools/call",
+   "tool_name": "list_invoices",
+   "duration": 128,
+   "response_status": "success"
+  },
+  {
+   "server_id": "notes",
+   "capability_name": "tools/call",
+   "tool_name": "get_note",
+   "duration": 13,
+   "response_status": "error"
+  },
+  {
+   "server_id": "tickets",
+   "capability_name": "tools/call",
+   "tool_name": "tickets_delete_ticket",
+   "duration": 0,
+   "response_status": "error"
+  }
+ ],
+ "counts": {
+  "success": 200,
+  "error": 18,
+  "all": 218
+ }
+}
