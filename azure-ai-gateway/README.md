@@ -48,9 +48,10 @@ Run them in order from this folder. Settings are in `scripts/env.sh` (resource g
 
 - `az aigateway` is beta (1.0.0b34). Flags can change. `az aigateway model list` without `--provider-name`
   hung for over two minutes in my exploration, so the scripts always pass a provider name.
-- The model account is in Sweden Central because model deployments in my new subscription were refused with
-  `(715-123420) unusual activity` for about an hour after I had created and deleted several accounts. I could not
-  find a reliable trigger or workaround. If your subscription is older you can set `FOUNDRY_LOCATION=eastus2`.
+- The gateway is in East US 2 and the model account in Sweden Central only because model deployments in my new
+  subscription were refused with `(715-123420) unusual activity` for about an hour, first in East US 2. It was
+  not planned, and the region was not the cause. Better: put both in one region. Sweden Central is one of the
+  gateway's regions, so `LOCATION=swedencentral FOUNDRY_LOCATION=swedencentral` is a valid setup.
 - Not covered: telemetry export, the Anthropic Messages API path, Model Router, private networking.
 
 ## Cost
