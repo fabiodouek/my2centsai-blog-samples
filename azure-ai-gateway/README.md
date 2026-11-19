@@ -38,7 +38,7 @@ Run them in order from this folder. Settings are in `scripts/env.sh` (resource g
 | `02_foundry_backend.sh` | Azure OpenAI account with two deployments (`main`, `alt`), imported as one provider, alias `chat`, a gateway key saved to `.state/key` (git-ignored, never printed) |
 | `03_first_call.py` | One chat call through the alias; prints status, latency, serving deployment, usage and headers |
 | `04_retarget.py` | Retargets `chat` from `main` to `alt` while 25 calls run; counts failures and time to apply |
-| `05_failover.py` | Adds the `capped` deployment (capacity 1). A: priority 0 `capped`, priority 1 `main`, 20 calls. B: priority 0 is a host that does not exist, 6 calls |
+| `05_failover.py` | Adds the `capped` deployment (capacity 1). Four runs of calls: A) priority 0 `capped` answers 429, no failure rules; B) priority 0 is a host that does not exist, no rules; C) A again with a 429 failure rule; D) B again with the three rules the product docs recommend. The CLI has no options for failure rules, so they go in with `az rest` (see `common.alias_rules`) |
 | `06_limits.py` | Token limit (300 a minute) then cost limit ($0.001 an hour), each with a burst; prints per-call tokens, the gateway's cost header and a list-price check |
 | `07_entra_auth.py` | Calls with an Entra token: a management token (401), a gateway token with no role (403), then assigns AI Gateway User and polls until it works |
 | `08_mcp.py` | Registers the public Microsoft Learn MCP server, lists its tools, blocks one, calls it anyway |
@@ -48,9 +48,9 @@ Run them in order from this folder. Settings are in `scripts/env.sh` (resource g
 
 - `az aigateway` is beta (1.0.0b34). Flags can change. `az aigateway model list` without `--provider-name`
   hung for over two minutes in my exploration, so the scripts always pass a provider name.
-- The model account is in Sweden Central because deployments in my new subscription were refused with
-  `(715-123420) unusual activity`. Fresh deployment names (`main`, `alt`, `capped`) went through. If your
-  subscription is older you can set `FOUNDRY_LOCATION=eastus2`.
+- The model account is in Sweden Central because model deployments in my new subscription were refused with
+  `(715-123420) unusual activity` for about an hour after I had created and deleted several accounts. I could not
+  find a reliable trigger or workaround. If your subscription is older you can set `FOUNDRY_LOCATION=eastus2`.
 - Not covered: telemetry export, the Anthropic Messages API path, Model Router, private networking.
 
 ## Cost

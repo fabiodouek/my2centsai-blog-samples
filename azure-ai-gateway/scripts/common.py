@@ -75,3 +75,15 @@ def aig(*args, **kw):
 
 def model_id(provider, model):
     return json.loads((STATE / "models.json").read_text())[f"{provider}/{model}"]
+
+
+API = "api-version=2026-11-01"
+
+
+def alias_rules(max_retries, failures):
+    """Set failure rules and the retry limit on the alias 'chat'. The CLI has no options for them yet,
+    so this PATCHes the management API (Azure/aigateway lab 29 does the same)."""
+    gw_id = az("aigateway", "show", "-g", RG, "-n", gateway_name(), "--query", "id", "-o", "tsv")
+    url = f"https://management.azure.com{gw_id}/workspaces/default/aliases/chat?{API}"
+    body = json.dumps({"properties": {"maxRetryAttempts": max_retries, "failures": failures}})
+    az("rest", "--method", "patch", "--url", url, "--body", body, "-o", "none")
