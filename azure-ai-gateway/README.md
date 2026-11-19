@@ -1,48 +1,60 @@
 # Azure AI Gateway
 
-Companion code for the my2cents.ai deep dive on Azure AI Gateway (GA 2026-11-17).
+Companion code for the my2cents.ai deep dive on [Azure AI Gateway](https://techcommunity.microsoft.com/blog/integrationsonazureblog/azure-ai-gateway-is-now-generally-available-ship-faster-stay-in-control/4572644) (GA 2026-11-17).
 
-> **Status: first draft, not yet run.** The scripts were written from the Azure/aigateway CLI reference
-> and labs. Flags and response shapes are checked against `--help` and the real service in the
-> hands-on run; expect edits.
-
-One gateway in front of one Foundry model, then the policies measured one at a time: alias, failover,
-token limit, cost limit, Entra ID against a key.
+One gateway in front of an Azure OpenAI deployment, then the behaviour measured one piece at a time: alias
+retargeting, failover, token limit, cost limit, Entra ID against a key, and MCP tool blocking. Every script
+prints what it saw; the numbers in the post are from running these in order.
 
 ```text
 python client (requests)
    │  Authorization: Bearer <gateway key or Entra token>, model = "chat"
    ▼
-Azure AI Gateway  (Microsoft.ApiManagement/aigateways, eastus2)
-   ├─ alias "chat" ─► priority 0: dead custom endpoint (failover test)
-   │               └► priority 1: Foundry gpt-5-mini (managed identity)
-   └─ policies: tokenLimit, costLimit
+Azure AI Gateway  (Microsoft.ApiManagement/aigateways, East US 2)
+   ├─ alias "chat" ─► deployment main   (Azure OpenAI, gpt-4.1-mini, managed identity)
+   │               ├► deployment alt    (retarget test)
+   │               └► deployment capped (capacity 1: answers 429, failover test)
+   ├─ policies: tokenLimit, costLimit
+   └─ tool server "learn" ─► https://learn.microsoft.com/api/mcp
 ```
 
 ## Requirements
 
-- An Azure subscription, Contributor on it, and the `Microsoft.ApiManagement` and
-  `Microsoft.CognitiveServices` providers registered
-- Azure CLI 2.75+ (`az login` done) and the `az aigateway` extension (`scripts/00_install_cli.sh`)
-- Python 3.11+ (`pip install -r requirements.txt`)
-- Quota for `gpt-5-mini` (GlobalStandard, capacity 10) in your region
+- An Azure subscription where you are Contributor (or Owner, for the role assignment in script 07), with the
+  `Microsoft.ApiManagement` and `Microsoft.CognitiveServices` resource providers registered
+- Azure CLI 2.75+, logged in (`az login`)
+- Python 3.11+: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then put `.venv/bin` first on PATH
+- Quota for `gpt-4.1-mini` (GlobalStandard, capacity 50 plus 50 plus 1) in the Foundry region
 
 ## Scripts
 
+Run them in order from this folder. Settings are in `scripts/env.sh` (resource group `rg-aigw-demo`, gateway in
+`eastus2`, Azure OpenAI account in `swedencentral`); random resource names are kept in `.state/names`.
+
 | Script | What it does |
 |---|---|
-| `00_install_cli.sh` | Installs the `az aigateway` extension from the Azure/aigateway release wheel and prints its version |
-| `01_create_gateway.sh` | Resource group, gateway, waits until created, prints the create time |
-| `02_foundry_backend.sh` | Foundry account and `gpt-5-mini` deployment, imports it as a provider, creates alias `chat` and a gateway key |
-| `03_first_call.py` | One call through the alias with the gateway key; prints the answer, usage and response headers |
-| `04_failover.sh` | Adds a dead custom provider at priority 0 under the same alias and runs 20 calls, reporting status and latency |
-| `05_limits.py` | Applies a token limit then a cost limit and sends a burst; shows the 429 and 403 and which call crossed the line |
-| `06_entra_auth.py` | Calls with an Entra token (`DefaultAzureCredential`) and shows the 401 and 403 cases |
-| `99_teardown.sh` | Deletes the gateway, waits, deletes the resource group and purges soft-deleted records |
+| `00_install_cli.sh` | Installs the `az aigateway` extension (1.0.0b34 when this was written) from the Azure/aigateway release |
+| `01_create_gateway.sh` | Resource group, then the gateway with `--no-wait` and `wait`, and prints the create time (95 s in my run) |
+| `02_foundry_backend.sh` | Azure OpenAI account with two deployments (`main`, `alt`), imported as one provider, alias `chat`, a gateway key saved to `.state/key` (git-ignored, never printed) |
+| `03_first_call.py` | One chat call through the alias; prints status, latency, serving deployment, usage and headers |
+| `04_retarget.py` | Retargets `chat` from `main` to `alt` while 25 calls run; counts failures and time to apply |
+| `05_failover.py` | Adds the `capped` deployment (capacity 1). A: priority 0 `capped`, priority 1 `main`, 20 calls. B: priority 0 is a host that does not exist, 6 calls |
+| `06_limits.py` | Token limit (300 a minute) then cost limit ($0.001 an hour), each with a burst; prints per-call tokens, the gateway's cost header and a list-price check |
+| `07_entra_auth.py` | Calls with an Entra token: a management token (401), a gateway token with no role (403), then assigns AI Gateway User and polls until it works |
+| `08_mcp.py` | Registers the public Microsoft Learn MCP server, lists its tools, blocks one, calls it anyway |
+| `99_teardown.sh` | Deletes the gateway, the resource group, and purges the Azure OpenAI account |
 
-Settings live in `scripts/env.sh` (names, region, model). Run the scripts in order.
+## Notes
+
+- `az aigateway` is beta (1.0.0b34). Flags can change. `az aigateway model list` without `--provider-name`
+  hung for over two minutes in my exploration, so the scripts always pass a provider name.
+- The model account is in Sweden Central because deployments in my new subscription were refused with
+  `(715-123420) unusual activity`. Fresh deployment names (`main`, `alt`, `capped`) went through. If your
+  subscription is older you can set `FOUNDRY_LOCATION=eastus2`.
+- Not covered: telemetry export, the Anthropic Messages API path, Model Router, private networking.
 
 ## Cost
 
-The gateway is free up to 10,000 requests a month and paid billing starts on 2027-01-01. The runs
-use a few hundred calls with small prompts on `gpt-5-mini`, so the model cost is cents.
+The gateway is free up to 10,000 requests a month, and paid billing starts on 2027-01-01. A full run is a few
+hundred requests and a few cents of `gpt-4.1-mini` tokens. The gateway exists for about two minutes of setup
+plus the tests, then script 99 removes everything.

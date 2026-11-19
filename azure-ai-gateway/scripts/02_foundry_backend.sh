@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
-# Foundry account + gpt-5-mini, imported as a provider (managed identity, no keys), alias, gateway key.
+# An Azure OpenAI account with two deployments, imported as one provider (managed identity, no keys),
+# an alias "chat", and a gateway API key.
 set -euo pipefail
 . "$(dirname "$0")/env.sh"
-GATEWAY=$(cat "$STATE_DIR/gateway"); FOUNDRY=$(cat "$STATE_DIR/foundry")
-az cognitiveservices account create -g "$RG" -n "$FOUNDRY" --kind AIServices --sku S0 \
-  --location "$LOCATION" --custom-domain "$FOUNDRY" -o none
-az cognitiveservices account deployment create -g "$RG" -n "$FOUNDRY" --deployment-name "$DEPLOYMENT" \
-  --model-name gpt-5-mini --model-version 2025-08-07 --model-format OpenAI \
-  --sku-name GlobalStandard --sku-capacity 10 -o none
-FOUNDRY_ID=$(az cognitiveservices account show -g "$RG" -n "$FOUNDRY" --query id -o tsv)
-az aigateway model-provider import -g "$RG" --gateway "$GATEWAY" --foundry-resource-id "$FOUNDRY_ID"
-# The alias maps "chat" to the imported model. Check the flags with: az aigateway model-alias set --help
-MODEL_ID=$(az aigateway model list -g "$RG" --gateway "$GATEWAY" --query "[?contains(name,'gpt-5-mini')].id | [0]" -o tsv)
-echo "$MODEL_ID" > "$STATE_DIR/model_id"
-az aigateway model-alias set -g "$RG" --gateway "$GATEWAY" --name "$ALIAS" \
-  --backend-model resource-id="$MODEL_ID" priority=1 weight=100
-az aigateway api-key create -g "$RG" --gateway "$GATEWAY" --name demo -o none
-az aigateway api-key list-secrets -g "$RG" --gateway "$GATEWAY" --name demo --query primaryKey -o tsv > "$STATE_DIR/key"
+dep() { az cognitiveservices account deployment create -g "$RG" -n "$FOUNDRY" --deployment-name "$1" \
+  --model-name "$2" --model-version "$3" --model-format OpenAI --sku-name GlobalStandard --sku-capacity "$4" -o none; }
+az cognitiveservices account create -g "$RG" -n "$FOUNDRY" --kind OpenAI --sku S0 \
+  -l "$FOUNDRY_LOCATION" --custom-domain "$FOUNDRY" --yes -o none
+dep main gpt-4.1-mini 2025-04-14 50   # the real backend
+dep alt gpt-4.1-mini 2025-04-14 50   # a second deployment, for the alias retarget test
+# (05_failover.py adds a third, with a tiny capacity, for the failover test.)
+FID=$(az cognitiveservices account show -g "$RG" -n "$FOUNDRY" --query id -o tsv)
+az aigateway model-provider import -g "$RG" --gateway-name "$GATEWAY" --foundry-resource-id "$FID" \
+  --query '{provider:providerName, summary:summary}' -o yaml
+# Gateway resource IDs of the two models, saved for the other scripts (git-ignored).
+python3 "$(dirname "$0")/save_models.py"
+MINI=$(python3 -c "import sys; sys.path.insert(0,'$(dirname "$0")'); import common; print(common.model_id('$FOUNDRY','main'))")
+az aigateway model-alias set -g "$RG" --gateway-name "$GATEWAY" -n chat --routing-name chat \
+  --backend-model resource-id="$MINI" priority=1 weight=100 \
+  --query '{alias:properties.aliasName, backends:length(properties.backendModels), url:properties.gatewayEndpoints[0].url}' -o yaml
+az aigateway api-key create -g "$RG" --gateway-name "$GATEWAY" -n demo -o none
+az aigateway api-key list-secrets -g "$RG" --gateway-name "$GATEWAY" -n demo --query primaryKey -o tsv > "$STATE_DIR/key"
 chmod 600 "$STATE_DIR/key"
-az aigateway show -g "$RG" -n "$GATEWAY" --query properties.frontend.defaultHostname -o tsv > "$STATE_DIR/host"
-echo "alias $ALIAS ready; key saved in $STATE_DIR/key (git-ignored, never printed)"
+echo "key saved in .state/key (git-ignored, never printed)"
