@@ -14,7 +14,7 @@ docker ps -aq | xargs -r docker rm -f >/dev/null 2>&1
 for n in a b; do git worktree remove --force ../wt-$n 2>/dev/null; git branch -D agent/$n >/dev/null 2>&1; git worktree add -q ../wt-$n -b agent/$n; done
 echo "== worktrees"; git worktree list
 
-( while sleep 3; do echo "$(date +%s) $(free -m | awk '/Mem/{print $3}') $(free -m | awk '/Swap/{print $3}')"; done > /tmp/par.log ) &
+( while sleep 2; do echo "$(date +%s) $(free -m | awk '/Mem/{print $3}') $(free -m | awk '/Swap/{print $3}') $(docker ps --format '{{.Names}}' | grep enclave-claude | grep -vc gateway)"; done > /tmp/par.log ) &
 SAMPLER=$!
 echo "== start two background sessions"
 for n in a b; do
@@ -30,6 +30,6 @@ for i in $(seq 1 60); do enclave ps 2>&1 | grep -q running || break; sleep 3; do
 echo "-- after they exit, their gateways are still up until you stop the sessions:"; enclave ps --all 2>&1 | cut -c1-120; docker ps --format '{{.Names}}' | grep -c gateway | sed 's/^/gateway containers still running: /'
 enclave stop >/dev/null 2>&1; echo "after enclave stop: $(docker ps -q | wc -l) containers running"
 kill $SAMPLER 2>/dev/null
+echo "most agent containers running at once: $(sort -k4 -n /tmp/par.log | tail -1 | awk '{print $4}')"
 echo "peak RAM used (MB): $(sort -k2 -n /tmp/par.log | tail -1 | awk '{print $2}')   peak swap used (MB): $(sort -k3 -n /tmp/par.log | tail -1 | awk '{print $3}')   (host total $(free -m | awk '/Mem/{print $2}') MB)"
-echo "== OOM kills: $(journalctl -k --no-pager 2>/dev/null | grep -ci 'out of memory' || true)"
 for n in a b; do echo "== worktree wt-$n"; ls ../wt-$n | tr '\n' ' '; echo; (cd ../wt-$n && python3 test_$n.py && echo "test_$n.py passes"); done

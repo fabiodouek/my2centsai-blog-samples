@@ -25,7 +25,7 @@ The instance is launched from the **EC2 console** in the post (Launch instance: 
 | `run_remote.sh remote/04_egress_probe.sh agent` | Nine network probes from inside a session, then the gateway log |
 | `05_imds.sh` | Instance metadata (IMDS) from a plain container, from Enclave, from Enclave with `--allow-all-network`, and from a plain container at hop limit 1 |
 | `run_remote.sh remote/06_secrets.sh agent` | A declared secret becomes a placeholder; an AWS key passed with `--pass-env` does not |
-| `run_remote.sh remote/07_parallel.sh agent` | Two agents in two git worktrees on 2 GiB of RAM |
+| `07_parallel.sh` | Two agents in two git worktrees on 2 GiB of RAM, then a kernel-log check for out-of-memory kills |
 | `08_security_group.sh` | No inbound rules, nothing answers on the public address, SSM still works |
 | `99_teardown.sh` | Terminates the instance, deletes the group, profile and role, and checks nothing is left |
 
