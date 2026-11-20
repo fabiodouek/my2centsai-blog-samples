@@ -4,6 +4,12 @@ Code samples for blog posts on [my2cents.ai](https://my2cents.ai).
 
 ## Samples
 
+### [eclipse-enclave-aws](./eclipse-enclave-aws)
+
+Eclipse Enclave 1.0.1 on one `t4g.small` (Graviton2, 2 GiB, Ubuntu 24.04 arm64) with no inbound rules, driven through Systems Manager: the arm64 install, Claude Code on Amazon Bedrock behind Enclave's egress gateway, nine network probes, the instance metadata service, placeholder secrets against `--pass-env` keys, two agents in git worktrees, and the teardown.
+
+Blog post: [Eclipse Enclave on AWS](https://my2cents.ai/deep-dive/eclipse-enclave-aws)
+
 ### [gcp-sandboxes](./gcp-sandboxes)
 
 The Google Cloud Sandboxes series: hands-on tests of Google Cloud's sandboxes for untrusted and agent code, starting with Managed Agents in the Gemini API (`managed-agents/`): the sandbox, its egress proxy, credential injection and hooks, driven with `curl` and `jq`.
