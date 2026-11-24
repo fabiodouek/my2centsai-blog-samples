@@ -10,6 +10,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 from common import (BOLD, DIM, GREEN, RESET, YELLOW, a2a_send, chat, client, head, http, load_state, mcp, mcp_call,
                     mcp_init, save_state, say, send)
@@ -90,26 +91,30 @@ def status():
     now = time.time()
     tl = json.loads(TIMELINE.read_text()) if TIMELINE.exists() else {}
     head(f"API inventory, {fmt_age(now - t0)} after discovery started: {len(items)} APIs")
-    say(f"  {BOLD}{'source':<13}{'method':<7}{'path':<36}{'class':<8}{'WAF':<9}{'workloads':<10}{'listed':<9}labeled{RESET}")
+    say(f"  {BOLD}{'host':<12}{'source':<13}{'method':<7}{'path':<36}{'class':<8}{'WAF':<9}{'workloads':<10}{'listed':<9}labeled{RESET}")
+    # Only this deployment's front doors count towards "done": API Portal keeps the routes of
+    # deleted APIs for about 30 days, so an earlier deployment's rows can still be listed.
+    mine = {urlparse(s.get("api_url", "")).hostname, urlparse(s.get("alb_url", "")).hostname} - {None}
     done = True
-    for it in sorted(items, key=lambda i: (i["discoverySource"], i["path"])):
-        key = f"{it['discoverySource']} {it['method']} {it['path']}"
+    for it in sorted(items, key=lambda i: (i["host"] not in mine, i["discoverySource"], i["path"])):
+        key = f"{it['host']} {it['discoverySource']} {it['method']} {it['path']}"
         wl = ",".join(it.get("workloads") or [])
         rec = tl.setdefault(key, {"listed": int(now - t0)})
         if wl and "labeled" not in rec:
             rec["labeled"] = int(now - t0)
             rec["workloads"] = wl
-        want = expected(it["path"])
+        want = expected(it["path"]) if it["host"] in mine else None
         ok = want is None or want in wl
         done &= ok
         colour = GREEN if (want and ok) else (YELLOW if want else DIM)
         labeled = "+" + fmt_age(rec["labeled"]) if "labeled" in rec else "-"
-        say(f"  {it['discoverySource']:<13}{it['method']:<7}{it['path']:<36}{it['classification']:<8}{it['wafStatus']:<9}"
+        host = it["host"].split(".")[0][:10] if it["host"] in mine else "(old)"
+        say(f"  {host:<12}{it['discoverySource']:<13}{it['method']:<7}{it['path']:<36}{it['classification']:<8}{it['wafStatus']:<9}"
             f"{colour}{wl or '-':<10}{RESET}{'+' + fmt_age(rec['listed']):<9}{labeled}")
     TIMELINE.parent.mkdir(exist_ok=True)
     TIMELINE.write_text(json.dumps(tl, indent=1))
-    sources = {i["discoverySource"] for i in items}
-    return items, bool(items) and done and {"API_GATEWAY", "ELB"} <= sources
+    sources = {i["discoverySource"] for i in items if i["host"] in mine}
+    return items, done and {"API_GATEWAY", "ELB"} <= sources
 
 
 def watch():

@@ -1,0 +1,17 @@
+{
+ "API_GATEWAY GET /prod/.well-known/agent-card.json": {
+  "listed": 1349
+ },
+ "API_GATEWAY POST /prod/a2a": {
+  "listed": 1349
+ },
+ "API_GATEWAY POST /prod/a2a/message:send": {
+  "listed": 1349
+ },
+ "API_GATEWAY POST /prod/mcp": {
+  "listed": 1349
+ },
+ "API_GATEWAY POST /prod/v1/chat/completions": {
+  "listed": 1349
+ }
+}

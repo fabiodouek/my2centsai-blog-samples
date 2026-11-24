@@ -55,11 +55,15 @@ Run the scripts in order. Each one prints what it did.
 
 `04_protect.py` takes more options: `--guardrails both|request|disable`, `--fail-closed`, `--no-scope-down`.
 
-My results from 2026-11-24 are in `results/`.
+My results from 2026-11-24 are in `results/`. `discovery-timeline-run1.json` is the first deployment (morning), `discovery-timeline.json` the second (afternoon).
 
 ## Things that tripped me up
 
 - `put-discovery-configuration` reported `ENABLED`, but every source stayed `STOPPED` until I called `start-discovery` with the configuration ARN (about twelve minutes later). `03_discovery.py enable` does this for you.
+- Enabling discovery from the API Gateway console behaves the same way: the configuration shows **Enabled** and both services **Stopped** until you press **Start discovery**.
+- When I deleted everything and enabled discovery again, the inventory immediately listed the routes of the deleted REST API (WAF status Disabled) next to the new ones. `03_discovery.py status` marks those rows `(old)`.
+- To view the AI Security settings in the console, use the new WAF console (protection packs). In the old console, **Edit rule** on this rule group failed with "An unspecified error occurred".
+- The `ReadOnlyAccess` managed policy had no `apiportal:*` actions yet, so a read-only console session cannot open the API inventory.
 - The rule group's `ManagedRuleGroupConfigs` block is mandatory. A web ACL that names the rule group without it is rejected.
 - A discovery configuration cannot be deleted while discovery is running. `teardown.py` stops it first. The inventory still listed my five routes after the configuration was gone; the docs say discovered APIs are removed about 30 days after discovery stops.
 - A new web ACL cannot be associated right away. The script retries for a few minutes.
