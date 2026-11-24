@@ -1,0 +1,62 @@
+[
+ {
+  "door": "REST API",
+  "kb": 1,
+  "status": 403,
+  "level": "high"
+ },
+ {
+  "door": "REST API",
+  "kb": 7,
+  "status": 403,
+  "level": "high"
+ },
+ {
+  "door": "REST API",
+  "kb": 12,
+  "status": 403,
+  "level": "high"
+ },
+ {
+  "door": "REST API",
+  "kb": 20,
+  "status": 200,
+  "level": "none"
+ },
+ {
+  "door": "REST API",
+  "kb": 70,
+  "status": 200,
+  "level": "none"
+ },
+ {
+  "door": "ALB",
+  "kb": 1,
+  "status": 403,
+  "level": "high"
+ },
+ {
+  "door": "ALB",
+  "kb": 7,
+  "status": 403,
+  "level": "high"
+ },
+ {
+  "door": "ALB",
+  "kb": 12,
+  "status": 200,
+  "level": "none"
+ },
+ {
+  "door": "ALB",
+  "kb": 20,
+  "status": 200,
+  "level": "none"
+ },
+ {
+  "door": "ALB",
+  "kb": 70,
+  "status": 200,
+  "level": "none"
+ }
+]

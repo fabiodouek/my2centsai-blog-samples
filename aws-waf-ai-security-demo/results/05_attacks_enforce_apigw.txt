@@ -1,0 +1,27 @@
+$ python 05_attacks.py --door apigw
+
+== Sent 20 requests (mode=enforce, guardrails=both). Reading the WAF logs ...
+
+== Front door: API Gateway REST API
+  case          HTTP  WAF log  labels                                      blocking rule
+  mcp-ok        200   ALLOW    mcp
+  mcp-list      200   ALLOW    mcp
+  mcp-mismatch  403   BLOCK    mcp mcp_method_mismatch                     Compliance_BaselineMCP
+  mcp-array     403   BLOCK    mcp mcp_non_object_root                     Compliance_BaselineMCP
+  mcp-version   403   BLOCK    mcp mcp_protocol_version_mismatch           Compliance_BaselineMCP
+  mcp-strict    200   ALLOW    mcp mcp_missing_name_header
+  mcp-inject    403   BLOCK    mcp prompt_attack=high                      Request_GuardrailsPromptAttackHighSeverity
+  mcp-old       200   ALLOW    not_recognized
+  mcp-nohdr     200   ALLOW    not_recognized
+  mcp-poison    403   ALLOW    mcp
+  mcp-pii       200   ALLOW    mcp
+  a2a-ok        200   ALLOW    a2a
+  a2a-role      403   BLOCK    a2a a2a_invalid_role                        Compliance_BaselineA2A
+  a2a-inject    403   BLOCK    a2a content_filter=high prompt_attack=high  Request_GuardrailsPromptAttackHighSeverity
+  a2a-poison    403   ALLOW    a2a
+  llm-ok        200   ALLOW    llm
+  llm-inject    403   BLOCK    llm content_filter=high prompt_attack=high  Request_GuardrailsPromptAttackHighSeverity
+  llm-violent   403   BLOCK    llm content_filter=high prompt_attack=high  Request_GuardrailsPromptAttackHighSeverity
+  llm-toolres   403   BLOCK    llm content_filter=high prompt_attack=high  Request_GuardrailsPromptAttackHighSeverity
+  llm-secret    200   ALLOW    llm
+  11 of 20 blocked

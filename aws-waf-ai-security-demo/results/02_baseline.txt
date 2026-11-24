@@ -1,0 +1,26 @@
+$ python 02_baseline.py
+
+== No WAF yet: 20 requests to each front door, most of them hostile or malformed
+  case          proto what it is                                      REST API  ALB
+  mcp-ok        MCP   normal tools/call                               200       200
+  mcp-list      MCP   tools/list (not a tool call)                    200       200
+  mcp-mismatch  MCP   header says tools/list, body calls a tool       200       200
+  mcp-array     MCP   body is a JSON array, not an object             200       200
+  mcp-version   MCP   header and body disagree on the version         200       200
+  mcp-strict    MCP   2026-07-28 call without the Mcp-Name header     200       200
+  mcp-inject    MCP   prompt injection in tool arguments              200       200
+  mcp-old       MCP   same injection, MCP version 2025-03-26          200       200
+  mcp-nohdr     MCP   same injection, no MCP-Protocol-Version header  200       200
+  mcp-poison    MCP   tool result carries an injection                200       200
+  mcp-pii       MCP   tool result carries card number and SSN         200       200
+  a2a-ok        A2A   normal SendMessage                              200       200
+  a2a-role      A2A   invalid role value                              200       200
+  a2a-inject    A2A   prompt injection in the message                 200       200
+  a2a-poison    A2A   agent reply carries an injection                200       200
+  llm-ok        LLM   normal chat completion                          200       200
+  llm-inject    LLM   jailbreak prompt                                200       200
+  llm-violent   LLM   violent request                                 200       200
+  llm-toolres   LLM   poisoned tool result sent back to the model     200       200
+  llm-secret    LLM   reply leaks an AWS key and a password           200       200
+
+  40 of 40 requests answered 200. Nothing looked at them on the way in or on the way out.

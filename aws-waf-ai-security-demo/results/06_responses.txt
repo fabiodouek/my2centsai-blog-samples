@@ -1,0 +1,21 @@
+$ python 06_responses.py
+
+== Four requests that look harmless, 3 times each. The problem is in the response.
+  case         what the backend returns                    REST API    ALB
+  mcp-poison   tool result carries an injection            403/403/403 403/403/403
+  mcp-pii      tool result carries card number and SSN     200/200/200 200/200/200
+  a2a-poison   agent reply carries an injection            403/403/403 403/403/403
+  llm-secret   reply leaks an AWS key and a password       200/200/200 200/200/200
+
+  waiting 4 minutes for CloudWatch ...
+
+== CloudWatch label metrics for responses, last 3 hours
+  web ACL             response label                                            metric            count
+  waf-ai-demo-alb     response:guardrails:prompt_attack:severity:high           AllowedResponses  6
+  waf-ai-demo-alb     response:guardrails:prompt_attack:severity:high           BlockedResponses  15
+  waf-ai-demo-alb     response:guardrails:sensitive_information:confidence:high AllowedResponses  22
+  waf-ai-demo-apigw   response:guardrails:prompt_attack:severity:high           AllowedResponses  6
+  waf-ai-demo-apigw   response:guardrails:prompt_attack:severity:high           BlockedResponses  17
+  waf-ai-demo-apigw   response:guardrails:sensitive_information:confidence:high AllowedResponses  22
+
+  sensitive information found in responses: aws_access_key, aws_secret_key, credit_debit_card_number, email, password, us_social_security_number

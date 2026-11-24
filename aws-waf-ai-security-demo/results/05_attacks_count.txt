@@ -1,0 +1,52 @@
+
+== Sent 40 requests (mode=count, guardrails=both). Reading the WAF logs ...
+
+== Front door: API Gateway REST API
+  case          HTTP  WAF log  labels                                      blocking rule
+  mcp-ok        200   ALLOW    mcp
+  mcp-list      200   ALLOW    mcp
+  mcp-mismatch  200   ALLOW    mcp mcp_method_mismatch
+  mcp-array     200   ALLOW    mcp mcp_non_object_root
+  mcp-version   200   ALLOW    mcp mcp_protocol_version_mismatch
+  mcp-strict    200   ALLOW    mcp mcp_missing_name_header
+  mcp-inject    200   ALLOW    mcp prompt_attack=high
+  mcp-old       200   ALLOW    not_recognized
+  mcp-nohdr     200   ALLOW    not_recognized
+  mcp-poison    200   ALLOW    mcp
+  mcp-pii       200   ALLOW    mcp
+  a2a-ok        200   ALLOW    a2a
+  a2a-role      200   ALLOW    a2a a2a_invalid_role
+  a2a-inject    200   ALLOW    a2a content_filter=high prompt_attack=high
+  a2a-poison    200   ALLOW    a2a
+  llm-ok        200   ALLOW    llm
+  llm-inject    200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-violent   200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-toolres   200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-secret    200   ALLOW    llm
+  0 of 20 blocked
+
+== Front door: Application Load Balancer
+  case          HTTP  WAF log  labels                                      blocking rule
+  mcp-ok        200   ALLOW    mcp
+  mcp-list      200   ALLOW    mcp
+  mcp-mismatch  200   ALLOW    mcp mcp_method_mismatch
+  mcp-array     200   ALLOW    mcp mcp_non_object_root
+  mcp-version   200   ALLOW    mcp mcp_protocol_version_mismatch
+  mcp-strict    200   ALLOW    mcp mcp_missing_name_header
+  mcp-inject    200   ALLOW    mcp prompt_attack=high
+  mcp-old       200   ALLOW    not_recognized
+  mcp-nohdr     200   ALLOW    not_recognized
+  mcp-poison    200   ALLOW    mcp
+  mcp-pii       200   ALLOW    mcp
+  a2a-ok        200   ALLOW    a2a
+  a2a-role      200   ALLOW    a2a a2a_invalid_role
+  a2a-inject    200   ALLOW    a2a content_filter=high prompt_attack=high
+  a2a-poison    200   ALLOW    a2a
+  llm-ok        200   ALLOW    llm
+  llm-inject    200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-violent   200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-toolres   200   ALLOW    llm content_filter=high prompt_attack=high
+  llm-secret    200   ALLOW    llm
+  0 of 20 blocked
+
+  saved results/count.json

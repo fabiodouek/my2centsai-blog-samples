@@ -1,0 +1,644 @@
+[
+ {
+  "case": "mcp-ok",
+  "proto": "MCP",
+  "what": "normal tools/call",
+  "expect": "allow",
+  "door": "apigw",
+  "status": 200,
+  "ms": 1001,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-ok",
+  "proto": "MCP",
+  "what": "normal tools/call",
+  "expect": "allow",
+  "door": "alb",
+  "status": 200,
+  "ms": 869,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-list",
+  "proto": "MCP",
+  "what": "tools/list (not a tool call)",
+  "expect": "allow, not assessed",
+  "door": "apigw",
+  "status": 200,
+  "ms": 327,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-list",
+  "proto": "MCP",
+  "what": "tools/list (not a tool call)",
+  "expect": "allow, not assessed",
+  "door": "alb",
+  "status": 200,
+  "ms": 224,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-mismatch",
+  "proto": "MCP",
+  "what": "header says tools/list, body calls a tool",
+  "expect": "block (Baseline)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 291,
+  "labels": [
+   "protocol_compliance_check:mcp_method_mismatch",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-mismatch",
+  "proto": "MCP",
+  "what": "header says tools/list, body calls a tool",
+  "expect": "block (Baseline)",
+  "door": "alb",
+  "status": 403,
+  "ms": 196,
+  "labels": [
+   "protocol_compliance_check:mcp_method_mismatch",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-array",
+  "proto": "MCP",
+  "what": "body is a JSON array, not an object",
+  "expect": "block (Baseline)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 302,
+  "labels": [
+   "protocol_compliance_check:mcp_non_object_root",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-array",
+  "proto": "MCP",
+  "what": "body is a JSON array, not an object",
+  "expect": "block (Baseline)",
+  "door": "alb",
+  "status": 403,
+  "ms": 197,
+  "labels": [
+   "protocol_compliance_check:mcp_non_object_root",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-version",
+  "proto": "MCP",
+  "what": "header and body disagree on the version",
+  "expect": "block (Baseline)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 299,
+  "labels": [
+   "protocol_compliance_check:mcp_protocol_version_mismatch",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-version",
+  "proto": "MCP",
+  "what": "header and body disagree on the version",
+  "expect": "block (Baseline)",
+  "door": "alb",
+  "status": 403,
+  "ms": 198,
+  "labels": [
+   "protocol_compliance_check:mcp_protocol_version_mismatch",
+   "protocol_compliance_level:baseline:mcp",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineMCP"
+ },
+ {
+  "case": "mcp-strict",
+  "proto": "MCP",
+  "what": "2026-07-28 call without the Mcp-Name header",
+  "expect": "count (Strict)",
+  "door": "apigw",
+  "status": 200,
+  "ms": 858,
+  "labels": [
+   "protocol_compliance_check:mcp_missing_name_header",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-strict",
+  "proto": "MCP",
+  "what": "2026-07-28 call without the Mcp-Name header",
+  "expect": "count (Strict)",
+  "door": "alb",
+  "status": 200,
+  "ms": 747,
+  "labels": [
+   "protocol_compliance_check:mcp_missing_name_header",
+   "protocol_compliance_level:strict:mcp",
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-inject",
+  "proto": "MCP",
+  "what": "prompt injection in tool arguments",
+  "expect": "block (prompt attack)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 619,
+  "labels": [
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "mcp-inject",
+  "proto": "MCP",
+  "what": "prompt injection in tool arguments",
+  "expect": "block (prompt attack)",
+  "door": "alb",
+  "status": 403,
+  "ms": 533,
+  "labels": [
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_mcp"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "mcp-old",
+  "proto": "MCP",
+  "what": "same injection, MCP version 2025-03-26",
+  "expect": "allow (not recognized)",
+  "door": "apigw",
+  "status": 200,
+  "ms": 316,
+  "labels": [
+   "traffic:not_recognized"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-old",
+  "proto": "MCP",
+  "what": "same injection, MCP version 2025-03-26",
+  "expect": "allow (not recognized)",
+  "door": "alb",
+  "status": 200,
+  "ms": 219,
+  "labels": [
+   "traffic:not_recognized"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-nohdr",
+  "proto": "MCP",
+  "what": "same injection, no MCP-Protocol-Version header",
+  "expect": "allow (not recognized)",
+  "door": "apigw",
+  "status": 200,
+  "ms": 318,
+  "labels": [
+   "traffic:not_recognized"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-nohdr",
+  "proto": "MCP",
+  "what": "same injection, no MCP-Protocol-Version header",
+  "expect": "allow (not recognized)",
+  "door": "alb",
+  "status": 200,
+  "ms": 214,
+  "labels": [
+   "traffic:not_recognized"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-poison",
+  "proto": "MCP",
+  "what": "tool result carries an injection",
+  "expect": "block in response phase",
+  "door": "apigw",
+  "status": 403,
+  "ms": 1050,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-poison",
+  "proto": "MCP",
+  "what": "tool result carries an injection",
+  "expect": "block in response phase",
+  "door": "alb",
+  "status": 403,
+  "ms": 751,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-pii",
+  "proto": "MCP",
+  "what": "tool result carries card number and SSN",
+  "expect": "count (sensitive info)",
+  "door": "apigw",
+  "status": 200,
+  "ms": 1055,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "mcp-pii",
+  "proto": "MCP",
+  "what": "tool result carries card number and SSN",
+  "expect": "count (sensitive info)",
+  "door": "alb",
+  "status": 200,
+  "ms": 966,
+  "labels": [
+   "traffic:recognized_mcp"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "a2a-ok",
+  "proto": "A2A",
+  "what": "normal SendMessage",
+  "expect": "allow",
+  "door": "apigw",
+  "status": 200,
+  "ms": 1063,
+  "labels": [
+   "traffic:recognized_a2a"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "a2a-ok",
+  "proto": "A2A",
+  "what": "normal SendMessage",
+  "expect": "allow",
+  "door": "alb",
+  "status": 200,
+  "ms": 1052,
+  "labels": [
+   "traffic:recognized_a2a"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "a2a-role",
+  "proto": "A2A",
+  "what": "invalid role value",
+  "expect": "block (Baseline)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 300,
+  "labels": [
+   "protocol_compliance_check:a2a_invalid_role",
+   "protocol_compliance_level:baseline:a2a",
+   "protocol_compliance_level:strict:a2a",
+   "traffic:recognized_a2a"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineA2A"
+ },
+ {
+  "case": "a2a-role",
+  "proto": "A2A",
+  "what": "invalid role value",
+  "expect": "block (Baseline)",
+  "door": "alb",
+  "status": 403,
+  "ms": 196,
+  "labels": [
+   "protocol_compliance_check:a2a_invalid_role",
+   "protocol_compliance_level:baseline:a2a",
+   "protocol_compliance_level:strict:a2a",
+   "traffic:recognized_a2a"
+  ],
+  "action": "BLOCK",
+  "rule": "Compliance_BaselineA2A"
+ },
+ {
+  "case": "a2a-inject",
+  "proto": "A2A",
+  "what": "prompt injection in the message",
+  "expect": "block (prompt attack)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 688,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_a2a"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "a2a-inject",
+  "proto": "A2A",
+  "what": "prompt injection in the message",
+  "expect": "block (prompt attack)",
+  "door": "alb",
+  "status": 403,
+  "ms": 767,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_a2a"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "a2a-poison",
+  "proto": "A2A",
+  "what": "agent reply carries an injection",
+  "expect": "block in response phase",
+  "door": "apigw",
+  "status": 403,
+  "ms": 994,
+  "labels": [
+   "traffic:recognized_a2a"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "a2a-poison",
+  "proto": "A2A",
+  "what": "agent reply carries an injection",
+  "expect": "block in response phase",
+  "door": "alb",
+  "status": 403,
+  "ms": 936,
+  "labels": [
+   "traffic:recognized_a2a"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "llm-ok",
+  "proto": "LLM",
+  "what": "normal chat completion",
+  "expect": "allow",
+  "door": "apigw",
+  "status": 200,
+  "ms": 805,
+  "labels": [
+   "traffic:recognized_llm"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "llm-ok",
+  "proto": "LLM",
+  "what": "normal chat completion",
+  "expect": "allow",
+  "door": "alb",
+  "status": 200,
+  "ms": 661,
+  "labels": [
+   "traffic:recognized_llm"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "llm-inject",
+  "proto": "LLM",
+  "what": "jailbreak prompt",
+  "expect": "block (prompt attack)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 600,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-inject",
+  "proto": "LLM",
+  "what": "jailbreak prompt",
+  "expect": "block (prompt attack)",
+  "door": "alb",
+  "status": 403,
+  "ms": 626,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-violent",
+  "proto": "LLM",
+  "what": "violent request",
+  "expect": "count (content filter)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 610,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:content_filter:violence:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-violent",
+  "proto": "LLM",
+  "what": "violent request",
+  "expect": "count (content filter)",
+  "door": "alb",
+  "status": 403,
+  "ms": 652,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:content_filter:violence:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-toolres",
+  "proto": "LLM",
+  "what": "poisoned tool result sent back to the model",
+  "expect": "block (prompt attack)",
+  "door": "apigw",
+  "status": 403,
+  "ms": 674,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-toolres",
+  "proto": "LLM",
+  "what": "poisoned tool result sent back to the model",
+  "expect": "block (prompt attack)",
+  "door": "alb",
+  "status": 403,
+  "ms": 593,
+  "labels": [
+   "guardrails:content_filter:misconduct:severity:high",
+   "guardrails:prompt_attack:jailbreak:severity:high",
+   "guardrails:prompt_attack:prompt_injection:severity:high",
+   "guardrails:prompt_attack:prompt_leakage:severity:high",
+   "request:guardrails:content_filter:severity:high",
+   "request:guardrails:prompt_attack:severity:high",
+   "traffic:recognized_llm"
+  ],
+  "action": "BLOCK",
+  "rule": "Request_GuardrailsPromptAttackHighSeverity"
+ },
+ {
+  "case": "llm-secret",
+  "proto": "LLM",
+  "what": "reply leaks an AWS key and a password",
+  "expect": "count (sensitive info)",
+  "door": "apigw",
+  "status": 200,
+  "ms": 740,
+  "labels": [
+   "traffic:recognized_llm"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ },
+ {
+  "case": "llm-secret",
+  "proto": "LLM",
+  "what": "reply leaks an AWS key and a password",
+  "expect": "count (sensitive info)",
+  "door": "alb",
+  "status": 200,
+  "ms": 717,
+  "labels": [
+   "traffic:recognized_llm"
+  ],
+  "action": "ALLOW",
+  "rule": ""
+ }
+]

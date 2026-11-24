@@ -1,0 +1,21 @@
+$ python 05_attacks.py --only mcp-inject,mcp-old,mcp-nohdr --show-block
+
+== Sent 6 requests (mode=enforce, guardrails=both). Reading the WAF logs ...
+
+== Front door: API Gateway REST API
+  case          HTTP  WAF log  labels                                      blocking rule
+  mcp-inject    403   BLOCK    mcp prompt_attack=high                      Request_GuardrailsPromptAttackHighSeverity
+  mcp-old       200   ALLOW    not_recognized
+  mcp-nohdr     200   ALLOW    not_recognized
+  1 of 3 blocked
+
+== Front door: Application Load Balancer
+  case          HTTP  WAF log  labels                                      blocking rule
+  mcp-inject    403   BLOCK    mcp prompt_attack=high                      Request_GuardrailsPromptAttackHighSeverity
+  mcp-old       200   ALLOW    not_recognized
+  mcp-nohdr     200   ALLOW    not_recognized
+  1 of 3 blocked
+
+== What a block looks like (mcp-inject on apigw)
+  HTTP 403
+  {"message":"Forbidden"}
