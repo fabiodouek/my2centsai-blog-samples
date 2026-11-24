@@ -42,7 +42,7 @@ Run the scripts in order. Each one prints what it did.
 | `01_deploy.py` | Lambdas, REST API, ALB. No WAF yet. `--code-only` re-uploads the Lambda code. |
 | `02_baseline.py` | Sends the request matrix (`cases.py`) to both front doors. Everything returns 200. |
 | `03_discovery.py enable` | Turns on API Portal discovery with AI discovery, and starts it. |
-| `03_discovery.py watch` | Sends client traffic and prints the inventory every 10 minutes until the endpoints carry MCP, A2A and LLM labels. `status` prints it once. |
+| `03_discovery.py watch` | Sends client traffic and prints the inventory every 10 minutes until the endpoints carry MCP, A2A and LLM labels. `status` prints it once. In my run the REST API routes were listed within 22 minutes, but no labels had appeared after 3.5 hours. |
 | `04_protect.py --mode count` | Creates the role, the log group and the web ACLs, with the four blocking rules overridden to Count. |
 | `05_attacks.py` | Sends the matrix through WAF and reads the labels from the WAF logs. |
 | `04_protect.py --mode enforce` | The rule group's default actions. Run `05_attacks.py --show-block` again. |
@@ -59,8 +59,9 @@ My results from 2026-11-24 are in `results/`.
 
 ## Things that tripped me up
 
-- `put-discovery-configuration` reported `ENABLED`, but every source stayed `STOPPED` for ten minutes until I called `start-discovery` with the configuration ARN. `03_discovery.py enable` does this for you.
+- `put-discovery-configuration` reported `ENABLED`, but every source stayed `STOPPED` until I called `start-discovery` with the configuration ARN (about twelve minutes later). `03_discovery.py enable` does this for you.
 - The rule group's `ManagedRuleGroupConfigs` block is mandatory. A web ACL that names the rule group without it is rejected.
+- A discovery configuration cannot be deleted while discovery is running. `teardown.py` stops it first. The inventory still listed my five routes after the configuration was gone; the docs say discovered APIs are removed about 30 days after discovery stops.
 - A new web ACL cannot be associated right away. The script retries for a few minutes.
 - WAF logs arrive in CloudWatch Logs with a delay of up to a couple of minutes, and response-phase labels are never in them. `06_responses.py` reads CloudWatch metrics instead.
 - A request to `/mcp` with no `MCP-Protocol-Version` header is "not recognized" and is not inspected at all. Your MCP server has to reject those itself.

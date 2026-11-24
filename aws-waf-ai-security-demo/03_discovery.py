@@ -37,7 +37,7 @@ def enable():
             break
         if i >= 3 and not started and st and all(s["status"] == "STOPPED" for s in st):
             # In my run the configuration said ENABLED but every source stayed STOPPED
-            # for ten minutes, until this call. The getting-started page does not mention it.
+            # for about twelve minutes, until this call. The enable page does not list it as a step.
             say("  still STOPPED: calling start-discovery with the configuration ARN")
             ap.start_discovery(id=arn)
             save_state(discovery_started=int(time.time()))

@@ -1,0 +1,9 @@
+$ python 03_discovery.py status
+
+== API inventory, 3h35m after discovery started: 5 APIs
+  source       method path                                class   WAF      workloads listed   labeled
+  API_GATEWAY  GET    /prod/.well-known/agent-card.json   SHADOW  ENABLED  -         +0h22m   -
+  API_GATEWAY  POST   /prod/a2a                           SHADOW  ENABLED  -         +0h22m   -
+  API_GATEWAY  POST   /prod/a2a/message:send              SHADOW  ENABLED  -         +0h22m   -
+  API_GATEWAY  POST   /prod/mcp                           SHADOW  ENABLED  -         +0h22m   -
+  API_GATEWAY  POST   /prod/v1/chat/completions           SHADOW  ENABLED  -         +0h22m   -

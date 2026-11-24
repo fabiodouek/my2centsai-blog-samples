@@ -1,7 +1,7 @@
 """Delete everything the demo created, then list what is left with the project tag.
 
 Order: WAF associations and web ACLs, the ALB and its target groups, the REST API,
-the Lambda functions, the IAM roles, the log groups, the API Portal discovery configuration.
+the Lambda functions, the IAM roles, the log groups, the API Portal discovery configuration (stopped first).
 
   python teardown.py              delete everything
   python teardown.py --keep-discovery   leave API Portal discovery on
@@ -91,13 +91,24 @@ def main():
     if "--keep-discovery" not in sys.argv:
         head("API Portal discovery")
         ap = client("apiportal")
-        quiet(ap.delete_discovery_configuration)
+        try:  # a running configuration cannot be deleted: stop it first
+            arn = ap.get_discovery_configuration()["discoveryConfiguration"]["arn"]
+            quiet(ap.stop_discovery, id=arn)
+            for _ in range(30):
+                if all(x["status"] == "STOPPED" for x in ap.list_discovery_statuses()["items"]):
+                    break
+                time.sleep(10)
+            ap.delete_discovery_configuration()
+            say("  stopped discovery and deleted the configuration")
+        except ClientError as e:
+            say(f"  nothing to delete ({e.response['Error']['Code']})")
         time.sleep(5)
         try:
             cfg = ap.get_discovery_configuration()["discoveryConfiguration"]
             say(f"  configuration still there: status {cfg['status']}")
         except ClientError as e:
             say(f"  discovery configuration gone ({e.response['Error']['Code']})")
+        quiet(iam.delete_service_linked_role, RoleName="AWSServiceRoleForAPIPortal")  # created when discovery was enabled
         st = ap.list_discovery_statuses()["items"]
         say("  statuses: " + (", ".join(f"{x['discoverySource']}={x['status']}" for x in st) or "none"))
 
