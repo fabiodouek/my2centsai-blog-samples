@@ -2,6 +2,8 @@
 
 Companion code for the my2cents.ai deep dive [AWS WAF AI Security: Hands-On with Shadow MCP Servers](https://www.my2cents.ai/deep-dive/aws-waf-ai-security/).
 
+Video walkthrough: https://youtu.be/teXK9cseqjU
+
 It deploys a small, deliberately sloppy estate of AI endpoints (an MCP server, an A2A agent and an OpenAI-style chat endpoint), lets API Gateway's **API Portal** discover them, puts the **AWS WAF AI Security** managed rule group in front, and then measures what the rule group catches, what it misses, what it adds in latency and what it costs.
 
 All data is fake. There is no model behind the chat endpoint: its replies are canned so every run is repeatable.
