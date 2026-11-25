@@ -1,0 +1,4 @@
+.state.json
+.venv/
+__pycache__/
+results/*.raw.json

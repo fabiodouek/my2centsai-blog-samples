@@ -1,0 +1,32 @@
+{
+ "rb9v1c33i1.execute-api.us-east-1.amazonaws.com API_GATEWAY GET /prod/.well-known/agent-card.json": {
+  "listed": 34
+ },
+ "rb9v1c33i1.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/a2a": {
+  "listed": 34
+ },
+ "rb9v1c33i1.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/a2a/message:send": {
+  "listed": 34
+ },
+ "rb9v1c33i1.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/mcp": {
+  "listed": 34
+ },
+ "rb9v1c33i1.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/v1/chat/completions": {
+  "listed": 34
+ },
+ "akzylhqy03.execute-api.us-east-1.amazonaws.com API_GATEWAY GET /prod/.well-known/agent-card.json": {
+  "listed": 1896
+ },
+ "akzylhqy03.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/a2a": {
+  "listed": 1896
+ },
+ "akzylhqy03.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/a2a/message:send": {
+  "listed": 1896
+ },
+ "akzylhqy03.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/mcp": {
+  "listed": 1896
+ },
+ "akzylhqy03.execute-api.us-east-1.amazonaws.com API_GATEWAY POST /prod/v1/chat/completions": {
+  "listed": 1896
+ }
+}

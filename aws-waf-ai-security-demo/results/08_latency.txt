@@ -1,0 +1,46 @@
+
+== Configuration: no WAF
+  REST API MCP tools/call   n=100  p50  110 ms   p95  116 ms
+  REST API MCP tools/list   n=100  p50  111 ms   p95  116 ms
+  REST API LLM chat         n=100  p50  109 ms   p95  117 ms
+  ALB      MCP tools/call   n=100  p50  107 ms   p95  113 ms
+  ALB      MCP tools/list   n=100  p50  107 ms   p95  114 ms
+  ALB      LLM chat         n=100  p50  106 ms   p95  116 ms
+
+== Configuration: WAF, Bedrock off
+  REST API MCP tools/call   n=100  p50  126 ms   p95  144 ms
+  REST API MCP tools/list   n=100  p50  126 ms   p95  156 ms
+  REST API LLM chat         n=100  p50  125 ms   p95  140 ms
+  ALB      MCP tools/call   n=100  p50  108 ms   p95  116 ms
+  ALB      MCP tools/list   n=100  p50  107 ms   p95  114 ms
+  ALB      LLM chat         n=100  p50  106 ms   p95  113 ms
+
+== Configuration: request checks
+  REST API MCP tools/call   n=100  p50  482 ms   p95  592 ms
+  REST API MCP tools/list   n=100  p50  127 ms   p95  175 ms
+  REST API LLM chat         n=100  p50  516 ms   p95  616 ms
+  ALB      MCP tools/call   n=100  p50  369 ms   p95  468 ms
+  ALB      MCP tools/list   n=100  p50  111 ms   p95  117 ms
+  ALB      LLM chat         n=100  p50  420 ms   p95  515 ms
+
+== Configuration: request + response
+  REST API MCP tools/call   n=100  p50  785 ms   p95 1010 ms
+  REST API MCP tools/list   n=100  p50  126 ms   p95  134 ms
+  REST API LLM chat         n=100  p50  637 ms   p95  870 ms
+  ALB      MCP tools/call   n=100  p50  635 ms   p95  782 ms
+  ALB      MCP tools/list   n=100  p50  111 ms   p95  120 ms
+  ALB      LLM chat         n=100  p50  489 ms   p95  670 ms
+
+== Median latency in ms (p95 in brackets), 100 sequential requests per cell
+
+  REST API          no WAF                WAF, Bedrock off      request checks        request + response
+  MCP tools/call    110 (116)             126 (144)             482 (592)             785 (1010)
+  MCP tools/list    111 (116)             126 (156)             127 (175)             126 (134)
+  LLM chat          109 (117)             125 (140)             516 (616)             637 (870)
+
+  ALB               no WAF                WAF, Bedrock off      request checks        request + response
+  MCP tools/call    107 (113)             108 (116)             369 (468)             635 (782)
+  MCP tools/list    107 (114)             107 (114)             111 (117)             111 (120)
+  LLM chat          106 (116)             106 (113)             420 (515)             489 (670)
+
+  saved results/latency.json

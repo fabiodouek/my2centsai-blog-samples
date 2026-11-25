@@ -1,0 +1,242 @@
+[
+ {
+  "config": "no WAF",
+  "door": "REST API",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 110,
+  "p95": 116,
+  "mean": 120
+ },
+ {
+  "config": "no WAF",
+  "door": "REST API",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 111,
+  "p95": 116,
+  "mean": 111
+ },
+ {
+  "config": "no WAF",
+  "door": "REST API",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 109,
+  "p95": 117,
+  "mean": 111
+ },
+ {
+  "config": "no WAF",
+  "door": "ALB",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 107,
+  "p95": 113,
+  "mean": 107
+ },
+ {
+  "config": "no WAF",
+  "door": "ALB",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 107,
+  "p95": 114,
+  "mean": 107
+ },
+ {
+  "config": "no WAF",
+  "door": "ALB",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 106,
+  "p95": 116,
+  "mean": 108
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "REST API",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 126,
+  "p95": 144,
+  "mean": 130
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "REST API",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 126,
+  "p95": 156,
+  "mean": 131
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "REST API",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 125,
+  "p95": 140,
+  "mean": 129
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "ALB",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 108,
+  "p95": 116,
+  "mean": 109
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "ALB",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 107,
+  "p95": 114,
+  "mean": 107
+ },
+ {
+  "config": "WAF, Bedrock off",
+  "door": "ALB",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 106,
+  "p95": 113,
+  "mean": 107
+ },
+ {
+  "config": "request checks",
+  "door": "REST API",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 482,
+  "p95": 592,
+  "mean": 484
+ },
+ {
+  "config": "request checks",
+  "door": "REST API",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 127,
+  "p95": 175,
+  "mean": 131
+ },
+ {
+  "config": "request checks",
+  "door": "REST API",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 516,
+  "p95": 616,
+  "mean": 522
+ },
+ {
+  "config": "request checks",
+  "door": "ALB",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 369,
+  "p95": 468,
+  "mean": 385
+ },
+ {
+  "config": "request checks",
+  "door": "ALB",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 111,
+  "p95": 117,
+  "mean": 111
+ },
+ {
+  "config": "request checks",
+  "door": "ALB",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 420,
+  "p95": 515,
+  "mean": 433
+ },
+ {
+  "config": "request + response",
+  "door": "REST API",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 785,
+  "p95": 1010,
+  "mean": 784
+ },
+ {
+  "config": "request + response",
+  "door": "REST API",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 126,
+  "p95": 134,
+  "mean": 128
+ },
+ {
+  "config": "request + response",
+  "door": "REST API",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 637,
+  "p95": 870,
+  "mean": 661
+ },
+ {
+  "config": "request + response",
+  "door": "ALB",
+  "kind": "MCP tools/call",
+  "n": 100,
+  "not_200": 0,
+  "p50": 635,
+  "p95": 782,
+  "mean": 645
+ },
+ {
+  "config": "request + response",
+  "door": "ALB",
+  "kind": "MCP tools/list",
+  "n": 100,
+  "not_200": 0,
+  "p50": 111,
+  "p95": 120,
+  "mean": 113
+ },
+ {
+  "config": "request + response",
+  "door": "ALB",
+  "kind": "LLM chat",
+  "n": 100,
+  "not_200": 0,
+  "p50": 489,
+  "p95": 670,
+  "mean": 515
+ }
+]

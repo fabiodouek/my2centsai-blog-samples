@@ -1,0 +1,24 @@
+$ python 10_cost.py
+
+== InvokeGuardrailChecks: text units billed per check, by message size
+  characters  contentFilter   promptAttack   sensitiveInformation  call time (median of 5)
+  100         1               1              1                     364 ms
+  1000        1               1              1                     387 ms
+  2000        2               2              2                     387 ms
+  8000        8               8              8                     498 ms
+
+== Cost of one million messages (USD): Amazon Bedrock checks, and the AWS WAF fee
+  message kind                100 chars     1000 chars    2000 chars    8000 chars
+  MCP tools/call, request     $80           $80           $160          $640
+  MCP tools/call, response    $180          $180          $360          $1,440
+  LLM chat, request           $150          $150          $300          $1,200
+  LLM chat, response          $100          $100          $200          $800
+  AWS WAF fee (any size)      $5.60 per 1M requests, charged once per request
+
+== Example: 1M MCP tool calls, 2000 characters each way, request and response checked
+  Amazon Bedrock checks   $520
+  AWS WAF                 $5.60
+  For comparison, ApplyGuardrail in your own code (content filter with prompt attack on both sides,
+  sensitive information on the response): $800
+
+  saved results/cost.json

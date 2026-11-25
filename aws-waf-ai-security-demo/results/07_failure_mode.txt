@@ -1,0 +1,45 @@
+$ python 07_failure_mode.py
+
+== IAM role for Bedrock
+  policy now allows bedrock:ApplyGuardrail only (the wrong action)
+  waiting for AWS WAF to notice (it keeps the role's session for a while) ...
+  Bedrock calls started failing 61s after the policy change
+
+== Default actions, broken role: does the jailbreak get through?
+  case        what it is                            HTTP  rule / labels
+  mcp-ok      normal tools/call                     200    guardrails:call_failed guardrails:call_failed:access_denied
+  mcp-list    tools/list (not a tool call)          200
+  mcp-inject  prompt injection in tool arguments    200    guardrails:call_failed guardrails:call_failed:access_denied
+  llm-ok      normal chat completion                200    guardrails:call_failed guardrails:call_failed:access_denied
+  llm-inject  jailbreak prompt                      200    guardrails:call_failed guardrails:call_failed:access_denied
+
+== AWS WAF AI Security: mode=enforce  guardrails=both  fail_closed=True  scope_down=True
+  web acl  waf-ai-demo-apigw  updated
+  web acl  waf-ai-demo-alb  updated
+  blocking rules: Compliance_BaselineMCP, Compliance_BaselineA2A, Request_GuardrailsPromptAttackHighSeverity, Response_GuardrailsPromptAttackHighSeverity
+  Guardrails_CallFailed: Block
+  waiting 60s for the change to propagate ...
+
+== Guardrails_CallFailed overridden to Block, broken role
+  case        what it is                            HTTP  rule / labels
+  mcp-ok      normal tools/call                     403   Guardrails_CallFailed guardrails:call_failed guardrails:call_failed:access_denied
+  mcp-list    tools/list (not a tool call)          200
+  mcp-inject  prompt injection in tool arguments    403   Guardrails_CallFailed guardrails:call_failed guardrails:call_failed:access_denied
+  llm-ok      normal chat completion                403   Guardrails_CallFailed guardrails:call_failed guardrails:call_failed:access_denied
+  llm-inject  jailbreak prompt                      403   Guardrails_CallFailed guardrails:call_failed guardrails:call_failed:access_denied
+
+== IAM role for Bedrock
+  policy allows bedrock:InvokeGuardrailChecks again
+
+== AWS WAF AI Security: mode=enforce  guardrails=both  fail_closed=False  scope_down=True
+  web acl  waf-ai-demo-apigw  updated
+  web acl  waf-ai-demo-alb  updated
+  blocking rules: Compliance_BaselineMCP, Compliance_BaselineA2A, Request_GuardrailsPromptAttackHighSeverity, Response_GuardrailsPromptAttackHighSeverity
+
+== Role fixed, default actions again
+  case        what it is                            HTTP  rule / labels
+  mcp-ok      normal tools/call                     200
+  mcp-list    tools/list (not a tool call)          200
+  mcp-inject  prompt injection in tool arguments    403   Request_GuardrailsPromptAttackHighSeverity request:guardrails:prompt_attack:severity:high
+  llm-ok      normal chat completion                200
+  llm-inject  jailbreak prompt                      403   Request_GuardrailsPromptAttackHighSeverity request:guardrails:content_filter:severity:high request:guardrails:prompt_attack:severity:high

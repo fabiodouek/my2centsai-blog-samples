@@ -1,0 +1,43 @@
+{
+ "text_units": {
+  "100": {
+   "contentFilter": 1,
+   "promptAttack": 1,
+   "sensitiveInformation": 1
+  },
+  "1000": {
+   "contentFilter": 1,
+   "promptAttack": 1,
+   "sensitiveInformation": 1
+  },
+  "2000": {
+   "contentFilter": 2,
+   "promptAttack": 2,
+   "sensitiveInformation": 2
+  },
+  "8000": {
+   "contentFilter": 8,
+   "promptAttack": 8,
+   "sensitiveInformation": 8
+  }
+ },
+ "bedrock_usd_per_1m": {
+  "MCP tools/call, request|100": 80.0,
+  "MCP tools/call, request|1000": 80.0,
+  "MCP tools/call, request|2000": 160.0,
+  "MCP tools/call, request|8000": 640.0,
+  "MCP tools/call, response|100": 180.0,
+  "MCP tools/call, response|1000": 180.0,
+  "MCP tools/call, response|2000": 360.0,
+  "MCP tools/call, response|8000": 1440.0,
+  "LLM chat, request|100": 150.0,
+  "LLM chat, request|1000": 150.0,
+  "LLM chat, request|2000": 300.0,
+  "LLM chat, request|8000": 1200.0,
+  "LLM chat, response|100": 100.0,
+  "LLM chat, response|1000": 100.0,
+  "LLM chat, response|2000": 200.0,
+  "LLM chat, response|8000": 800.0
+ },
+ "waf_usd_per_1m": 5.6
+}
