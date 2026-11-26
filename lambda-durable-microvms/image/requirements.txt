@@ -1,0 +1,4 @@
+# The worker is an alpha pre-release, so it is pinned exactly.
+aws-durable-execution-sdk-python-compute-worker==0.0.1a1
+boto3==1.44.12
+pytest==9.2.0

@@ -1,0 +1,13 @@
+[project]
+name = "lambda-durable-microvms"
+version = "0.1.0"
+description = "Companion code for the my2cents.ai deep dive on Lambda durable functions orchestrating Lambda MicroVMs"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3==1.44.12",
+    "python-dotenv>=1.0",
+    "pip>=24",
+]
+
+[tool.setuptools]
+py-modules = ["common"]
