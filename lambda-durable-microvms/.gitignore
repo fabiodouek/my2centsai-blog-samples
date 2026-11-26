@@ -1,0 +1,8 @@
+results/
+logs/
+build/
+.env
+infra/.terraform/
+infra/terraform.tfstate*
+infra/.terraform.lock.hcl
+results-dev/

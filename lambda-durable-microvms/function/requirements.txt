@@ -1,0 +1,4 @@
+# The MicroVM extension is an alpha pre-release, so everything is pinned exactly.
+aws-durable-execution-sdk-python==3.1.0
+aws-durable-execution-sdk-python-extensions==0.1.0a1
+boto3==1.44.12
