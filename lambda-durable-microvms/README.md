@@ -14,6 +14,8 @@ One Python durable function that launches [Lambda MicroVMs](https://docs.aws.ama
 
 Companion code for [Lambda Durable Functions + MicroVMs: Hands-On with the Developer Preview](https://my2cents.ai/deep-dive/lambda-durable-microvms).
 
+Video walkthrough: https://youtu.be/w9ZFenhMe7k
+
 > **Developer preview.** The extension packages are alpha releases (`aws-durable-execution-sdk-python-extensions` 0.1.0a1, `aws-durable-execution-sdk-python-compute-worker` 0.0.1a1). AWS says not to use them for production, and their APIs can change in any release. Everything here is pinned to the versions I tested on 2026-11-26.
 
 ## How it works
